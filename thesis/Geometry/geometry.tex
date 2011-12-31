@@ -1,0 +1,807 @@
+\section{Introduction}
+
+The need for coarse geometry - make sure not to repeat introduction chapter.
+
+\section{Indoor Manhattan Environments}
+
+In this section we introduce the notion of indoor Manhattan
+environments. 
+
+A reconstruction $\Reconstruction$ consists of a set of polygons
+$\Poly_i$ with vertices $\vertex_j$ specified in 3--dimensional
+Euclidean coordinates,
+\begin{equation}
+  \vertex_j = (x_j, y_j, z_j)
+\end{equation}
+
+An \textit{indoor Manhattan reconstruction} is a reconstruction
+$\Reconstruction$ with the following properties.
+\begin{enumerate}
+\item{\textit{Each polygon is oriented in one of three mutually
+    orthogonal directions}. Formally, for each pair of polygons
+  $\Poly_i,\Poly_j \in \Reconstruction$ with unit--length normals
+  $\normal_i,\normal_j$,
+  \begin{equation}
+    \normal_i \cdot \normal_j \in \{0,1\}
+  \end{equation}
+}
+\item{\textit{There is a floor plane and a ceiling plane}. Formally,
+  there exists some direction $vertnormal$ and a pair of real
+  numbers $\zfloor, \zceil$ such that each polygon
+  $P\in\Reconstruction$ with normal $\normal=\vertnormal$ has
+  vertices $\vertex$ satisfying
+  \begin{equation}
+    \vertex \cdot \vertnormal \in \{\zfloor, \zceil\}
+  \end{equation}
+}
+\item{\textit{Vertical walls extend from floor to ceiling}. Formally, if
+  $\normal_i \neq \vertnormal$ then we say that $\Poly_i \in
+  \Reconstruction$ is a \textit{vertical} polygon. Then this
+  condition is satisfied if and only if each vertex $\vertex$ of
+  each vertical polygon satisfies
+  \begin{equation}
+    \vertex \cdot \vertnormal \in \{\zfloor, \zceil\}
+  \end{equation}
+}
+\item{\textit{Walls extend from floor to ceiling}. Formally, if
+  $\vertex\in\Poly$ and $\vertex\cdot\vertnormal=\zfloor$, then
+  $\exists\othervertex\in\Poly$ such that
+  \begin{equation}
+    \othervertex \cdot \vertnormal = \zceil
+  \end{equation}
+  and
+  \begin{equation}
+    \othervertex = \vertex + \ScaleParam \vertnormal
+  \end{equation}
+  for some $\ScaleParam \in \Reals$.
+}
+\end{enumerate}
+
+We assume a pinhole camera mapping homogeneous world coordinates
+$\vect{X}\in\Rfour$ to homogeneous image coordinates $\vect{x}\in\Rthree$
+according to
+\begin{equation}
+  \vect{x} = 
+  \CamMatrix \begin{bmatrix} \CamR & \vect{t} \end{bmatrix} \vect{X} ~,
+\end{equation}
+where $\CamMatrix$ is a $3 \times 3$ homography, $\CamR$ is a
+3--dimensional rotation matrix, and $\vect{t}$ is a 3--dimensional
+translation.
+
+We further define an indoor Manhattan \textit{scene} as a
+reconstruction together with a camera viewpoint, subject to the
+following additional constraints.
+\begin{enumerate}
+  \item{The camera viewpoint $\vect{c}$ is located between the floor
+    and ceiling planes,
+    \begin{equation}
+      \zfloor < \vect{c} \cdot \vertnormal < \zceil
+    \end{equation}
+  }
+  \item{The reconstruction is closed relative to the camera
+    viewpoint. Formally, for each viewing direction $\vect{x}$ there
+    is some polygon $\Poly\in\Reconstruction$ containing a point
+    $\vect{X}$ that projects to $\vect{x}$.
+  }
+\end{enumerate}
+
+In general we will assume that scenes consist only of those polygons
+visible to the camera. Since reconstructions consists of a finite
+number of polygons and our camera model is linear, it can be shown
+that an indoor Manhattan reconstruction truncated to a view
+frustrutrum remains an indoor Manhattan reconstruction as defined
+above. [ XXX not true if view frustrum clips walls so no longer meet
+  floor or ceiling ]
+
+\section{Floorplans}
+
+The polygonal representation for indoor Manhattan environments is
+inconvenient for our purposes. A more useful representation is a
+\textit{floorplan}, in which walls are represented as line--segments
+in the $XY$ plane.
+
+Formally, we define a $\Floorplan$ as a tuple
+$(\SceneR,\Zs,\Polyline)$, where
+\begin{itemize}
+  \item{$\SceneR$ is a 3--dimensional rotation matrix;}
+  \item{$\Zs=(\zfloor,\zceil)$ is a pair of scalars defining the floor
+    and ceiling planes,
+    \begin{eqnarray}
+      \Pfloor &=& \{ \vect{x} ~|~ \vect{x} \cdot [0~0~1]^T = \zfloor \}\\
+      \Pceil  &=& \{ \vect{x} ~|~ \vect{x} \cdot [0~0~1]^T = \zceil \} ~;
+    \end{eqnarray}
+  }
+  \item{$\Polyline=\{(\startpt_i,\enpt_i)\}_{i=0}^M$, is a set of line
+    segments defining walls, $\startpt_i,\enpt_i \in \Rtwo$.}
+\end{itemize}
+
+A floorplan $\Floorplan$ is converted to a reconstruction as
+follows. First, trace each line segment in the floor plane. Next,
+extrude those line segments vertically to meet the ceiling plane,
+resulting in a set of vertical planes. Now add polygons for the floor
+and ceiling planes, which may simply be sufficiently large
+quads. Finally, apply the coordinate transform $\SceneR$. Formally,
+\begin{eqnarray}
+  \Reconstruction &=& 
+  \{ ( \vect{p}_i, \vect{q}_i, \vect{r}_i, \vect{s}_i ) \} \\
+  \vect{p}_i &=& \SceneR \begin{bmatrix} \startpt_i \\ \zfloor \end{bmatrix} \\
+  \vect{q}_i &=& \SceneR \begin{bmatrix} \enpt_i \\ \zfloor \end{bmatrix} \\
+  \vect{r}_i &=& \SceneR \begin{bmatrix} \enpt_i \\ \zceil \end{bmatrix} \\
+  \vect{s}_i &=& \SceneR \begin{bmatrix} \startpt_i \\ \zceil \end{bmatrix}
+\end{eqnarray}
+
+For the remainder of this chapter we use the term ``corner'' to refer
+to a point at which two line segments in the floorplan meet. In 3D, a
+corner is therefore a vertical seam at which two walls meet. This
+contrasts with the usual computer vision terminology in which a corner
+is a point in an image.
+
+\subsection{Images of Floorplans}
+
+In this section we discuss some geometric properties of floorplans
+projected into images. 
+
+Let $\Image$ be the image formed by camera
+$\Camera=(\CamMatrix,\CamR,\CamTr)$ viewing floorplan
+$\Floorplan$. Let $\Image(x,y)$ be the index of the wall that projects
+to the location $(x,y)$ in the image plane, or 0 if no wall plane
+projects to $(x,y)$. In the latter case it must be that a point on the
+floor or ceiling plane projects to $(x,y)$ due to our assumption of a
+closed environment.
+
+In homogeneous image coordinates, the vanishing points associated with
+the three Manhattan orientations are given by
+\begin{equation}
+  \vpt_i = \CamMatrix \CamR \SceneR \vect{e_i}
+\end{equation}
+where $e_i \in \Rthree$ has i\th coordinate equal to $1$ and zeros
+elsewhere. Indoor Manhattan environments distinguish a unique
+``vertical'' direction. To capture the semantic distinction of this
+direction from the other two cardinal orientations we label $\vvpt =
+\vpt_3$.
+
+The remainder of this thesis will be simplified considerably if we can
+assume that vertical lines in the world appear vertical in image
+coordinates. To that end, we define the following homography:
+\begin{equation}
+  \label{eq:rectifier}
+  \Rectifier =
+  \begin{pmatrix}
+    \vvpt \times \ez \\
+    \vvpt \\
+    \vvpt \times \ez \times \vvpt
+  \end{pmatrix} ~.
+\end{equation}
+Let $\Image'$ be the image formed by applying the homography $\Rectifier$ as a
+coordinate transform to $\Image$,
+\begin{equation}
+  \label{eq:rectification}
+  \Image'(\vect{x}) = \Image(\Rectifier \vect{x})
+\end{equation}
+where we are implicitly working in homogeneous coordinates. We say
+that $\Image'$ is \textit{vertically rectified}.
+
+TODO: prove that $\Rectifier$ is the right rectification.
+%Due to the presence of $\ez$ in first row of \eqnref{rectifier}
+%it is always the case that $H_{13} = 0$. Hence the $x$--cordinate of
+%the projection of 3D points $\vect{X}$ is independent of their
+%$z$--coordinate. This corresponds to the condition that vertical lines
+%appear vertical in images, as originally desired.
+
+In practice the image $\Image$ is not a continuous signal but is
+sampled at discrete pixel locations; as a result the transformation
+$\Rectifier$ will result in a a non--uniformly sampled image
+plane. Worse, if the vertical vanishing point $\vvpt$ is within the
+original image boundary, then the transformation $\Rectifier$ will
+introduce a singularity at which a finite region in the input image is
+mapped to an infinite region in the output image.
+
+Thankfully, the validity of the algorithms presented in the remainder
+of this thesis do not actually depend on performing the rectification
+\eqnref{rectification} --- we could perform all calculations assuming
+a non--rectified image, in which case ``image columns'' would be
+replaced by ``rays cast from the vertical vanishing point'' and
+``paths from left to right through the image'' would be replaced by
+``paths normal to rays cast from the vertical vanishing
+point''. However, it will simplify the remainder of this thesis
+considerably if we assume the rectification \eqnref{rectification} so
+without loss of generality we assume throughout the remainder of this
+thesis that the vertical vanishing point falls outside the image
+bounds and that images have been rectified.
+
+TODO:
+Homogeneous scene: Tuple (rotation, homology [one param], floorplan [polyline])
+Metric scene: Tuple: (rotation, homology, scale, floorplan [polyline])
+
+TODO: Talk about the fact that we'll assume R and Z known.
+
+\section{Parametrisation}
+
+In this section we turn to the scene parametrisation that we will use
+during learning and inference in future chapters. We choose a
+parametrisation in image coordinates because this will simplify the
+algorithms to be presented later in this thesis.
+
+We present the parametrisation in the image domain first, then show
+that it uniquely specifies a 3D scene.
+
+
+TODO: prove this?
+
+\subsection{Parametrising rotations}
+
+We parametrise the rotation of the camera with respect to the
+Manhattan--aligned world coordinate frame as a vector in the Lie
+algebra SO(3). XXX More on this in the next chapter.
+
+\subsection{Parametrising the floor and ceiling location}
+
+In the preceeding sections we implicitly parametrised the floor and
+ceiling planes with a pair of scalars $\zfloor,\zceil\in\Reals$. In
+this section we switch to a different parametrisation
+$(\HomParam,\ScaleParam)$ where $\HomParam\in\Reals$ parametrises a
+Homology relating the image of points on the floor plane to the image
+of corresponding points on the ceiling plane, and $\ScaleParam$
+resolves scale. The advantage of this representation is that
+$\HomParam$ can be estimated from a single image and is sufficient to
+perform inference in single image context. If only one image is
+available then we may therefore ignore $\ScaleParam$ and the remainder
+of the algorithms in this thesis go through without modification.
+
+Intuitively, one can think of $\HomParam$ as a scale--invariant
+representation of the relationship between the floor and ceiling
+planes in the image domain, and $\ScaleParam$ as the parameter that
+resolves that scale ambiguity. In the single view setting we simply
+avoid resolving scale.
+
+To define $\HomParam$ we first need to introduce the \textit{Manhattan
+  correspondence}. For the purpose of this section we will say that
+two image points $\FloorPt$ and $\CeilPt$ correspond if and only if
+the difference between their back--projections onto the floor and
+ceiling plane respectively is parallel to the $z$ axis, as illustrated
+in \figref{homology}. Formally, $\FloorPt$ and $\CeilPt$ are in
+correspondence if and only if there exists $\FloorVec,\CeilVec \in
+\Rthree$ with
+\begin{eqnarray}
+  \FloorPt &=& \CamMatrix (\CamR \FloorVec + \CamTr) \\
+  \CeilPt &=& \CamMatrix (\CamR \CeilVec + \CamTr) \\
+  \CeilVec &=& \FloorVec + r \ez ~~~~ r \in \Reals
+\end{eqnarray}
+
+\begin{figure}[tb]
+  \label{fig:homology}
+  \centering
+  \includegraphics[width=0.4\textwidth]{manhattan_homology}
+  \caption{The mapping $\Hcf$ transfers points between the ceiling
+    and floor.}
+  \hrule
+\end{figure}
+
+Since the floor and ceiling planes are parallel, there is a planar
+homology $\Hcf$ such that
+\begin{equation}
+  \FloorPt = \Hcf \CeilPt
+\end{equation}
+if and only if $\pfloor$ and and $\pceil$ are in correspondence
+\cite{Criminisi01}. Further, $\Hcf$ is given by \cite{Criminisi01}
+\begin{eqnarray}
+  \label{eq:manhattanhom}
+  \Hcf &=& I + \HomParam\frac{\vvpt\horizon^T}{\vvpt \cdot \horizon}\\
+  \horizon &=& \CamMatrix\CamR\ex \cross \CamMatrix\CamR\ey
+\end{eqnarray}
+where $\horizon = \CamProj{\ex} \cross \CamProj{\ey}$ is
+the horizon line. Equation \eqnref{manhattanhom} defines a homology
+relating the projections of a pair of parallel planes
+\cite{Criminisi01}. Given any corresponding pair $(\FloorPt,\CeilPt)$,
+$\HomParam$ is given by \cite{Criminisi01}
+\begin{equation}
+  \HomParam = 
+  \langle\vvpt,\CeilPt,\FloorPt,(\CeilPt\times\FloorPt)\times\horizon\rangle ~,
+\end{equation}
+where
+\begin{equation}
+  \langle \vect{a},\vect{b},\vect{c},\vect{d} \rangle = \frac{
+    (\vect{a}-\vect{c}) \cdot (\vect{b}-\vect{d})
+  }{
+    (\vect{b}-\vect{c}) \cdot (\vect{a}-\vect{d})
+  }
+\end{equation}
+is called the characteristic cross ratio of $\Hcf$.
+
+Note that $\HomParam$ is invariant to the camera intrinsics. To see
+this, consider transforming the image by some homography $M$. In the
+transformed image the horizon is givey by
+$\horizon'=|M|M^{-T}\horizon$, the vertical vanishing point is
+$\vvpt'=M\vvpt$, and the Manhattan homology is
+\begin{equation}
+  \label{eq:homprime}
+  \Hcf' = I + \HomParam'\frac{\vvpt'\horizon'^T}{\vvpt'\cdot\horizon'}~.
+\end{equation}
+We also have that
+\begin{eqnarray}
+  \Hcf' &=& M \Hcf M^{-1} \\
+  &=& M (I + \HomParam\frac{\vvpt\horizon^T}{\vvpt \cdot
+    \horizon})M^{-1} ~.\\
+\end{eqnarray}
+Substituting $\horizon=\frac{1}{|M|}M^T\horizon'$ and
+$\vvpt=M^{-1}\vvpt'$ gives
+\begin{eqnarray}
+  \Hcf' &=& I + \HomParam
+    \frac{M(M^{-1}\vvpt')(\frac{1}{|M|}M^T\horizon')^T M^{-1}}
+         {(M^{-1}\vvpt')^T(\frac{1}{|M|}M^T\horizon')}\\
+  \label{eq:comparehom}
+  &=& I + \HomParam\frac{\vvpt'\horizon'^T}
+                        {\vvpt'\cdot\horizon'} ~.
+\end{eqnarray}
+Comparing \eqnref{comparehom} and \eqnref{homprime} shows that
+$\HomParam'=\HomParam$. We therefore assume without loss of generality
+that $\CamMatrix=I$ for the remainder of this section.
+
+Next we show how to compute $\HomParam$ from $\zfloor,\zceil$. Let
+\begin{eqnarray}
+  \efloor = \zfloor ~ \ez \\
+  \eceil = \zceil ~ \ez \\
+  \pfloor = \RetProj{\efloor} \\
+  \pceil = \RetProj{\eceil}
+\end{eqnarray}
+Then
+\begin{eqnarray}
+  (\pceil \cross \pfloor) \cross \horizon &=&
+    \bigl((\RetProj{\efloor}) \cross (\RetProj{\eceil}\bigr))
+    \cross
+    \bigl(\CamR\ex \cross
+          \CamR\ey \bigr)\\
+  &=& \bigl( (\RetProj{\eceil}) \cross (\RetProj{\efloor}) \bigr)
+      \cross
+      \CamR(\ex\cross\ey) \\
+  &=& \bigl( \CamR(\eceil-\efloor)\cross\CamTr \bigr)
+      \cross
+      \CamR\ez \\
+\end{eqnarray}
+We can now write
+\begin{eqnarray}
+  \HomParam &=& \langle\vvpt,\pceil,\pfloor,(\pceil\cross\pfloor)\cross\horizon\rangle \\
+  &=& \frac{
+    \bigl(\vvpt-\pfloor\bigr)^T
+    \bigl(\pceil-(\pceil\cross\pfloor)\cross\horizon\bigr)
+   }{
+    \bigl(\pceil-\pfloor\bigr)^T
+    \bigl(\vvpt-(\pceil\cross\pfloor)\cross\horizon\bigr)
+   }\\
+  &=& \frac{
+    \bigl(\CamR\ez - (\CamR\efloor+\CamTr)\bigr)^T
+    \bigl(\CamR\eceil+\CamTr-
+          (\CamR(\eceil-\efloor)\cross\CamTr)\cross\CamR\ez
+          \bigr)
+   }{
+    \bigl(\CamR\eceil+\CamTr-\CamR\efloor-\CamTr\bigr)^T
+    \bigl(\CamR\ez-
+          (\CamR(\eceil-\efloor)\cross\CamTr)\cross\CamR\ez
+          \bigr)
+   }\\
+  &=& \frac{
+    \bigl(\ez - \efloor - \CamR^T\CamTr\bigr)^T R^T
+    \bigl(\CamR\eceil+\CamTr-
+          (\CamR(\eceil-\efloor)\cross\CamTr)\cross\CamR\ez
+          \bigr)
+   }{
+    \bigl(\eceil-\efloor\bigr)^T R^T
+    \bigl(\CamR\ez-
+          (\CamR(\eceil-\efloor)\cross\CamTr)\cross\CamR\ez
+          \bigr)
+   }\\
+  &=& \frac{
+    \bigl(\ez - \efloor - \CamR^T\CamTr\bigr)^T
+    \bigl(\eceil + \CamR^T\CamTr -
+          ((\eceil-\efloor)\cross\CamR^T\CamTr)\cross\ez
+          \bigr)
+   }{
+    (\eceil-\efloor)^T\ez -
+    (\eceil-\efloor)^T(((\eceil-\efloor)\CamR^T\CamTr)\ez)
+   }\\
+  &=& \frac{
+    (\ez-\efloor-\CamR^T\CamTr)^T(\eceil+\CamR^T\CamTr)
+    +(\zceil-\zfloor)(\|\CamTr\|^2 - (\ez^T\CamR^T\CamTr)^2)
+   }{
+    \zceil-\zfloor
+   }\\
+  &=& \frac{1}{\zceil-\zfloor}
+    \Bigl( (\zceil + \zcam)(1-\zfloor-\zcam) + \zcam^2 - \|\CamTr\|^2 \Bigr)
+     + \|\CamTr\|^2 - \zcam^2
+\end{eqnarray}
+where in the last line we substituted $\zcam =
+\ez^T\CamR^T\CamTr$.
+
+\subsection{Parametrising walls}
+
+Consider the scenes shown in \figref{example-scenes}. Following
+rectification, vertical edges in the world appear vertical in each
+image, including the vertical seams between adjacent wall segments, so
+any line drawn vertically from the top to bottom of a rectified image
+intersects exactly one wall segment. That this is true in general
+follows from our assumption that walls meet at vertical seams and
+extend continuously from floor to ceiling, that the camera is located
+between the floor and ceiling planes, and that the environment is
+closed.
+
+\begin{figure}[tb]%
+  \label{fig:example-scenes}
+  \centering
+    \begin{tabular}{ccc}
+      \includegraphics[width=0.3\textwidth]{true_models/lab_ground1_010_rect.png} &
+      \includegraphics[width=0.3\textwidth]{true_models/lab_kitchen_030_rect.png} &
+      \includegraphics[width=0.3\textwidth]{true_models/lab_ground1_030_rect.png}
+      \\      
+      \includegraphics[width=0.3\textwidth]{true_models/lab_ground1_010} &
+      \includegraphics[width=0.3\textwidth]{true_models/lab_kitchen_030} &
+      \includegraphics[width=0.3\textwidth]{true_models/lab_ground1_030}
+    \end{tabular}
+  \caption{Three input images and the indoor Manhattan models we
+    seek. Notice how each image column intersects exactly one
+    wall.}
+  \hrule
+\end{figure}
+
+It turns out that once the vanishing points $\vpt_i$ and Manhattan
+homology $\Hcf$ are known, a wall segment in rectified image
+coordinates is fully specified by just four scalars,
+\begin{equation}
+  \label{eq:wall-def}
+  \Wall = ( x_0, y, \WallOrient, x_1 )
+\end{equation}
+where $x_0$ is the location of the left edge, $x_1$ is the location of
+the right edge, $y$ is the $y$--cordinate of the top--left corner, and
+$WallOrient\in\{1,2,3\}$ is the index of the vanishing point associated with
+the wall. The four vertices of the wall are then given by
+\begin{eqnarray}
+  \label{eq:pi}
+  \vect{p_i} &=& \begin{bmatrix}x&y&1\end{bmatrix}^t \\
+  \label{eq:qi}
+  \vect{q_i} &=& \vect{p_i}\cross\vect{v_{a}}\cross
+               \begin{bmatrix}1&0&-c_{i+1}\end{bmatrix}^T\\
+  \label{eq:ri}
+  \vect{r_i} &=& \Hcf \vect{q_i}\\
+  \label{eq:si}
+  \vect{s_i} &=& \Hcf \vect{p_i} ~.
+\end{eqnarray}
+\Figref{pqrs} illustrates the geometry of the parametrisation
+\eqnref{vertex-repr}.
+
+\begin{figure}[tb]%
+  \centering
+  \label{fig:pqrs}
+  \includegraphics[width=0.4\textwidth]{pqrs}
+  \caption{The row/column indices $c_i,c_{i+1},r_i,$ together with
+    the vanishing point index $a_i\in\{l,r\}$ are sufficient via the
+    homology $\Hcf$ to determine the four vertices defining a
+    wall.}
+  \hrule
+\end{figure}
+
+\subsection{Parametrising Scenes}
+
+Since each image column intersects exactly one wall, we may think of
+the scene as a sequence of walls stretching from left to right in the
+image. This observation suggests our scene parametrisation, which is
+simply a sequence of wall segments. We make the additional observation
+that the right--edge of a wall is redundant given the left edge of the
+wall to its right. A scene therefore is fully specified by
+\begin{equation}
+  \label{eq:vertex-repr}
+  \Scene =
+  ( x_1,y_1,\WallOrient_1,
+   ~x_2,y_2,\WallOrient_2,
+   ~\ldots,
+   ~x_{n-1},y_{n-1},\WallOrient_{n-1},
+   ~x_n ) ~.
+\end{equation}
+An example scene and its parametrisation is shown in
+\figref{scene-params}. Note that although the right edge of a wall
+always coincides with the left edge of its neighbour, it is not always
+the case that the lower edges of adjacent walls meet at a point, \ie
+$\vect{r_i} \neq \vect{s_{i+1}}$ in egeneral. For example, notice the
+second edge in \figref{scene-params}. Ordinarily we will always have
+$x_1=0$ and $x_n=\Width$, but for the benefit of later chapter where
+we consider partial models we leave these values in the
+parametrisation.
+
+\begin{figure}[tb]
+  \centering
+  \label{fig:scene-params}
+  \includegraphics[width=0.4\textwidth]{new-model-params}
+  \caption{An illustration of the model
+    $\Scene=\{x_1,y_1,\WallOrient_1,\ldots,x_4,y_4,\WallOrient_4,c_5\}$.}
+  \hrule
+\end{figure}
+
+\subsubsection{Physical Realisability}
+
+TODO: Discuss unrealisable models? Or just permit all models?
+
+Not all models $\Scene$ are physically realisable, but those that are
+not can be discarded using simple tests on the locations of walls and
+vanishing points as enumerated by Lee \etal \cite{Lee09}. The reader
+is referred to their paper for details; the key result for our
+purposes is that a model is feasible if all of its corners are
+feasible, and the feasibility of a corner is dependent only on the
+immediately adjoining walls.
+
+\subsection{The Seam Representation}
+\label{sec:seam-representation}
+
+For the purpose of the probabilistic model to be presented in the
+following chapter we will now present an additional, slightly
+different parametrisation that we will refer to as the
+\textit{floor--wall seam} representation of indoor Manhattan scenes. A
+scene in vertex representation $\Scene$ uniquely determines a scene in
+seam $\Seam$ representation, but the converse is not true. For this
+reason we will always work in the vertex representation during
+inference, but to evaluate likelihoods, priors, and posteriors for a
+fixed scene we will find it notationally more convenient to work in
+the seam representation.
+
+Under the seam representation a scene is represented by assocating a
+pair of scalars $y,a$ to each iamge column $j$,
+\begin{equation}
+  \label{eqn:seam-def}
+  \Seam = \{(\seam_j,\WallOrient_j)\}_{j=0}^\Width  ~,
+\end{equation}
+where $\seam_j$ is the $y$--coordinate of the bottom edge of the wall that
+intersects the $j$\th column, and $\WallOrient_j\in\{1,2,3\}$ is its
+orientation. Note that the size of this representation is proportional
+to the image width, whereas the size of the vertex representation is
+proportional to the number of distinct wall segments.
+
+We compute the seam representation $\Seam$ from a scene in vertex
+representation $\Scene$ as follows. For each $j\in[0,\Width]$ we
+identify the wall segment index for column $j$ by finding
+$x_i,x_{i+1}\in\Scene$ such that $x_i \leq j \leq x_{i+1}$. We then
+compute $\vect{s_i}$ and $\vect{r_i}$ according to equations
+\eqnref{si} and \eqnref{r_i} and find the position of the wall seam at
+column $j$,
+\begin{equation}
+  \label{eqn:seam-from-scene}
+  \seam_j = (\vect{r_i} \cross \vect{s_i}) \cross
+  \begin{bmatrix} 0 & 1 & -j \end{bmatrix}^T ~.
+\end{equation}
+The orientation $a_j$ is equal to the orientation of the identified
+wall segment, $a_i$.
+
+TODO: figure showing the seam
+
+Floor/wall seam
+  - prove: uniquely determined by scene (but not one-to-one)
+
+TODO: note that this mapping is not invertible
+
+\section{Observations}
+
+In this section we make several geometric observations that will be
+useful in the chapters to follow.
+
+\subsection{Classification of Corners}
+\label{sec:corner-categories}
+
+Lee \etal \cite{Lee09} showed that the meeting line of adjacent walls
+(as viewed by some camera) can be categorised as follows.
+\begin{itemize}
+  \item{A \textit{convex corner} occurs where two wall segments meet
+    exactly and form an internal angle not greater than $180\degrees$, \ie
+    \begin{eqnarray}
+      \vect{r_i} &=& \vect{s_{i+1}}\\
+      &\mbox{and}&\\
+      \frac{(\vect{s_i}-\vect{r_i})\cdot(\vect{q_i}-\vect{r_i})}
+           {\|\vect{s_i}-\vect{r_i})\|\|(\vect{q_i}-\vect{r_i}\|}
+      &\leq&
+      \frac{(\vect{r_{i+1}}-\vect{r_i})\cdot(\vect{q_i}-\vect{r_i})}
+           {\|\vect{r_{i+1}}-\vect{r_i})\|\|(\vect{q_i}-\vect{r_i}\|} ~.
+    \end{eqnarray}
+  }
+  \item{A \textit{concave corner} occurs where two wall segments meet
+    exactly and form an internal angle greater than $180\degrees$, \ie
+    \begin{eqnarray}
+      \vect{r_i} &=& \vect{s_{i+1}}\\
+      &\mbox{and}&\\
+      \frac{(\vect{s_i}-\vect{r_i})\cdot(\vect{q_i}-\vect{r_i})}
+           {\|\vect{s_i}-\vect{r_i})\|\|(\vect{q_i}-\vect{r_i}\|}
+      &>&
+      \frac{(\vect{r_{i+1}}-\vect{r_i})\cdot(\vect{q_i}-\vect{r_i})}
+           {\|\vect{r_{i+1}}-\vect{r_i})\|\|(\vect{q_i}-\vect{r_i}\|} ~.
+    \end{eqnarray}
+  }
+  \item{An \textit{occluding corner} occurs where to wall segments
+    meet but their lower edges do not coincide, \ie
+    \begin{equation}
+      \vect{r_i} \neq \vect{s_{i+1}}
+    \end{equation}
+  }
+\end{itemize}
+TODO: figure from presentation
+
+\subsection{Recovering Metric Scene Structure}
+\label{sec:metric-recovery}
+
+In this section we show that once the scene parameters $\SceneR$ and
+$\Zs$ are known, a scene $\Scene$ in vertex representation uniquely
+specifies a 3D scene $\Reconstruction$. We show this by demonstrating
+how to convert a scene $\Scene$ to a floorplan $\Floorplan$, after
+which we may apply equations \eqnref{pi},
+\eqnref{qi}, \eqnref{ri}, and
+\eqnref{si} to recover a polygonal reconstruction. 
+
+Let $\backproj(\Pixel;\vect{w},\CamMatrix,\CamR,\CamTr)$ be the
+back--projection of image point $\Pixel$ onto the plane
+$\vect{x}\cdot\vect{w}=0$ given camera intrinsics $\CamMatrix$ and
+extrinsics $\CamR,\CamTr$. To compute this we solve for $\vect{y}$ in
+\begin{eqnarray}
+  P \vect{y} &=& \vect{0}\\
+  \| \vect{y} \| &=& 1
+\end{eqnarray}
+where
+\begin{equation}
+  P =
+  \begin{bmatrix}
+    & \CamMatrix\CamR & & \CamMatrix\CamTr-\Pixel \\
+    0 & 0 & 1 & -\zfloor
+  \end{bmatrix}~.
+\end{equation}
+We will usually omit the camera parameters and simply write
+$\backproj(\Pixel;\vect{w})$. Futhermore, since we will often be
+back--projecting onto planes orthogonal to the $z$ axis we adopt the
+short--hand
+\begin{equation}
+  \backproj(\Pixel;z) = \backproj(\Pixel;
+    \begin{bmatrix}0 & 0 & 1 & -z\end{bmatrix}) ~.
+\end{equation}
+
+To recover a floorplan $\Floorplan$ from a scene $\Scene$
+we simply need to back--project $\vect{q_i},\vect{s_i}$ pairs onto
+the floor plane. This is formalized in \algref{scene-to-recon}.
+
+\begin{algorithm}
+  \label{alg:scene-to-recon}
+      \begin{algorithmic}
+        \REQUIRE{$\Scene =(x_1,y_1,\WallOrient_1,\ldots,x_n)$ ~~~
+          \{a scene in vertex representation\}}
+        \ENSURE $\Floorplan=\{(\vect{u_i},\vect{v_i})\}$
+        \STATE{$\Floorplan \leftarrow \emptyset$}
+        \FOR{$i=1 \ldots n-1$}
+          \STATE{$\vect{u_i}=\backproj(\vect{s_i}; \zfloor)$}
+          \STATE{$\vect{u_i}=\backproj(\vect{r_i}; \zfloor)$}
+          \STATE{$\Floorplan \leftarrow \Floorplan \union (\vect{u_i},\vect{v_i})$}
+        \ENDFOR
+      \end{algorithmic}
+  \caption{An algorithm for recovering a metric 3D scene from the
+    vertex representation $\Scene$.}
+\end{algorithm}
+
+\subsection{Recovering Orientation and Depth}
+We say that an indoor Manhattan scene $\Scene$ ``predicts'' the depth
+of each point $\Pixel$ in the image plane because we can compute the
+depth of each $\Pixel$ given the hypothesis $\Scene$. Similarly, a
+scene predicts an orientation $\Orient_{\Pixel}\in\SetOfOrients$ for
+each image point, which is the orientation of the 3D surface that
+generated the image point $\Pixel$.
+
+To compute either the orientation $\Orient_{\Pixel}$ or depth
+$\Depth_{\Pixel}$ for an image point $\Pixel$ we first need to identify
+the wall polygon that contains $\Pixel$. If there is such a polygon then
+$\Pixel$ has the orientation of the corresponding wall segment and we
+back--project $\Pixel$ onto that polygon to recover depth. If $\Pixel$
+is not contained by any wall polygon then $\Pixel$ has the horizontal
+orientation and we recover depth by back--projecting onto the floor or
+ceiling plane, according to whether $\Pixel$ is above or below the
+horizon. This process is formalized in \algref{computing-from-scene}.
+
+\begin{algorithm}[tb]
+  \label{alg:comuting-from-scene}
+        \begin{algorithmic}
+          \REQUIRE{$\Scene =(x_1,y_1,\WallOrient_1,\ldots,x_n)$ ~~~ 
+            \{a scene in vertex representation\}}
+          \REQUIRE $\Pixel=(\Pixel_x,\Pixel_y)\in\Rtwo$
+          \REQUIRE $x_1 \leq \Pixel_x < x_n$
+          \ENSURE{$i_{\Pixel} \in [1,n],
+            \Orient_{\Pixel} \in \SetOfOrients,
+            \Depth_{\Pixel}>0$}
+          \FOR{$i = 1 \ldots n-1$}
+            \IF{$x_i \leq \Pixel_x < x_{i+1}$}
+              \STATE\COMMENT{Compute the floor--wall and ceiling--wall
+                seam in column $\Pixel_x$}
+              % TODO: euclidean projection needed below!!
+              \STATE{$\seam_f \leftarrow \ey \cdot (\vect{s_i}
+                \cross \vect{r_i})
+                \cross \begin{bmatrix}1&0&-\Pixel_x\end{bmatrix}^T$}
+              \STATE{$\seam_c \leftarrow \ey \cdot (\vect{s_i}
+                \cross \vect{r_i})
+                \cross \begin{bmatrix}1&0&-\Pixel_x\end{bmatrix}^T$}
+              \IF{$\Pixel_y < \seam_c$}
+                \STATE{$\Orient_{\Pixel} \leftarrow ``vert orient''$}
+                \STATE{$X_{\Pixel} \leftarrow \backproj(\Pixel; \zceil)$}
+              \ELSIF{$\seam_c < \Pixel_y < \seam_f$}
+                \STATE{$\Orient_{\Pixel} \leftarrow \WallOrient_{\Pixel_x}$}
+                \STATE{$w_{\Pixel} \leftarrow
+                  \begin{bmatrix}
+                    1 & 0 & 0 & -\backproj(\vect{x_f}; \zfloor)\cdot\ex
+                  \end{bmatrix}^T$}
+                \STATE{$X_{\Pixel} \leftarrow \backproj(\Pixel; w_{\Pixel})$}
+              \ELSE
+                \STATE{$\Orient_{\Pixel} \leftarrow ``vert orient''$}
+                \STATE{$X_{\Pixel} \leftarrow \backproj(\Pixel; \zfloor)$}
+              \ENDIF
+              \STATE{$\Depth_{\Pixel} \leftarrow
+                (\CamR X_{\Pixel} + \CamTr) \cdot \ez$}
+              \RETURN
+            \ENDIF
+          \ENDFOR
+        \end{algorithmic}
+  \caption{An algorithm for recovering orientation and depth for an
+    image location $\Pixel$ under a scene hypothesis $\Scene$.}
+\end{algorithm}
+
+The above calculations are considerably simpler in the seam
+representation, though in this context depth and orientation can only
+be computed at integer pixel coordinates. For our purposes in the
+ensuing chapters this will suffice since we will not try to resolve
+the scene structure to a resolution beyond that of the image itself.
+
+Suppose we are given a scene in seam representation $\Seam$ and a
+integer pixel location $\Pixel\in\Ints^2$. We first look up the the
+pair $(\seam_j,\WallOrient_j)\in\Seam$ for the column in which $\Pixel$
+falls, which we denote $(\seam_{\Pixel_x},\WallOrient_{\Pixel_x})$. Then
+the floor--wall seam in column $\Pixel_x$ is at
+$\seam_f=\seam_{\Pixel_x}$ and the ceiling--wall seam is can be
+recovered using the Manhattan homology. From here the orientation and depth at
+$\Pixel$ are easily obtained using the procedure shown in
+\algref{seam-depth-orient}.
+
+\begin{algorithm}[tb]
+  \label{alg:seam-depth-orient}
+        \begin{algorithmic}
+          \REQUIRE{$\Seam = \{(\seam_j,\WallOrient_j)\}$ ~~~
+            \{a scene in seam representation\}}
+          \REQUIRE $\Pixel=(\Pixel_x,\Pixel_y)\in\Ints^2$
+          \ENSURE{$\Orient_{\Pixel} \in \SetOfOrients,
+                   \Depth_{\Pixel}>0$}
+          \STATE\COMMENT{Compute the floor--wall and ceiling--wall
+            seam in column $\Pixel_x$}
+          \STATE{$\seam_f \leftarrow \seam_{\Pixel_x}$}
+          \STATE{$\vect{x_f} \leftarrow
+            \begin{bmatrix}
+              \Pixel_x & \seam_f & 1
+            \end{bmatrix}^T$}
+          \STATE{$\vect{x_c} \leftarrow \Hcf \vect{x_f}$}
+          \STATE{$\seam_c \leftarrow \frac{\vect{x_c}\cdot\ey}
+                                          {\vect{x_c}\cdot\ez}$}
+          \IF{$\Pixel_y < \seam_c$}
+            \STATE{$\Orient_{\Pixel} \leftarrow ``vert orient''$}
+            \STATE{$X_{\Pixel} \leftarrow \backproj(\Pixel; \zceil)$}
+          \ELSIF{$\seam_c < \Pixel_y < \seam_f$}
+            \STATE{$\Orient_{\Pixel} \leftarrow \Orient_{\Pixel_x}$}
+            \STATE{$\vect{w}_{\Pixel} \leftarrow
+              \begin{bmatrix}
+                1 & 0 & 0 & -\backproj(\vect{x_f}; \zfloor)\cdot\ex
+              \end{bmatrix}^T$}
+            \STATE{$X_{\Pixel} \leftarrow \backproj(\Pixel; \vect{w}_{\Pixel})$}
+          \ELSE
+            \STATE{$\Orient_{\Pixel} \leftarrow ``vert orient''$}
+            \STATE{$X_{\Pixel} \leftarrow \backproj(\Pixel; \zfloor)$}
+          \ENDIF
+          \STATE{$\Depth_{\Pixel} \leftarrow
+            (\CamR X_{\Pixel} + \CamTr) \cdot \ez$}
+        \end{algorithmic}
+  \caption{An algorithm for recovering orientation and depth for an
+    image location $\Pixel$ under the seam representation $\Seam$.}
+\end{algorithm}
+
+TODO: figure showing step-by-step recovery of depth and orientation
+
+\subsection{Column--wise Decomposability}
+\label{sec:col-decomposability}
+
+Of particular significance to the algorithms to be presented in the
+remainder of this thesis is that the procedure of
+\algref{seam-depth-orient} \textit{only requires access to the pair
+  $(\seam_j,\WallOrient_j)$ for the image column $j$ that contains the
+  query pixel.} That is, a pixel's depth and orientation are
+functionally independent of the location of the floor--wall seam in
+all columns other than the one containing it.

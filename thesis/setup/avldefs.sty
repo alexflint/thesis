@@ -1,0 +1,206 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{avldefs}[]
+
+\newcommand{\tinyspace}{\tmspace+\thinmuskip{.001em}}
+\newcommand{\tinynegspace}{\tmspace-\thinmuskip{.001em}}
+
+\newcommand{\PPP}{${\cal P}^3$}
+\newcommand{\PP}{${\cal P}^2$}
+\newcommand{\bm}[1]{\mbox{\boldmath $#1$}}
+
+
+\newcommand{\define}{\stackrel{\mathrm{\scriptscriptstyle def}}{=}}
+\newcommand{\projeq}{\mbox{$~\stackrel{P}{=}~$}}
+
+% Functions are calligraphic
+\newcommand{\func}[1]{\mbox{${\cal \uppercase{#1}}$}}
+
+% Scalars are dull
+\newcommand{\scau}[2]{\mbox{${#1}^{#2}$}}
+\newcommand{\scad}[2]{\mbox{${#1}_{#2}$}}
+\newcommand{\scaud}[3]{\mbox{${#1}^{#2}_{#3}$}}
+\newcommand{\dsca}[2]{\mbox{$\,_{#2}{#1}$}}
+\newcommand{\dscau}[3]{\mbox{$\,_{#2}{#1}^{#3}$}}
+\newcommand{\dscad}[3]{\mbox{$\,_{#2}{#1}_{#3}$}}
+\newcommand{\dscaud}[4]{\mbox{$\,_{#2}{#1}^{#3}_{#4}$}}
+
+% Vectors are roman bold
+\renewcommand{\vec}[1]{\mbox{$\boldsymbol{\rm #1}$}}
+\newcommand{\vecu}[2]{\mbox{$\boldsymbol{\rm #1}^{#2}$}}
+\newcommand{\vecd}[2]{\mbox{$\boldsymbol{\rm #1}_{#2}$}}
+\newcommand{\vecud}[3]{\mbox{$\boldsymbol{\rm #1}^{#2}_{#3}$}}
+
+% Yuck!
+\newcommand{\dvec}[2]{\mbox{$\,_{#2}\boldsymbol{\rm #1}$}}
+\newcommand{\dvecu}[3]{\mbox{$\,_{#2}\boldsymbol{\rm #1}^{#3}$}}
+\newcommand{\dvecd}[3]{\mbox{$\,_{#2}\boldsymbol{\rm #1}_{#3}$}}
+\newcommand{\dvecud}[4]{\mbox{$\,_{#2}\boldsymbol{\rm #1}^{#3}_{#4}$}}
+
+% Unit vectors
+\newcommand{\uvec}[1]{\mbox{$\hat{\boldsymbol{\rm #1}}$}}
+\newcommand{\uvecu}[2]{\mbox{$\hat{\boldsymbol{\rm #1}}^{#2}$}}
+\newcommand{\uvecd}[2]{\mbox{$\hat{\boldsymbol{\rm #1}}_{#2}$}}
+\newcommand{\uvecud}[3]{\mbox{$\hat{\boldsymbol{\rm #1}}^{#2}_{#3}$}}
+
+
+% Matrices are courier bold
+\newcommand{\mat}[1]{\mbox{$\boldsymbol{\tt #1}$}}
+\newcommand{\matu}[2]{\mbox{$\boldsymbol{\tt #1}^{#2}$}}
+\newcommand{\matd}[2]{\mbox{$\boldsymbol{\tt #1}_{#2}$}}
+\newcommand{\matud}[3]{\mbox{$\boldsymbol{\tt #1}^{#2}_{#3}$}}
+\newcommand{\dmat}[2]{\mbox{$\,_{#2}\boldsymbol{\tt #1}$}}
+\newcommand{\dmatd}[3]{\mbox{$\,_{#2}\boldsymbol{\tt #1}_{#3}$}}
+\newcommand{\dmatu}[3]{\mbox{$\,_{#2}\boldsymbol{\tt #1}^{#3}$}}
+
+\renewcommand{\det}[1]{\mbox{det{${#1}$}}}
+\newcommand{\sk}[1]{[#1]_\times}
+\newcommand{\trace}[1]{\mbox{trace{${#1}$}}}
+\newcommand{\calmat}[1]{\mbox{${\cal #1}$}}
+\newcommand{\matentry}[1]{\mbox{${\tt #1}$}}
+\newcommand{\calmatentry}[1]{\mbox{${\cal #1}$}}
+\newcommand{\tra}{^\top}
+\newcommand{\trans}{^\top}
+\newcommand{\inv}{^{-1}}
+\newcommand{\invtrans}{^{-\top}}
+\newcommand{\mattt}[9]
+   {\mbox{$
+      \left(
+         \begin{array}{ccc}
+         #1 & #2 & #3   \\
+         #4 & #5 & #6   \\
+         #7 & #8 & #9
+         \end{array}
+      \right )
+   $}}
+
+% Quaternions
+\newcommand{\quat}[1]{\mbox{$\stackrel{{\scriptscriptstyle \circ}}{\bf #1}$}}
+\newcommand{\quatc}[1]{\mbox{$\stackrel{{\scriptscriptstyle \circ}}{{\bf #1}}^\ast$}}
+
+% Tensors are calligraphic bold
+\newcommand{\tensor}[1]{\mbox{$\boldsymbol{\cal #1}$}}
+\newcommand{\tensoru}[2]{\mbox{$\boldsymbol{\cal #1}^{#2}$}}
+\newcommand{\tensord}[2]{\mbox{$\boldsymbol{\cal #1}_{#2}$}}
+\newcommand{\tensorud}[3]{\mbox{$\boldsymbol{\cal #1}^{#2}_{#3}$}}
+\newcommand{\udtensor}[3]{\mbox{$\,_{#3}^{#2}\!\boldsymbol{\cal #1}$}}
+\newcommand{\udtensorud}[5]{\mbox{$\,_{#3}^{#2}\!\boldsymbol{\cal #1}^{#4}_{#5}$}}
+
+
+
+% Probability stuff
+\newcommand{\prob}[1]{\mbox{${\rm p}(#1)$}}
+\newcommand{\expect}[1]{\mbox{${\rm E}\left\{#1\right\}$}}
+\newcommand{\mean}[1]{\mbox{$\overline{#1}$}}
+\def\med{{\rm med}}
+
+\newcommand{\cross}{\mbox{$\times$}}
+ 
+
+% Stuff for doing the qed sign.
+\def\squareforqed{\hbox{\rlap{$\sqcap$}$\sqcup$}}
+\def\qed{\ifmmode\squareforqed\else{\unskip\nobreak\hfil
+\penalty50\hskip1em\null\nobreak\hfil\squareforqed
+\parfillskip=0pt\finalhyphendemerits=0\endgraf}\fi}
+ 
+
+
+
+\newcommand{\persec}{\mbox{${\rm s}^{-1}$}}
+\def\time{\tau}
+\def\dtime{\delta \tau}
+\def\ptime{\tau + \delta \tau}
+
+% Some trig shortcuts
+\def\sa{\sin\alpha}
+\def\sb{\sin\beta} 
+\def\sg{\sin\gamma} 
+\def\sd{\sin\delta}
+\def\ca{\cos\alpha}
+\def\cb{\cos\beta} 
+\def\cg{\cos\gamma} 
+\def\cd{\cos\delta}
+\def\sas{\sin^2\alpha}
+\def\sbs{\sin^2\beta} 
+\def\sgs{\sin^2\gamma} 
+\def\sds{\sin^2\delta}
+\def\cas{\cos^2\alpha}
+\def\cbs{\cos^2\beta} 
+\def\cgs{\cos^2\gamma} 
+\def\cds{\cos^2\delta}
+
+\newcommand{\cosec}{\mbox{$\rm cosec$}}
+
+\newcommand{\minisection}[1]{\vskip 4mm\noindent{\bf {#1}}\\} 
+\newcommand{\greybox}[1]{\psboxit{box 0.8 setgray fill}{\fbox{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Probably don't use
+
+%
+\DeclareMathAlphabet{\bi}{OML}{cmm}{b}{it}
+%
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\rme}{\mathrm{e}}
+\newcommand{\rmi}{\mathrm{i}}
+\newcommand{\rmd}{\mathrm{d}}
+\renewcommand{\qquad}{\hspace*{25pt}}
+\newcommand{\tdot}[1]{\stackrel{\dots}{#1}}   % Added 1/9/94
+\newcommand{\tqs}{\hspace*{25pt}}
+\newcommand{\fl}{\hspace*{-\mathindent}}
+\newcommand{\Tr}{\mathop{\mathrm{Tr}}\nolimits}
+\newcommand{\tr}{\mathop{\mathrm{tr}}\nolimits}
+\newcommand{\Or}{\mathord{\mathrm{O}}} %changed from \mathop 20/1/95
+\newcommand{\lshad}{[\![}
+\newcommand{\rshad}{]\!]}
+\newcommand{\case}[2]{{\textstyle\frac{#1}{#2}}}
+\def\pt(#1){({\it #1\/})}
+\newcommand{\dsty}{\displaystyle}
+\newcommand{\tsty}{\textstyle}
+\newcommand{\ssty}{\scriptstyle}
+\newcommand{\sssty}{\scriptscriptstyle}
+\def\lo#1{\llap{${}#1{}$}}
+\def\eql{\llap{${}={}$}}
+\def\lsim{\llap{${}\sim{}$}}
+\def\lsimeq{\llap{${}\simeq{}$}}
+\def\lequiv{\llap{${}\equiv{}$}}
+%
+\newcommand{\eref}[1]{(\ref{#1})}
+\newcommand{\sref}[1]{section~\ref{#1}}
+\newcommand{\fref}[1]{figure~\ref{#1}}
+\newcommand{\tref}[1]{table~\ref{#1}}
+\newcommand{\Eref}[1]{Equation (\ref{#1})}
+\newcommand{\Sref}[1]{Section~\ref{#1}}
+\newcommand{\Fref}[1]{Figure~\ref{#1}}
+\newcommand{\Tref}[1]{Table~\ref{#1}}
+
+\newcommand{\dotted}{\protect\mbox{${\mathinner{\cdotp\cdotp\cdotp\cdotp\cdotp\cdotp}}$}}
+\newcommand{\dashed}{\protect\mbox{-\; -\; -\; -}}
+\newcommand{\broken}{\protect\mbox{-- -- --}}
+\newcommand{\longbroken}{\protect\mbox{--- --- ---}}
+\newcommand{\chain}{\protect\mbox{--- $\cdot$ ---}}
+\newcommand{\dashddot}{\protect\mbox{--- $\cdot$ $\cdot$ ---}}
+\newcommand{\full}{\protect\mbox{------}}
+\newcommand{\opencircle}{\mbox{\Large$\circ\,$}}  % moved Large outside maths
+\newcommand{\fullcircle}{\mbox{{\Large$\bullet\,$}}} % moved Large outside maths
+\newcommand{\opensquare}{\mbox{$\rlap{$\sqcap$}\sqcup$}}
+\newcommand{\opentriangle}{\mbox{$\triangle$}}
+\newcommand{\opentriangledown}{\mbox{$\bigtriangledown$}}
+\newcommand{\opendiamond}{\mbox{$\diamondsuit$}}
+\newcommand{\fullsquare}{\,\vrule height5pt depth0pt width5pt}
+
+
+
+\endinput
+
+
+
+
+
+
+
+
+
+
+
+
+

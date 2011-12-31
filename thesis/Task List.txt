@@ -1,0 +1,25 @@
+Thesis TODO
+===========
+
+Introduction
+Literature Review
+
+Estimating rotation chapter
+- Experiments
+- Explanation for point estimate
+
+Estimating the Manhattan homology
+
+Model chapter
+- Using integral images to compute photometric likelihood quickly
+- Experimental validation of the probabilistic model
+- Many figures from ICCV poster and presentation
+- Extensions
+  - EM for occlusion reasoning
+  - EM for smoothness terms on the indicators t_i
+
+Inference chapter
+
+Learning chapter
+
+Conclusion

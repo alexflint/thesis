@@ -1,0 +1,85 @@
+
+The projections of the three vanishing points into the $i$\th frame
+are related to $\SceneR$ by
+\begin{eqnarray}
+  \vpt_1 & = & \CamR \SceneR \ex \\
+  \vpt_2 & = & R_i \SceneR \ey \\
+  \vpt_3 & = & R_i \SceneR \ez
+\end{eqnarray}
+where $\ex$, $\ey$, and $\ez$ are unit vectors in
+the $x$, $y$, and $z$ directions respectively. We can now write down
+an error function to be minimised in terms of $\SceneR$:
+\begin{equation}
+  \label{errfunc}
+  f(\SceneR) = \sum_{i,j,k} r_{jk}
+  \Bigl(\frac{{\LineSeg_j}^T ~ R_i \SceneR \vect{e}_k}{\sqrt{{l_{jx}}^2 +
+      {l_{jy}}^2}}\Bigr)^2 ~,
+\end{equation}
+where $r_{jk}$ is the responsibility of the $k$\th vanishing point for
+the $j$\th line segment. The squared term in \eqref{errfunc} is the
+algebraic deviation\footnotemark of the $j$\th line segment from the
+$k$\th vanishing point in frame $i$, and the full error
+\eqref{errfunc} is the sum over all such deviations, weighted by the
+respective responsibilities.
+
+\footnotetext{We use the algebraic deviation rather than the
+  re--projection error \cite{Liebowitz98} for simplicity and because
+  we have found that the very large number of line segments we obtain
+  from the entire video sequence renders a more complicated error
+  metric unnecessary.}
+
+We now describe an EM algorithm to optimise $\SceneR$ with respect to
+\eqref{errfunc}. During the E step we compute the responsibilities
+$r_{jk}$ of each vanishing point $\vpt_k$ for each line segment
+$\LineSeg_j$. We assume a Gaussian likelihood
+\begin{equation}
+  \label{line-lik}
+  p(\LineSeg_j ~|~ \vpt_k) = G\biggl( \frac{{\LineSeg_j}^T \vpt_k}
+  {\sqrt{{l_{jx}}^2 + {l_{jy}}^2}} ; \sigma\biggr)
+\end{equation}
+as well as a fixed prior on observing a spurious line segment
+\begin{equation}
+  p(S_j) = \rho ~.
+\end{equation}
+Noting that we must have
+\begin{equation}
+  p(S_j) + \sum_{i=1}^3 r_{ji} = 1
+\end{equation}
+and assuming that line segments are equally likely to be associated
+with any of the three vanishing points, we have
+\begin{equation}
+  r_{jk} = \frac{p(\LineSeg_j ~|~ \vpt_k)}
+  {\alpha + \sum_i p(\LineSeg_j ~|~ \vpt_i)}
+\end{equation}
+where we have substituted
+\begin{equation}
+  \alpha = \frac{3\rho}{1-\rho} p(\LineSeg_j ~|~ S_j) ~.
+\end{equation}
+
+The M step consists of optimising $\SceneR$ with respect to the
+error function \eqref{errfunc}. There is no closed form solution for
+the optimal $\SceneR$ so we instead perform gradient descent. We represent
+$\SceneR$ in the Lie algebra as a member of the special orthogonal group
+$SO(3)$, so
+\begin{equation}
+  \SceneR = \exp(\sum m_i G_i)
+\end{equation}
+where the $G_i$ are the generator matrices for $SO(3)$ and the $m_i$
+provide a minimal representation for the 3D rotation matrix group. The
+advantage of using this representation is that at each step we are
+guaranteed that $\SceneR$ remains a pure rotation, whereas under other
+representations, such as optimising the elements of the $3 \times 3$
+rotation matrix directly, this is not the case. Differentiating
+\eqref{errfunc} with respect to $\vect{m}$ yields
+\begin{eqnarray}
+  \grad f &=& \sum_{i,j,k}
+  \frac{2{r_{jk}}^2 {\LineSeg_j}^T R_i \SceneR e_k ~
+         {\LineSeg_j}^T R_i \grad \SceneR \vect{e}_k}
+       {{l_{jx}}^2 + {l_{jy}}^2}\\
+  \grad \SceneR & =& [G_1 \vect{e_1} , G_2\vect{e_2} , G_3\vect{e_3}] ~.
+\end{eqnarray}
+Our update rule is then
+\begin{equation}
+  \vect{m^{t+1}} = \vect{m^t} - \frac{f(\vect{m^t})}
+       {\|\grad f(\vect{m^t})\|_2} \grad f(\vect{m^t}) ~.
+\end{equation}

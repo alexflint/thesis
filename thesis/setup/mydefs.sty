@@ -1,0 +1,292 @@
+% Latin abbreviations
+\newcommand\etal{\textit{et al.}\xspace}
+\newcommand\ie{\textit{i.e.}\xspace}
+\newcommand\eg{\textit{e.g.}\xspace}
+\newcommand\cf{\textit{c.f.}\xspace}
+\newcommand\etc{\textit{etc.}\xspace}
+
+% References
+\newcommand\figref[1]{figure \ref{fig:#1}}
+\newcommand\Figref[1]{Figure \ref{fig:#1}}
+\newcommand\secref[1]{section \ref{sec:#1}}
+\newcommand\Secref[1]{Section \ref{sec:#1}}
+\newcommand\sectref[1]{section \ref{sec:#1}}
+\newcommand\Sectref[1]{Section \ref{sec:#1}}
+\newcommand\chapref[1]{chapter \ref{chap:#1}}
+\newcommand\Chapref[1]{Chapter \ref{chap:#1}}
+\newcommand\tableref[1]{table \ref{table:#1}}
+\newcommand\Tableref[1]{Table \ref{table:#1}}
+\newcommand\algref[1]{algorithm \ref{alg:#1}}
+\newcommand\Algref[1]{Algorithm \ref{alg:#1}}
+\newcommand\eqnref[1]{\eqref{eq:#1}}
+
+% Counters
+\renewcommand\th[0]{\textsuperscript{th}\xspace}
+\newcommand\st[0]{\textsuperscript{st\xspace}}
+\newcommand\nd[0]{\textsuperscript{nd\xspace}}
+\newcommand\rd[0]{\textsuperscript{rd\xspace}}
+
+% Generic
+\newcommand\degrees{^\circ}
+\newcommand\vect[1]{\boldsymbol{#1}}
+\newcommand\grad{\nabla}
+\newcommand\xor{\oplus}
+\newcommand\union\cup
+\newcommand\abs[1]{\lvert#1\rvert}
+\newcommand\norm[1]{\lVert#1\rVert}
+\newcommand\argmax{\operatorname{argmax}}
+\renewcommand\cross\times
+\newcommand{\concat}{\ensuremath{+\!\!\!\!+\,}}
+\newcommand\sign{\operatorname{Sign}}
+
+% Analysis
+\newcommand\intd{\mathrm{d}}   % for the 'dx' in integrals
+\newcommand\NormalDistr{\mathcal{N}}
+\newcommand\Expected{\mathbb{E}}
+\newcommand\Deriv[2]{\frac{\partial #1}{\partial #2}}
+\newcommand\EvalAt[1]{\biggl|_{#1}}
+
+% Fields
+\newcommand\field[1]{\mathbb{#1}}
+\newcommand\Reals{\field{R}}
+\newcommand\Rtwo{\Reals^2}
+\newcommand\Rthree{\Reals^3}
+\newcommand\Rfour{\Reals^4}
+\newcommand\Ints{\field{Z}}
+
+% Theorems
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+%
+% Subject-specific Macros
+%
+
+\newcommand\Dom{\mathcal{D}}
+\newcommand\Mapto{\rightarrow}
+
+\newcommand\Hcf{H_a}
+\newcommand\Hcfhat{\hat{\Hcf}}
+
+\newcommand\vpt{\vect{v}}
+\newcommand\vvpt{\vect{v_v}}
+\newcommand\lvpt{\vect{v_l}}
+\newcommand\rvpt{\vect{v_r}}
+
+% TODO: translate all these into alternate notation
+\newcommand\YfAtX{y_x}
+\newcommand\YcAtX{y_x'}
+\newcommand\YfAtXX{y_{x_0}}
+\newcommand\YcAtXX{y_{x_0}'}
+\newcommand\PfAtX{\Pixel_x}
+\newcommand\PcAtX{\vect{q}_x}
+
+% Hypotheses and hypothesis classes
+\newcommand\Scene{M}
+\newcommand\Seam{S}
+\newcommand\seam{s}
+\newcommand\NumWalls{K}
+\newcommand\SetOfScenes{\mathcal{M}}
+\newcommand\SetOfSeams{\mathcal{S}}
+
+\newcommand\WallOrient{o}
+
+% Cost functions
+\newcommand\ScenePayoff{\Pi}
+\newcommand\PixelPayoff{\pi}
+\newcommand\ScenePenalty{\Gamma}
+\newcommand\CornerPenalty{\gamma}
+\newcommand\SceneLoss{\mathcal{L}}
+\newcommand\Objective{f}
+
+\newcommand\WallPayoff{\ScenePayoff}
+
+% Model parameters
+\newcommand\MonoPayoff{\PixelPayoff_{\textsf{mono}}}
+\newcommand\StereoPayoff{\PixelPayoff_{\textsf{stereo}}}
+\newcommand\DepthPayoff{\PixelPayoff_{\textsf{3D}}}
+\newcommand\JointPayoff{\PixelPayoff_{\textsf{joint}}}
+
+% Input parameters
+\newcommand\Width{W}
+\newcommand\Height{H}
+\newcommand\NumViews{K}
+
+\newcommand\Pixel{\vect{p}}
+\newcommand\OtherPixel{\vect{q}}
+\newcommand\AuxPixel{\vect{q}}
+
+\newcommand\TruncScene{\Scene'}
+\newcommand\CfScene{\OtherScene}
+\newcommand\CfTruncScene{\OtherScene'}
+
+\newcommand\ManhattanClass{\mathcal{M}}
+\newcommand\Feature{\vect{\psi}}
+\newcommand\Features{\Psi}
+\newcommand\AuxFeature{\vect{\theta}}
+\newcommand\ComputedAuxFeature{\bar{\AuxFeature}}
+\newcommand\AuxFeatures{\Theta}
+\newcommand\Pixels{\vect{P}}
+\newcommand\PixelModel{\vect{w}}
+\newcommand\PixelModels{\vect{W}}
+\newcommand\Orients{A}
+\newcommand\Orient{a}
+\newcommand\Depth{d}
+\newcommand\Depths{D}
+\newcommand\ComputedDepth{\bar{\Depth}}
+\newcommand\Ind{t}
+\newcommand\Inds{T}
+
+\newcommand\StereoModel{\Sigma}
+
+\newcommand\PredictedOrient{\Orient^*}
+\newcommand\ComputedOrient{\bar{\Orient}}
+
+\newcommand\SetOfOrientations{\mathcal{A}}
+\newcommand\Orientations{\{1,2,3\}}
+
+% TODO: change each instance of this to one of the above
+\newcommand\SetOfOrients{\Orientations}
+
+
+\newcommand\Corners{C}
+\newcommand\Penalties{\vect{\lambda}}
+\newcommand\Penalty{\lambda}
+\newcommand\PenaltyConc{\lambda_1}
+\newcommand\PenaltyConv{\lambda_2}
+\newcommand\PenaltyOccl{\lambda_3}
+
+\newcommand\pc{\operatorname{PC}}
+\newcommand\reproj{\operatorname{reproj}}
+\newcommand\Qixel{\vect{q}}
+\newcommand\StereoData{\Image_0,\ldots,\Image_M}
+
+\newcommand\IN{\textsf{IN}}
+\newcommand\OUT{\textsf{OUT}}
+\newcommand\ON{\textsf{ON}}
+
+\newcommand\IndModel{\vect{\tau}}
+\newcommand\tIN{\tau_{\IN}}
+\newcommand\tOUT{\tau_{\OUT}}
+\newcommand\tON{\tau_{\ON}}
+
+% Sub--problems
+\newcommand\fIN{\Objective_{\textsf{in}}}
+\newcommand\fOUT{\Objective_{\textsf{out}}}
+\newcommand\fUP{\Objective_{\textsf{up}}}
+\newcommand\fDOWN{\Objective_{\textsf{down}}}
+
+% Optimal sub--structure proof
+\newcommand\OptimalScene{\Scene^*}
+\newcommand\EstimatedScene{\hat{\Scene}}
+\newcommand\PartialScene{\Scene}
+\newcommand\PartialSeam{\Seam}
+\newcommand\OtherScene{Q}
+\newcommand\CroppedScene{\Scene'}
+\newcommand\PartialCol{x}
+\newcommand\CroppedCol{x'}
+
+% DP State space
+\newcommand\State{\vect{s}}
+\newcommand\OtherState{\vect{t}}
+\newcommand\StateSpace{\mathcal{S}}
+\newcommand\FeasibleSet{\mathcal{F}}
+
+\newcommand\Length[1]{|\!#1\!|}
+\newcommand\SceneLen{\Length{\PartialScene}}
+
+\newcommand\DepthAtPGivenModel{\ComputedDepth(\Pixel;\Scene)}
+\newcommand\DepthAtPGivenY{\ComputedDepth(\Pixel;\seam_j)}
+\newcommand\Dmax{N_d}
+\newcommand\RoundoffEps{\epsilon}
+\newcommand\SceneAtX{y_x} % remove
+
+\newcommand\PixelLoss{l_{\Pixel}}
+
+\newcommand\Image{I}
+
+\renewcommand\vect[1]{\boldsymbol{#1}}
+\newcommand\Reconstruction{M}
+\newcommand\Poly{P}
+\newcommand\vertex{\vect{v}}
+\newcommand\othervertex{\vect{u}}
+\newcommand\normal{\vect{n}}
+\newcommand\vertnormal{\normal_v}
+\newcommand\zfloor{z_f}
+\newcommand\zceil{z_c}
+\newcommand\zcam{z_\rho}
+\newcommand\Pfloor{P_{\textsf{floor}}}
+\newcommand\Pceil{P_{\textsf{ceil}}}
+
+\newcommand\Floorplan{F}
+\newcommand\SceneR{R_w}
+\newcommand\Point{\vect{p}}
+\newcommand\Polyline{T}
+\newcommand\Zs{Z}
+\newcommand\startpt{\vect{u}}
+\newcommand\enpt{\vect{v}}
+
+\newcommand\Camera{C}
+\newcommand\CamMatrix{H}
+\newcommand\CamR{R}
+\newcommand\CamTr{\vect{t}}
+\newcommand\RetProj[1]{\CamR #1 + \CamTr}
+\newcommand\CamProj[1]{\CamMatrix(\RetProj{#1})}
+
+\newcommand\Rectifier{H_{\textsf{rect}}}
+\newcommand\HomParam\mu
+\newcommand\ScaleParam\lambda
+
+\newcommand\CeilPt{\vect{p_c}}
+\newcommand\FloorPt{\vect{p_f}}
+\newcommand\CeilVec{\vect{X_c}}
+\newcommand\FloorVec{\vect{X_f}}
+\newcommand\eceil{\vect{e_c}}
+\newcommand\efloor{\vect{e_f}}
+\newcommand\pceil{\CeilPt}
+\newcommand\pfloor{\FloorPt}
+\newcommand\horizon{\vect{h}}
+
+\newcommand\Wall{W}
+
+\newcommand\backproj{\operatorname{backproject}}
+
+\newcommand\ebasis{\vect{e}}
+\newcommand\ex{\ebasis_1}
+\newcommand\ey{\ebasis_2}
+\newcommand\ez{\ebasis_3}
+
+
+
+
+% Rotation estimation
+\newcommand\StartPt{\vect{a}}
+\newcommand\EndPt{\vect{b}}
+\newcommand\LineSeg{\vect{l}}
+\newcommand\LineSegs{L}
+
+\newcommand\Indicator{z}    % associating lines with vanishing points
+\newcommand\Indicators{Z}
+\newcommand\SpurJoint{\rho}
+\newcommand\SpurIndicator{s}
+
+\newcommand\TrueStartPt{\bar{\vect{a}}}
+\newcommand\TrueEndPt{\bar{\vect{b}}}
+\newcommand\TrueSeg{\bar{\LineSeg}}
+
+\newcommand\EffectiveVpt{\vpt}
+\newcommand\ReprojLine{\vect{m}}
+
+\newcommand\dist{d}
+\newcommand\Mixing{\pi}
+\newcommand\Spurious{\textsf{spurious}}
+
+\newcommand\PosteriorEst{q}
+\newcommand\Resp{r}          % responsibility
+\newcommand\ErrorFunc{f}
+\newcommand\Gen{G}           % generator matrices
+\newcommand\LieM{m}          % coefficients in the Lie algebra
+\newcommand\LieMs{\vect{m}}  % coefficients in the Lie algebra
+

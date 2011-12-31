@@ -1,0 +1,42 @@
+% This file may be useful when drafting a
+% single chapter. It wraps the chapter text
+% up in a journal style
+% You could use any layout you wanted
+\documentclass[journal,a4paper,10pt]{../setup/IEEEtran}
+ 
+\usepackage{times}
+\usepackage{amsmath,amsfonts}
+\usepackage{graphicx}
+\usepackage{algorithm,algorithmic}
+% Our stuff to set draft page etc
+%\usepackage{../setup/avldraft}   
+% Our stuff to set math defs etc
+\usepackage{../setup/avldefs}   
+% My very personal defs etc
+\usepackage{../setup/mydefs}   
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+\begin{document}
+\def\localpath{.}
+  
+\title{My Chapter}
+\author{My Name}
+%
+\maketitle
+ 
+\begin{abstract}
+\input{abstract2}
+\end{abstract}
+
+\input{chapter2}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibstuff
+\bibliography{../VisionRefs}
+ 
+
+ 
+
+\end{document} 
