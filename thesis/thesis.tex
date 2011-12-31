@@ -1,0 +1,181 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,11pt]{report}
+% Add 'twoside' to the document class for two-sided
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Font
+%\usepackage{newcent}         
+%\usepackage{times}         
+\usepackage{palatino}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Size, ams 
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{algorithm,algorithmic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Other packages
+\usepackage{xspace}
+\usepackage{epsfig}
+\usepackage{booktabs}
+\usepackage{verbatim}
+\usepackage{array}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Our stuff to set chapters, page size etc
+\usepackage{setup/avlthesis}
+% Our stuff to set math defs etc
+\usepackage{setup/avldefs}   
+% My stuff to set very personal defs
+\usepackage{setup/mydefs}   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define these
+\def\xtitle{Contextual Reasoning for Egocentric Vision}
+\def\xauthor{Alexander John Flint}
+\def\xcollege{Exeter College}
+\def\xterm{Hilary Term 2012}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{1}
+\begin{document}
+
+\pagestyle{empty}
+\setcounter{page}{1}
+\pagenumbering{roman}
+
+\def\localpath{frontmatter}
+% no need to alter frontmatter/title.tex
+\input{frontmatter/title}
+\sglspace
+% edit the words in frontmatter/abstract.tex
+\input{frontmatter/abstract}
+
+\setcounter{tocdepth}{4}
+\tableofcontents
+\newpage
+% edit the words in frontmatter/acknowledgements.tex
+\input{frontmatter/acknowledgements}
+\newpage
+% edit the words in frontmatter/notation.tex
+\input{frontmatter/notation}
+\newpage
+% edit the words in frontmatter/abbreviations.tex
+\input{frontmatter/abbreviations}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{page}{0}
+\pagenumbering{arabic}
+\pagestyle{thesisheadings}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{Introduction}
+\graphicspath{{\localpath/figures/}}
+\chapter{Introduction}
+\label{chap:intro}
+\input{Introduction/introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{Review}
+\graphicspath{{\localpath/figures/}}
+\chapter{Review}
+\label{chap:review}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{Review/review}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{AppearanceOnly}
+\graphicspath{{\localpath/figures/}}
+\chapter{Appearance--Only Context Models}
+\label{chap:appearance-only}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{AppearanceOnly/appearance_only}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{Geometry}
+\graphicspath{{\localpath/figures/}}
+\chapter{Geometry of Indoor Environments}
+\label{chap:geometry}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{Geometry/geometry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{RecoveringOrientation}
+\graphicspath{{\localpath/figures/}}
+\chapter{Recovering Orientation}
+\label{chap:orientation}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{RecoveringOrientation/recovering_orientation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{Models}
+\graphicspath{{\localpath/figures/}}
+\chapter{Probabilistic Models for Manhattan Worlds}
+\label{chap:models}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{Models/models}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{Inference}
+\graphicspath{{\localpath/figures/}}
+\chapter{Inference}
+\label{chap:inference}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{Inference/inference}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{Learning}
+\graphicspath{{\localpath/figures/}}
+\chapter{Learning}
+\label{chap:learning}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{Learning/learning}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\localpath{Conclusion}
+\graphicspath{{\localpath/figures/}}
+\chapter{Conclusion}
+\label{chap:conclusion}
+% If you like chapter abstracts ...
+%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
+\input{Conclusion/conclusion}
+
+% Appendices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+%
+\chapter{Dull stuff in the Appendix}
+\def\localpath{ApA}
+\input{ApA/appendixa}
+
+\sglspace
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibstuff
+\pagestyle{bibheadings}
+
+%\bibliographystyle{plain}   % For just numbers
+\bibliographystyle{alpha}   % For initials+year
+%\bibliographystyle{apalike} % For full surname
+\bibliography{TransferReport,VisionRefs}
+
+\end{document}

@@ -1,0 +1,3 @@
+Labelling accuracy: 0.785410%
+Mean depth error: 0.785410%
+50th/90th/99th percentile errors:        0.0% / 42.2% / 65.3%

@@ -1,0 +1,177 @@
+
+\textheight        640pt 
+\textwidth         160mm
+\columnwidth       \textwidth
+\footskip          0.3in
+\topmargin        -0mm % 3cm margin
+\oddsidemargin    +2mm
+\evensidemargin   +2mm
+\parindent        0mm
+
+\font\notefont=cmr10 at 6pt
+\font\matfont=cmr10 at 8.5pt
+\font\matfontdos=cmr10 at 10pt
+\newcommand{\mynote}[1]{\marginpar{\notefont #1}}
+
+\newcommand{\sglspace}{\setlength{\baselineskip}{11truept}}
+\newcommand{\dblspace}{\setlength{\baselineskip}{22truept}}
+\newcommand{\tablinespace}{\renewcommand{\arraystretch}{1.2}}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\if@twoside         % If two-sided printing.
+\def\ps@oldtheadings{\let\@mkboth\markboth
+\def\@oddfoot{DRAFT \hfil \today}\def\@evenfoot{DRAFT \hfil \today}
+\def\@evenhead{\rm \thepage\hfil \sl \leftmark}%        Left heading.
+\def\@oddhead{\hbox{}\sl \rightmark \hfil \rm\thepage}% Right heading.
+\def\chaptermark##1{\markboth {\uppercase{\ifnum \c@secnumdepth >\m@ne
+      \@chapapp\ \thechapter. \ \fi ##1}}{}}%
+\def\sectionmark##1{\markright {\uppercase{\ifnum \c@secnumdepth >\z@
+   \thesection. \ \fi ##1}}}}
+\else               % If one-sided printing.
+\def\ps@oldheadings{\let\@mkboth\markboth
+\def\@oddfoot{DRAFT \hfil \today}\def\@evenfoot{DRAFT \hfil \today}
+\def\@oddhead{\hbox {}\sl \rightmark \hfil \rm\thepage}% Heading.
+\def\chaptermark##1{\markright {\uppercase{\ifnum \c@secnumdepth >\m@ne
+      \@chapapp\ \thechapter. \ \fi ##1}}}}
+\fi
+
+\newlength{\chaplen}
+\newlength{\chaptitlewidth}
+
+\def\@makechapterhead#1{\vspace*{30pt}{\parindent 0pt
+ \ifnum\c@secnumdepth >\m@ne
+   \hfill\inch\thechapter\par\vskip \@fterchapnumskip
+ \fi
+ \parbox[t]{\textwidth}{\begin{center}\@chapsym\chft #1\end{center}}
+ \nobreak\vskip 20pt\vskip -\baselineskip\hrule\vskip 20pt}}
+
+% {\raggedright\hbox{\@chapsym\chft #1}\par}
+% \nobreak\vskip 20pt\hrule\vskip 20pt}}
+
+\def\@makeschapterhead#1{\vspace*{50pt}{\parindent 0pt
+ {\raggedright\hbox{\@chapsym\chft #1}\par}
+ \nobreak\vskip 20pt\hrule\vskip 20pt}}
+
+\def\chapter{\clearpage\thispagestyle{empty} \global\@topnum\z@
+\@afterindentfalse \secdef\@chapter\@schapter}
+
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+   \refstepcounter{chapter}
+   \typeout{\@chapapp\space\thechapter.}
+   \addcontentsline{toc}{chapter}{\protect
+   \numberline{\thechapter}#1}
+ \else
+   \addcontentsline{toc}{chapter}{#1}
+  \fi
+ \chaptermark{#1}
+ \addtocontents{lof}{\protect\addvspace{10pt}}
+ \addtocontents{lot}{\protect\addvspace{10pt}}
+ \if@twocolumn\@topnewpage[\@makechapterhead{#2}]
+ \else\@makechapterhead{#2}\@afterheading
+ \fi}
+
+\def\@schapter#1{\if@twocolumn \@topnewpage[\@makeschapterhead{#1}]
+ \else\@makeschapterhead{#1}\@afterheading
+ \fi}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newlength{\pagewidth}
+\setlength{\pagewidth}{160mm}
+
+\makeatletter
+\def\ps@draftheadings{
+\let\@mkboth\markboth
+\def\@oddfoot{\footnotesize Draft \hfil \today}
+\def\@oddhead{\makebox[\textwidth][l]{\underline{\hbox to \pagewidth 
+{\bf \raisebox{0ex}[0ex][1.2ex]
+\firstmark\hfill\thepage}}}}%
+\def\@evenfoot{\footnotesize Draft \hfil \today}
+\def\@evenhead{\makebox[\textwidth][r]{\underline{\hbox to \pagewidth{\bf
+\raisebox{0ex}[0ex][1.2ex] \thepage\hfill\@lhead}}}}%
+\def\chaptermark##1{\mark{}\def\@lhead{##1}}%
+\def\chaptermark##1{{\let\protect\noexpand\mark{\thechapter 
+    \hskip 1em##1}}}}
+
+%finalheadings
+\def\ps@thesisheadings{
+\let\@mkboth\markboth
+\def\@oddfoot{}
+\def\@oddhead{\makebox[\textwidth][l]{\underline{\hbox to \pagewidth{\bf
+\raisebox{0ex}[0ex][1.2ex]\firstmark\hfill\thepage}}}}%
+\def\@evenfoot{}
+\def\@evenhead{\makebox[\textwidth][r]{\underline{\hbox to \pagewidth{\bf
+\raisebox{0ex}[0ex][1.2ex]\thepage\hfill\@lhead}}}}%
+\def\chaptermark##1{\mark{}\def\@lhead{##1}}%
+\def\sectionmark##1{{\let\protect\noexpand\mark{\thesection 
+    \hskip 1em##1}}}}
+
+%bibheadings Added by Eric Hayman to prevent latex screwing up, for
+%            some strange reason, on the header for the bibliography
+% BJT: Adjusted two-sided version to also print 'bibliography' as
+%      there are no sections
+\def\ps@bibheadings{
+\let\@mkboth\markboth
+\def\@oddfoot{}
+\def\@oddhead{\makebox[\textwidth][l]{\underline{\hbox to \pagewidth{\bf
+\raisebox{0ex}[0ex][1.2ex]Bibliography \hfill\thepage}}}}%
+\def\@evenfoot{}
+\def\@evenhead{\makebox[\textwidth][r]{\underline{\hbox to \pagewidth{\bf
+\raisebox{0ex}[0ex][1.2ex]\thepage\hfill Bibliography}}}}%
+\def\chaptermark##1{\mark{}\def\@lhead{wibble}}%
+\def\sectionmark##1{{\let\protect\noexpand\mark{\thesection 
+    \hskip 1em##1}}}}
+
+
+%special_plain for first pages of each chapter
+\def\ps@specialheadings{\def\@oddfoot{}
+\def\@oddhead{\makebox[\textwidth][l]{\hbox to \pagewidth {\hfill 
+{\bf \raisebox{0ex}[0ex][1.2ex]{\thepage}}}}}
+\def\@evenfoot{}
+\def\@evenhead{\makebox[\textwidth][r]{\hbox to \pagewidth {\hfill 
+{\bf \raisebox{0ex}[0ex][1.2ex]{\thepage}}}}}
+}
+
+
+%figureheadings
+\def\ps@figureheadings{
+\let\@mkboth\markboth
+\def\@oddfoot{}
+\def\@oddhead{\makebox[\textwidth][l]{\underline{\hbox to \pagewidth{\bf
+\raisebox{0ex}[0ex][1.2ex]
+{\@chapapp \hskip 0.5em \thechapter \hskip 1em
+}\hfill\thepage}}}}
+\def\@evenfoot{}
+\def\@evenhead{\makebox[\textwidth][r]{\underline{\hbox to \pagewidth{\bf
+\raisebox{0ex}[0ex][1.2ex]\thepage\hfill\@lhead}}}}%
+\def\chaptermark##1{\mark{}\def\@lhead{##1}}%
+\def\sectionmark##1{{\let\protect\noexpand\mark{\thesection 
+    \hskip 1em##1}}}}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newlength{\diagramwidth}
+\setlength{\diagramwidth}{0.35\textwidth}
+\newlength{\imwidth}
+\setlength{\imwidth}{0.12\textwidth}
+\newlength{\imwidthsix}
+\setlength{\imwidthsix}{0.16\textwidth}
+\newlength{\imwidththree}
+\setlength{\imwidththree}{0.3\textwidth}
+\newlength{\imwidthfour}
+\setlength{\imwidthfour}{0.235\textwidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\floatsep}{5mm}%3
+\renewcommand{\textfloatsep}{3mm}%5
+\renewcommand{\dbltopfraction}{0.99}
+\renewcommand{\dblfloatpagefraction}{.01}
+\renewcommand{\dblfloatsep}{2mm}%5mm
+\renewcommand{\dbltextfloatsep}{5mm}%5mm
+\setlength{\intextsep}{11pt}%12pt
