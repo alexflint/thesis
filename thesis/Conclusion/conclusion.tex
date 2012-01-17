@@ -1,4 +1,273 @@
-\section{Introduction}
-Introduction here
+- summarise chapters?
+- re-iterate take-home messages from introduction
+  - AR is more than just SLAM
+  - multi-view scene understanding is worthwhile
+  - geometry is helpful for scene understanding
+  - indoor Manhattan models are a good choice because
+    - simple
+    - concise
+    - general
+    - efficient inference possible
 
-\section{More sections...}
+- key results
+  - textons are a simple and flexible basis for scene context
+  - vanishing points should be estimated from multiple views if available
+  - there is a simple and efficient inference algorithm for indoor Manhattan models
+  - single and multiple views under one framework
+  - discriminative training of indoor Manhattan models is possible
+
+
+In this thesis I have presented a series of ideas for high--level
+inference in the context of a moving observed. Drawing inspiration
+from scene understanding ideas that have traditionally been the
+purview of single--view computer vision, we have demonstrated a number
+of promising approaches towards multiple--view scene understanding. In
+this concluding chapter we will briefly review the key results and
+present ideas for future work.
+
+\section{Key Results}
+
+\Chapref{appearance-only} presented 
+
+In \chapref{models} we presented a probabilistic model relating indoor
+Manhattan models to three sensor modalities. We showed that for all
+three sensor modalities, MAP inference can be reduced to optimisation
+over a payoff matrix. We see this formulation as the key result of
+this chapter; it suggests a general strategy by which further sensor
+modalities can be integrated with our model without modifying the
+inference algorithm.
+
+One contribution of this thesis is the dynamic programming algorithm
+that we presented in \chapref{inference}. The geometric prior that we
+employed prevents our problem from fitting into common frameworks
+suited to the Viterbi algorithm. Nevertheless, we showed that a
+decomposition into sub--problems permitted an efficient and exact
+dynamic programming solution
+
+A theme of this thesis has been the use of geometry for scene
+understanding purposes. We have shown how to extract semantically
+meaningful reconstructions using ideas drawn from both the geometry
+literature and the scene understanding literature. It was ideas from
+geometry that allowed us to decompose our reconstructions into a
+representation amenable to dynamic programming, but ideas from
+single--view scene understanding and probability theory that allowed
+us to connect our hypothesis class to observed image features.
+
+\section{Future Work}
+
+\subsection{Applications of Indoor Manhattan Models}
+
+Perhaps the clearest direction for future work is to apply the indoor
+Manhattan model to the semantic inference tasks for which it was
+originally designed, namely scene category recognition and contextual
+object detection.
+
+Scene category recognition is the problem of classifying scenes into
+categories such as ``bedroom'', ``bathroom'', or ``office''. There is
+a significant literature on this problem for the single--view case (as
+reviewed in \chapref{review}), but little effort has been directed at
+leveraging multiple--view geometry to this end. Since humans greatly
+out--perform computers at this task, and humans appear to use various
+notions of geometry to achieve their high performance, the use of
+geometry for scene categorisation appears to be a particularly
+compelling direction for future work.
+
+Indoor Manhattan models could be leveraged for scene categorisation in
+a number of ways. At the simplest level, one could recover an indoor
+Manhattan representation for a query scene and compute a series of
+geometric features to capture the shape of the scene (ratios of
+length, breadth, and height, for example) and the position of the
+camera within it. These could be appended to a vector of photometric
+features (such as the many proposed in the single--view literature),
+then a classic multiple--label classifier could be trained to
+distinguish the various categories. A more sophisticated approach
+might link the recovered geometry with photometric information more
+closely. A typical photo captured by a camera located close to the
+ceiling would be expected to look different from that of a camera
+located close to the floor, even within one scene
+category. Photoemtric approaches rely on a classifier to learn such
+variations automatically, but with an indoor Manhattan model at hand
+one could model such variations explicitly. For example, one could
+build up separate appearance models of the floor, wall, and ceilings,
+using known geometry and camera position to compute
+viewpoint--invariant features. Finally, the possibility exists of
+improving upon simple Markovian models to integrate information over
+time. A system that recognises when the camera moves between rooms
+(such as by identifying doorways) could segment a video sequence
+according to which frames are situated in which rooms. Such a system
+could perform data association between observations and room
+categories much more accurately than under a hidden Markov model with
+a homogeneous transition function such as that used in
+\cite{Torralba03}.
+
+The second application to which I intended to apply indoor Manhattan
+models was object recognition. Contextual information appears to
+greatly improve object recognition (see \chapref{review} for a
+review), and the prospect of leveraging the high--level geometric
+information captured by the indoor Manhattan for this purpose seems
+promising. A simple approach would be to append geometric features
+derived from the recovered indoor Manhattan model to traditional
+appearance features. These geometric features might include the
+distance of the object from the floor plane (as a percentage of the
+distance from floor to ceiling), the distance from the closest wall,
+shape features of the environment, and so on. However, once again the
+possibility exists of using Manhattan geometry in a more sophisticated
+way than just augmenting a feature vector. For example, one could
+integrate observations from different viewpoints to improve the
+estimate of an object's identity. The floorplan provided by an indoor
+Manhattan model could provide a natural basis for integrating such
+observations.
+
+Several robotics applications may also benefit from the ability to
+recover Manhattan structure. Path planning requires knowledge of
+``traversible'' surfaces in the environment as well as boundaries that
+will obstruct movement. The floorplan provided by an indoor Manhattan
+model seems a natural representation of such information. One might
+divide the floor plane into a series of cells and separately estimate
+traversibility of each. The occupancy grid estimation might benefit
+substantially from knowing the shape of the environment about each
+cell.
+
+Related to path planning is the problem of \textit{active
+  exploration}, in which an agent must plan a path to find an object
+or location of interest as quickly as possible. Typically this problem
+is approached from the perspective of information gain rather than
+shortest path. One might use Manhattan models as a basis for active
+exploration by reasoning explicitly in terms of rooms and
+corridors. For example, if a robot seeking a teapot recognises that it
+is in a bathroom then it could move to a different room immediately,
+not bothering to continue searching the current environment. There are
+also interesting connections here to the active search problem we
+considered in relation to our texton work in
+\chapref{appearance-only}.
+
+  - application areas
+    - use indoor Manhattan models for the purpose they were originally intended for
+      - scene categorization
+      - contextual priming for object detection
+    - other uses
+      - navigation
+      - active search, info-based path planning
+
+\subsection{Relaxing Geometric Constraints}
+
+A common criticism levelled against indoor Manhattan models is the
+strong geometric constraints that one must make. We have argued that
+even in their present form, indoor Manhattan models are surprisingly
+versatile. Nevertheless, there are several promising approaches to
+relaxing these assumptions. The difficulty, of course, is finding
+relaxations that retain the fast inference algorithm of
+\chapref{inference}, which is based on the left--to--right
+decomposability of indoor Manhattan models.
+
+A first relaxation is to permit walls oriented in more than two
+directions. This ccould be accomplished by identifying vanishing
+points on the horizon line corresponding to additional wall
+orientations, then extending the domain of the orientation variable in
+the inference algorithm to account for these. These vanishing points
+could be found either by clustering lines with respect to their
+intersection at the horizon, or by modifying the rotation estimation
+algorithm to jointly estimate these wall orientations together with
+the scene orientation.
+
+A second relaxation would be to permit walls that do not project to
+straight lines on the floor plane. This could be accomplished in a
+range of ways depending on the restriction that is chosen to replace
+straightness. One could parametrise walls in pixel coordinates and
+simply allow walls to change direction arbitrarily. While this would
+permit a wide range of environments to be represented, it is not clear
+that this is desirable since it removes the implicit penalization of
+highly complex models. A different approach would be to permit
+paramtric curves so that pillars and circular wall segments could be
+represented. This could be accomplished without expanding the
+state--space of the dynamic programming at all; it would simply entail
+integrating the parametric family into the maximization in
+\eqnref{fin-split}.
+
+Another promising direction for relaxation would be to target outdoor
+areas by removing the assumption of a fixed ceiling plane. Many
+built--up areas could be represented by a horizontal ground plane and
+series of vertical facades. The key difference between indoor
+environments is that building facades typically have varying
+height. By adding a height parameter to the state space one could
+jointly estimate the orientation and height of each facade using only
+a slight modifcation to the algorithm presented in
+\chapref{inference}.
+
+\subsection{Extensions Of The Probabilistic Model}
+
+In addition to the geometric extensions suggested above, there are
+several promising ways in which the probabilistic models underlying
+Manhattan structure recoery could be extended. In \chapref{learning}
+we considered learning from labelled examples, but other types of
+background information could also be helpful for fixing
+parameters. For example, a database of architectural floorplans could
+be leveraged to learn about the architectures an agent is most likely
+to encounter, and hence to form a more accurate prior over building
+structures. This would require a Bayesian model connecting
+architectural floorplans to our prior over building structures
+
+In a different direction, one might consider \textit{marginalizing}
+over indoor Manhattan reconstructions for certain purposes rather than
+just using a single MAP estimate. That is, for the purpose of, say,
+scene categorisation or object search, we would consider \textit{all}
+possible indoor Manhattan reconstructions and their implications for
+the task at hand, weighted by their plausability under the model
+presented in \chapref{models}. In this case we would see the
+reconstruction as a latent variable, so the Bayesian gold standard is
+always to marginalise. In many cases such a marginalisation is
+intractible, but in the case of indoor Manhattan models there is a
+promising approach by which the decomposition of \chapref{inference}
+might be leveraged to perform exact marginalisation for a large family
+of models.
+
+Finally, there is much room for integrating the estimation of indoor
+Manhattan models over time. Currently our inference procedure is a
+batch operation that re--estimates the model from scratch at each time
+step. Extending this to a recursive estimation framework would allow
+us to integrate new information in a more principled way, and avoid
+discarding the computational effort invested at previous time
+steps. Recursive estimators maintain a distribution over an underlying
+hypothesis class that can be efficiently updated from new
+evidence. The Kalman filter, for example, uses a vector space as its
+hypothesis class and maintains a joint Gaussian distribution over
+hypotheses, represented by a mean and covariance. A filter for indoor
+Manhattan environments might represent hypotheses in the seam
+representation discussed in chapter \chapref{geometry} and summarise a
+distribution over this space using a payoff matrix as discussed in
+\chapref{inference}. Updating the payoff matrix over time requires
+integrating image evidence from new viewpoints, but we have already
+presented the basic geometry that such updates would require during
+our discussion of stereo features in \chapref{models}. Significant
+work would be required to deal with the occlusion artifacts that
+integrating information over long periods would introduce.
+
+  - Bayesian training
+    - learning from architectural databases
+  - distributions of manhattan worlds
+    - perturb-and-MAP style inference for scene categorisation etc
+  - recursive estimation of indoor Manhattan models
+
+\subsection{Next Steps For Semantic SLAM}
+
+We now delve into some more speculative ideas for future research of
+particular relevance to the ideas presented in this thesis.
+
+TODO
+
+- next steps for multi-view scene understanding
+  - connecting with textons (other information too?)
+  - occlusion reasoning
+  - unsupervised learning of common building structures
+  - explicitly modelling lighting
+  - 
+
+\section{Final Remarks}
+
+The meeting between geometric ideas from structure--from--motion and
+scene understanding ideas from single view computer vision seems to
+hold promise as an exciting research direction over the coming
+years. This will be driven as much by the new sensor modalities
+discussed in the introduction as by the maturatity of both SLAM and
+scene understanding as separate areas of study. 
+
