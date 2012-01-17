@@ -5,26 +5,40 @@ discover the orientation of the Manhattan world with respect to the
 camera. Equivalent to the Manhattan world assumption is the statement
 that there exists a ``canonical'' coordinate frame in which world
 surfaces are axis--aligned. The topic of this chapter is the
-estimation of $\SceneR$ from a sequence of input images. As described
-in preceeding chapters, we assume a structure--from--motion system
-providing a continuous estimate of the camera pose. We will not use
-any point cloud generated from structure--from--motion in this
-chapter.
+estimation of this coordinate frame from a sequence of input images. 
 
-$\SceneR$ is constant for all frames since the structure--from--motion
-system measures consecutive poses with respect to single global
-coordinate frame.
+We assume that an estimate of the camera pose for each frame is
+available, such as might be estimated by a structure--from--motion
+system. We will not use any point cloud generated from
+structure--from--motion in this chapter. We assume that provided
+camera poses are measured in a fixed but arbitrary coordinate
+frame. In practice this coordinate frame might be determined during a
+SLAM initialization phase, for example. The transform to the unknown
+canonical coordinate frame is therefore a 3--dimensional rotation
+$\SceneR$, which is applied consistently to all frames.
+
+We estimate $\SceneR$ using the assumption that a non--trivial number
+of line segments observed in the input frames correspond to one of the
+three Manhattan orientations. We present a graphical model relating
+line segments to $\SceneR$, then we present an
+expectation--maximization algorithm for inference within this model.
 
 The problem of determining $\SceneR$ in the conext of a single image
-is equivalent to the problem of vanishing point detection since three
-vanishing points and a calibrated camera give $\SceneR$ in closed
-form, and vice--versa. TODO: give equations here? Therefore the
-algorithms presented in this chapter may be viewed as a generalization
-of vanishing point detection to multiple calibrated views.
-
-TODO: note on point estimate of R rather than joint inference.
+is equivalent to detecting vanishing points since three vanishing
+points and a calibrated camera give $\SceneR$ in closed form. However,
+in the multiple view context it makes sense to estimate $\SceneR$
+jointly using all available information, rather than to try post--hoc
+merging of single--view estimates. One view of the contribution of
+this chapter is therefore as a generalization of vanishing point
+detection to multiple calibrated views.
 
 \section{Background}
+
+Vanishing point detection has a long history in the computer vision
+literature, stretching at least as far back as the seminal work of
+Barnard \etal \cite{Barnard83}. In this section we survey key
+contributions within this literature and discuss their relationship to
+our work.
 
 \subsection{Single View}
 
@@ -91,14 +105,14 @@ in the last section of this chapter.
 
 \subsection{Mulitple Views}
 
-The literature concerning multiple views leverage different approaches
-to recover $\SceneR$. Furukawa and Curless \cite{Furukawa09} use
-multiple--view stereo to recover a dense point cloud, then estimate
-$\SceneR$ by clustering surface normals on the unit hemisphere.
-
-Werner and Zisserman \cite{Werner02} identify vanishing points
-independently in several uncalibrated views, then resolve associations
-between views using a simple combinatorial search.
+The literature concerning multiple views is considerably more sparse,
+and generally involve alternate approaches to recover
+$\SceneR$. Furukawa and Curless \cite{Furukawa09} use multiple--view
+stereo to recover a dense point cloud, then estimate $\SceneR$ by
+clustering surface normals on the unit hemisphere. Werner and
+Zisserman \cite{Werner02} identify vanishing points independently in
+several uncalibrated views, then resolve associations between views
+using a simple combinatorial search.
 
 \section{Overview of Proposed Approach}
 
@@ -113,18 +127,18 @@ three--parameter estimation problem. Furthermore, the point cloud
 provided by on--line structure--from--motion is too sparse to obtain
 accurate surface normal estimates.
 
-We overcome these limitations by reasoning directly in terms of line
+We overcome these difficulties by reasoning directly in terms of line
 segments and integrating observations from many frames into the
 estimation. Since $\SceneR$ is fixed for all frames it makes sense to
 leverage all available data during estimation. Whereas previous
 approaches often estimate vanishing points as a precursor to
 reconstructing camera poses \cite{Zhang02,Werner02}, we prefer to rely
-on a vanishing point--less structure--from--motion system to provide
-camera poses, then recover vanishing points afterwards. Under this
-problem setup we can relate line segments in all views directly to
-$\SceneR$ and therefore to perform full joint estimation. We show that
-this is both computationally efficient and avoids the fragile
-single--view estimation scenario.
+on the structure--from--motion system only to provide camera poses,
+then recover vanishing points afterwards. Under this problem setup we
+can relate line segments in all views directly to $\SceneR$ and
+therefore incorporate all available evidence into a joint
+estimation. We show that this is both computationally efficient and
+avoids the fragile single--view estimation scenario.
 
 \section{Generative Model}
 
@@ -145,39 +159,39 @@ single--view estimation scenario.
 
 We assume the graphical model shown in \figref{R-graphical}. The
 variable $\Indicator$ bears special explanation. It is a binary vector
-of length 4 indicating which vanishing point the $i$\th line segment
-is associated with. Exactly one element is set to 1, the remainder are
+of length 4 indicating which vanishing point each line segment is
+associated with. Exactly one element is set to 1, the other three are
 0. The first three elements correspond to the three vanishing points;
 the fourth element corresponds to a spurious observation not
-associated with any of the three Manhattan directions. We denote
-the (binary) value of one of the components by $\Indicator_{ik}$ but
-we will also write $\Indicator_i=k$ as shorthand for the event that
+associated with any of the three Manhattan directions. We denote the
+(binary) value of the $k$\th element $\Indicator_{ik}$, but we will
+also write $\Indicator_i=k$ as shorthand for the event that
 $\Indicator_i$ is the binary vector with the $k$\th element set to 1
 and the others set to zero. For clarity we write
 $\Indicator_i=\Spurious$ in place of $\Indicator_i=4$.
 
 The generative process operates as follows. First we sample a scene
-orientation $\SceneR$ and the rotation component of the camera pose
-for each frame. Camera translation plays no part when reasoning about
-vanishing points, which are at infinity. Next we sample a series of
-indicators and line segments. First we sample $\Indicator_i$ from a
-categorical distribution with mixing parameters $\Mixing$. Next, if
-$\Indicator_i=\Spurious$ then the line segment $\TrueSeg$ is sampled
-uniformly from the image. Otherwise, we sample $\TrueSeg$ as follows.
+orientation $\SceneR$ and the rotation component of the camera pose,
+$\CamR_i$ for each frame. (Camera translation plays no part when
+reasoning about vanishing points.) Next we sample each
+$\Indicator_i$ from a categorical distribution with mixing parameters
+$\Mixing$. If $\Indicator_i=\Spurious$ then we the line segment
+$\TrueSeg$ is sampled uniformly from the image. Otherwise, we sample
+$\TrueSeg$ as follows.
 
 The vanishing point $\vpt$ corresponding to $\Indicator_i$ is
 \begin{equation}
   \vpt_{\Indicator_i} = \CamR_i \SceneR \ebasis_{\Indicator_i} ~.
 \end{equation}
 We sample a ray through $\vpt$, then sample a line segment $\TrueSeg =
-(\TrueStartPt,\TrueEndPt)$ along the ray. Finally we sample Gaussian
+(\TrueStartPt,\TrueEndPt)$ along the ray. We add isotropic Gaussian
 noise to arrive at the measured line segment
 $\LineSeg=(\StartPt,\EndPt)$:
 \begin{eqnarray}
   \StartPt &\sim& \NormalDistr(\TrueStartPt, \Sigma) \\
   \EndPt &\sim& \NormalDistr(\TrueEndPt, \Sigma) ~.
 \end{eqnarray}
-This is illustated in \figref{R-graphical}.
+This process is illustated by the graphical model in \figref{R-graphical}.
 
 \subsection{Likelihood for Line Segments}
 
@@ -194,15 +208,15 @@ simplified as follows
 \end{eqnarray}
 where $\dist(\LineSeg,\vpt)$ is the reprojection error illustrated in
 \figref{reprojection-error}. $\dist$ is computed as follows. First,
-cast a line between the vanishing point $\vpt$ and the mid--point of
+draw a line between the vanishing point $\vpt$ and the mid--point of
 the line segment $\LineSeg$,
 \begin{equation}
   \ReprojLine_{ik} =
     \vpt_k \cross \frac{\StartPt_i+\EndPt_i}{2}
 \end{equation}
 Now, $\dist$ is the distance between the line $\ReprojLine$ and either
-end point of $\LineSeg$ (the two quantities are equal, as evident by
-inspecting \figref{reprojection-error}). So
+of the two end points of $\LineSeg$ (the two quantities are equal, as
+evident by inspecting \figref{reprojection-error}). So
 \begin{eqnarray}
   \dist(\LineSeg_i,\vpt_k) &=& 
   \frac
@@ -249,7 +263,7 @@ drawn from completely different distributions depending on its value:
       & \mbox{if } \Indicator_i = \Spurious ~.
   \end{cases}
 \end{equation}
-Through our definition of $\Indicator_i$ as a binary vector we can
+Due to our definition of $\Indicator_i$ as a binary vector we can
 express this likelihood in the following analytic form,
 \begin{equation}
   \label{eq:complete-likelihood}
@@ -261,6 +275,10 @@ express this likelihood in the following analytic form,
 \end{equation}
 
 \section{Inference}
+
+We now turn to the inference algorithm that we use to perform a
+maximum--likelihood estimate of $\SceneR$ under the probabilistic
+assumptions described in the previous section.
 
 \subsection{Detecting Line Segments}
 
@@ -285,7 +303,7 @@ to follow are conditioned on $\{\CamR_i\}$.
 The indicators $\Indicators$ are latent variables over which we need
 to marginalize in order to perform inference on $\SceneR$. Integrating
 explicitly over $\Indicator$ is intractible so we turn to the
-Expectation--Maximization algorithm, which alternately refines
+expectation--maximization algorithm, which alternately refines
 estimates of the posterior on $\Indicators$ (the ``E--step'') and
 $\SceneR$ (the ``M--step'').
 
@@ -293,7 +311,9 @@ Due to the iterative nature of the EM algorithm we adopt superscript
 notation for the scene rotation and indicators to make clear the
 dependence between successive time steps. $\SceneR^t$ is the estimate
 of the scene rotation at time $t$ and $\PosteriorEst^t$ is the
-estimate for the posterior on $\Indicators$ at time $t$. We will treat
+estimate for the posterior on $\Indicators$ at time $t$. Note that the
+former is an estimate of a variable but the latter is an estimate of a
+distribution over a variable. For notational convenience we will treat
 $\PosteriorEst$ as a continuous function, though of course behind the
 scenes we are really just estimating sufficient statistics for
 $\PosteriorEst$. Also note that we never actually store or estimate
@@ -304,8 +324,8 @@ marginalizing it out, or defining a function over it.
 
 \subsubsection{The E--step}
 
-In this phase we compute sufficient statistics for the posterior on
-the indicators,
+During this phase we compute sufficient statistics for the posterior on
+the indicators given a (fixed) estimate of $\SceneR$.
 \begin{eqnarray}
   \PosteriorEst^t(\Indicators) &=&
     P(\Indicators ~|~ \LineSegs,\SceneR^t) \\
@@ -323,7 +343,7 @@ Consider the term on the top line,
   P(\LineSeg_i,\Indicator_i ~|~\SceneR^t)
   =
   P(\LineSeg_i ~|~ \Indicator_i,\SceneR^t)
-  P(\Indicator_i ~|~ \SceneR^t)
+  P(\Indicator_i ~|~ \SceneR^t) ~.
 \end{equation}
 As a function of $\Indicator_i$ this is simply a categorical
 distribution, and since equation \eqnref{posterior-est} is a
@@ -440,32 +460,32 @@ in the number of observed line segments.
 
 \subsubsection{M--step}
 
-In the M--step we maximize the expectation of the complete data
-log--likelihood with respect to the distribution
-$\PosteriorEst^t$. The complete data log--likelihood is
+During this phase we compute $\SceneR^{t+1}$ as the maximizer of the
+expectation of the complete data log--likelihood under the (fixed)
+distribution $\PosteriorEst^t$. The complete data log--likelihood is
 \begin{equation}
   \label{eq:complete-loglikelihood}
-  \log P(\LineSegs,\Indicators ~|~ \SceneR^t) =
-  \sum_i \log P(\LineSeg_i,\Indicator_i ~|~ \SceneR^t) ~.
+  \log P(\LineSegs,\Indicators ~|~ \SceneR) =
+  \sum_i \log P(\LineSeg_i,\Indicator_i ~|~ \SceneR) ~.
 \end{equation}
 Substituting \eqnref{complete-likelihood} gives
 \begin{eqnarray}
-  \log P(\LineSegs,\Indicators ~|~ \SceneR^t) 
+  \log P(\LineSegs,\Indicators ~|~ \SceneR) 
   &=&
   \sum_i \sum_{k=1}^4 \Indicator_{ik} \Bigl(
-    \log P(\LineSeg_i ~|~ \Indicator_i=k, \SceneR^t)
-    + \log P(\Indicator_i=k ~|~ \SceneR^t)
+    \log P(\LineSeg_i ~|~ \Indicator_i=k, \SceneR)
+    + \log P(\Indicator_i=k ~|~ \SceneR)
   \Bigr)\\
   &=&
   \sum_i \sum_{k=1}^4 \Indicator_{ik} 
   \Bigl(
-    \log \NormalDistr(\dist(\LineSeg_i, \CamR_i\SceneR^t\ebasis_k);0,\sigma)
+    \log \NormalDistr(\dist(\LineSeg_i, \CamR_i\SceneR\ebasis_k);0,\sigma)
     + \log \Mixing_k
   \Bigr)\\
   &=&
   \sum_i \sum_{k=1}^4 \Indicator_{ik} 
   \Bigl(
-    \frac{\dist(\LineSeg_i, \CamR_i\SceneR^t\ebasis_k)^2}{2\sigma^2}
+    \frac{\dist(\LineSeg_i, \CamR_i\SceneR\ebasis_k)^2}{2\sigma^2}
     + \log \Mixing_k
   \Bigr) + c\\
 \end{eqnarray}
@@ -513,11 +533,12 @@ It is worth examining the expression being maximised and noting which
 variables it is and is not a function of. During each M--step, the
 distribution $\PosteriorEst^t$, as represented by the sufficient
 statistics computed in the E--step, is held fixed. The expectation is
-over all possible values of the indicators $\Indicators$, but the
-weight of each is computed from $\PosteriorEst^t$, which does not
-depend on the quantity $\SceneR$ being maximized in this step. Hence
-the expression being maximized is a function of $\SceneR$
-alone. Substituting \eqnref{expected-lik},
+over all possible values of the indicators $\Indicators$, each
+weighted according to $\PosteriorEst^t$, which was computed from the
+previous estimate $\SceneR^t$ but does not depend on the quantity
+$\SceneR$ being maximized in this step. Hence the expression being
+maximized in \eqnref{R-argmax} is a function of $\SceneR$ alone. Substituting
+\eqnref{expected-lik},
 \begin{eqnarray}
   \SceneR^{t+1} &=& \argmax_{\SceneR}\limits \ErrorFunc(\SceneR) \\
   \ErrorFunc(\SceneR) 
@@ -616,20 +637,20 @@ normal with gradient steps of the form
 Due to the low dimensionality of the search space and relatively low
 curvature of the error function we found that a simple instantiation
 of the gradient descent algorithm converged quickly and robustly. Our
-algorithm initializes $\gamma$ to a fixed constant $\gamma_0$ at the
-beginning of each M--step, then halves $\gamma$ each time an update
-leads to an increase in the error function. Convergence is detected
-when $\gamma<\epsilon_1$ and the value of the error function decreases
-by less than $\epsilon_2$ in any one update.
+algorithm initializes the step size $\gamma$ to a fixed constant
+$\gamma_0$ at the beginning of each M--step, then divides $\gamma$ by
+2 each time that an update leads to an increase in the error
+function. Convergence is detected when $\gamma<\epsilon_1$ and the
+value of the error function decreases by less than $\epsilon_2$ in any
+one update.
 
 \subsubsection{Summary}
-In summary, to obtain $\SceneR$ we iterate between computing
-responsibilities $\Resp_{ik}$ (the E--step) and optimising $\SceneR$
-given those responsibilities (the M--step). Each M step consists of a
-gradient descent in the Lie algebra $SO(3)$. In practice we find that
-our system converged in around 25 iterations of the EM algorithm, and
-that approximately 10 steps were required for each gradient
-descent. 
+To obtain $\SceneR$ we iterate between updating $\PosteriorEst$ (the
+E--step) and optimising $\SceneR$ (the M--step). Each M step consists
+of a gradient descent in the Lie algebra $SO(3)$. In practice we find
+that our system converged in around 25 iterations of the EM algorithm,
+and that approximately 10 steps were required for each gradient
+descent.
 
 \subsubsection{Generalized EM}
 
