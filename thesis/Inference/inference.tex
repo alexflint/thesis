@@ -270,7 +270,7 @@ the internals of the probabilistic model in this chapter.
   \label{def:scene-score}
   The score obtained by a partial scene $\PartialScene$ that
   terminates at column $x_b$ under the payoff function $\ScenePayoff$
-  is 
+  is
   \begin{equation}
     \Objective(\PartialScene) = \sum_{j=0}^{x_b} 
       \PixelPayoff(j,\seam_j,\WallOrient_j) - 
@@ -503,6 +503,8 @@ feasible set,
 Intuitively one can think of the feasible set as the set of states
 ``reachable in one step'' from $\State$.
 
+Our first recurrence relation is a corollary to theorem
+\ref{thm:substructure} as follows.
 \begin{corollary}
   \label{cor:first-recurrence}
   Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state with
