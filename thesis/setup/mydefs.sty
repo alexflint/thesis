@@ -6,17 +6,17 @@
 \newcommand\etc{\textit{etc.}\xspace}
 
 % References
-\newcommand\figref[1]{figure \ref{fig:#1}}
+\newcommand\figref[1]{Figure \ref{fig:#1}}
 \newcommand\Figref[1]{Figure \ref{fig:#1}}
-\newcommand\secref[1]{section \ref{sec:#1}}
+\newcommand\secref[1]{Section \ref{sec:#1}}
 \newcommand\Secref[1]{Section \ref{sec:#1}}
-\newcommand\sectref[1]{section \ref{sec:#1}}
+\newcommand\sectref[1]{Section \ref{sec:#1}}
 \newcommand\Sectref[1]{Section \ref{sec:#1}}
-\newcommand\chapref[1]{chapter \ref{chap:#1}}
+\newcommand\chapref[1]{Chapter \ref{chap:#1}}
 \newcommand\Chapref[1]{Chapter \ref{chap:#1}}
-\newcommand\tableref[1]{table \ref{table:#1}}
+\newcommand\tableref[1]{Table \ref{table:#1}}
 \newcommand\Tableref[1]{Table \ref{table:#1}}
-\newcommand\algref[1]{algorithm \ref{alg:#1}}
+\newcommand\algref[1]{Algorithm \ref{alg:#1}}
 \newcommand\Algref[1]{Algorithm \ref{alg:#1}}
 \newcommand\eqnref[1]{\eqref{eq:#1}}
 
@@ -35,6 +35,7 @@
 \newcommand\abs[1]{\lvert#1\rvert}
 \newcommand\norm[1]{\lVert#1\rVert}
 \newcommand\argmax{\operatorname{argmax}}
+\newcommand\argmin{\operatorname{argmin}}
 \renewcommand\cross\times
 \newcommand{\concat}{\ensuremath{+\!\!\!\!+\,}}
 \newcommand\sign{\operatorname{Sign}}
@@ -59,6 +60,10 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 \newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+% Algebra
+\DeclareMathOperator{\diag}{diag}
 
 %
 % Subject-specific Macros
@@ -86,12 +91,15 @@
 % Hypotheses and hypothesis classes
 \newcommand\Scene{M}
 \newcommand\Seam{S}
+\newcommand\EstSeam{\hat{\Seam}}
 \newcommand\seam{s}
+\newcommand\Label{o}
 \newcommand\NumWalls{K}
 \newcommand\SetOfScenes{\mathcal{M}}
 \newcommand\SetOfSeams{\mathcal{S}}
 
-\newcommand\WallOrient{o}
+% TODO: replace by \Label
+\newcommand\WallOrient{\Label}
 
 % Cost functions
 \newcommand\ScenePayoff{\Pi}
@@ -123,14 +131,14 @@
 \newcommand\CfTruncScene{\OtherScene'}
 
 \newcommand\ManhattanClass{\mathcal{M}}
-\newcommand\Feature{\vect{\psi}}
-\newcommand\Features{\Psi}
+\newcommand\Feature{\vect{\phi}}
+\newcommand\Features{\Phi}
 \newcommand\AuxFeature{\vect{\theta}}
 \newcommand\ComputedAuxFeature{\bar{\AuxFeature}}
 \newcommand\AuxFeatures{\Theta}
 \newcommand\Pixels{\vect{P}}
-\newcommand\PixelModel{\vect{w}}
-\newcommand\PixelModels{\vect{W}}
+\newcommand\PixelModel{\vect{\omega}}
+\newcommand\PixelModels{\vect{\Omega}}
 \newcommand\Orients{A}
 \newcommand\Orient{a}
 \newcommand\Depth{d}
@@ -138,8 +146,11 @@
 \newcommand\ComputedDepth{\bar{\Depth}}
 \newcommand\Ind{t}
 \newcommand\Inds{T}
+\newcommand\Observations{X}
 
-\newcommand\StereoModel{\Sigma}
+\newcommand\StereoCov{\Sigma}
+\newcommand\StereoModel{\vect{\sigma}}
+\newcommand\StereoCoef{\sigma}
 
 \newcommand\PredictedOrient{\Orient^*}
 \newcommand\ComputedOrient{\bar{\Orient}}
@@ -150,6 +161,7 @@
 % TODO: change each instance of this to one of the above
 \newcommand\SetOfOrients{\Orientations}
 
+\newcommand\Counts{\vect{n}}
 
 \newcommand\Corners{C}
 \newcommand\Penalties{\vect{\lambda}}
@@ -157,6 +169,9 @@
 \newcommand\PenaltyConc{\lambda_1}
 \newcommand\PenaltyConv{\lambda_2}
 \newcommand\PenaltyOccl{\lambda_3}
+
+% TODO: remove this:
+\newcommand\LikelihoodHypers{\vect{\kappa}}
 
 \newcommand\pc{\operatorname{PC}}
 \newcommand\reproj{\operatorname{reproj}}
@@ -168,15 +183,24 @@
 \newcommand\ON{\textsf{ON}}
 
 \newcommand\IndModel{\vect{\tau}}
+\newcommand\IndModelo{\vect{\tau_0}}
 \newcommand\tIN{\tau_{\IN}}
 \newcommand\tOUT{\tau_{\OUT}}
 \newcommand\tON{\tau_{\ON}}
 
 % Sub--problems
+% The different notation below results from the differen between my
+% ICCV 2011 and ECCV 2012 papers.
+% TODO: remove one version of the below or the other
 \newcommand\fIN{\Objective_{\textsf{in}}}
 \newcommand\fOUT{\Objective_{\textsf{out}}}
 \newcommand\fUP{\Objective_{\textsf{up}}}
 \newcommand\fDOWN{\Objective_{\textsf{down}}}
+
+\newcommand\SubProbIN{\Objective_{in}}
+\newcommand\SubProbOUT{\Objective_{out}}
+\newcommand\SubProbUP{\Objective_{up}}
+\newcommand\SubProbDOWN{\Objective_{down}}
 
 % Optimal sub--structure proof
 \newcommand\OptimalScene{\Scene^*}
@@ -259,6 +283,9 @@
 \newcommand\ey{\ebasis_2}
 \newcommand\ez{\ebasis_3}
 
+% Non-memoryless priors
+\newcommand\CategoryFunc{\omega}
+
 
 
 
@@ -291,3 +318,25 @@
 \newcommand\LieM{m}          % coefficients in the Lie algebra
 \newcommand\LieMs{\vect{m}}  % coefficients in the Lie algebra
 
+
+% Losses
+\newcommand\Loss{\Delta}
+\newcommand\LblLoss{\Delta_{\textsf{labelling}}}
+\newcommand\DepthLoss{\Delta_{\textsf{depth}}}
+
+\newcommand\LossMat{\delta}
+
+% Structured prediction
+\newcommand\PixelFtr{\nu}
+\newcommand\Model{\vect{w}}
+\newcommand\JointFtr{\Psi}
+\newcommand\AugSeam{\Seam^+}
+
+\newcommand\Predictor{f}
+\newcommand\OptPredictora{f^{\textsf{min}}}
+\newcommand\OptPredictor{f^*}
+
+\newcommand\AugPayoff{\PixelPayoff_{\textsf{aug}}}
+
+\newcommand\Slack{\xi}
+\newcommand\Slacks{\vect{\xi}}

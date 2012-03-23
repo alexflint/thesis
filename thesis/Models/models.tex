@@ -141,6 +141,7 @@ inference, in \secref{alternative-priors}.
 
 Taking logarithms yields
 \begin{equation}
+  \label{eq:log-scene-prior}
   \log P(\Scene ~|~ \Penalties) =
     -\log Z +
     n_1\log\PenaltyConc + 
@@ -194,12 +195,11 @@ and is included in the graphical model for notational convenience
 only. Finally a feature $\Feature$ is sampled from a distribution that
 is conditionally independent of $\Scene$ given $\Orient$.
 
-We assume a linear likelihood for pixel features,
+We assume a exponential--family likelihood for pixel features,
 \begin{equation}
-\label{eq:feature-likelihood}
-  P(\Feature ~|~ \Orient) = 
-    \frac{{\PixelModel_\Orient}^T\Feature}
-          {\sum_j{\PixelModel_\Orient}^T\Feature_j} ~.
+  \label{eq:pixel-likelihood}
+  P(\Feature ~|~ \Orient) \propto
+    \exp(\PixelModel_\Orient \cdot \Feature) ~.
 \end{equation}
 
 Denoting the set of all observed pixel
@@ -218,7 +218,7 @@ conditioned on this quantity.
 
 We now derive MAP inference. The likelihood for $\Scene$ is
 \begin{equation}
-  \label{eq:mono-lik-full}
+  \label{eq:photometric-lik-full}
   P(\Features ~|~ \Scene) \propto 
   \int
     \prod_i P(\Feature_i ~|~ \Orient_i) 
@@ -232,18 +232,18 @@ $\PredictedOrient_i$ the orientation output by
 \algref{computing-from-scene} for pixel $\Pixel_i$ under $\Scene$ we
 have
 \begin{equation}
-  \label{eq:mono-lik}
+  \label{eq:photometric-lik}
   P(\Features ~|~ \Scene) \propto
     \prod_i P(\Feature_i ~|~ \PredictedOrient_i) ~.
 \end{equation}
 Taking logarithms gives
 \begin{equation}
-  \label{eq:mono-loglik}
+  \label{eq:photometric-loglik}
   \log P(\Features ~|~ \Scene) =
     \sum_i \log P(\Feature_i ~|~ \Orient_i^*) + c
 \end{equation}
 where $c$ corresponds to the constant of proportionality in
-\eqnref{mono-lik}, which we henceforth drop since it makes no
+\eqnref{photometric-lik}, which we henceforth drop since it makes no
 difference to the optimization to come. 
 
 At this point we use the crucial observation of
@@ -271,7 +271,7 @@ Now consider the scene payoff,
   &=&
     \log P(\Features ~|~ \Scene) - c  ~,
 \end{eqnarray}
-which is simply the log--likelihood \eqnref{mono-loglik}.
+which is simply the log--likelihood \eqnref{photometric-loglik}.
 
 \subsection{Features}
 
@@ -351,13 +351,13 @@ likelihood for $\Scene$ under our model is
 \begin{equation}
   P(\Features,\AuxFeatures_1,\ldots,\AuxFeatures_K ~|~ \Scene) =
     \prod_i \prod_{k=0}^{\NumViews} 
-      P(\Feature_i, \ComputedAuxFeature_k(\Pixel_i;\Scene) ~|~ \StereoModel)~.
+      P(\Feature_i, \ComputedAuxFeature_k(\Pixel_i;\Scene) ~|~ \StereoCov)~.
 \end{equation}
 and the feature likelihood is a zero--mean Gaussian, which is standard in
 the literature \cite{Scharstein01}:
 \begin{equation}
-  P(\Feature_i, \ComputedAuxFeature_k(\Pixel_i;\Scene) ~|~ \StereoModel)
-   = \NormalDistr(\Feature_i-\ComputedAuxFeature_k(\Pixel_i;\Scene); \StereoModel)
+  P(\Feature_i, \ComputedAuxFeature_k(\Pixel_i;\Scene) ~|~ \StereoCov)
+   = \NormalDistr(\Feature_i-\ComputedAuxFeature_k(\Pixel_i;\Scene); \StereoCov)
 \end{equation}
 
 Taking logarithms we recognise a simple sum over pixel--wise
@@ -367,7 +367,7 @@ photo--consistency terms,
   \log P(\Features,\AuxFeatures_1,\ldots,\AuxFeatures_{\NumViews}
             ~|~ \Scene) =
   \sum_i \sum_{k=0}^{\NumViews} 
-    \|\Feature_i-\ComputedAuxFeature_k(\Pixel_i;\Scene)\|_{\StereoModel}
+    \|\Feature_i-\ComputedAuxFeature_k(\Pixel_i;\Scene)\|_{\StereoCov}
    +c
 \end{equation}
 
@@ -583,15 +583,16 @@ substituting the above into \eqnref{scene-payoff}, giving
 We combine photometric, stereo, and 3D data into a joint model by
 assuming conditional independence given $\Scene$,
 \begin{equation}
-  P(X_{\textsf{mono}}, X_{\textsf{stereo}}, X_{\textsf{3D}} ~|~ \Scene)
+  P(\Observations_{\textsf{mono}}, \Observations_{\textsf{stereo}}, \Observations_{\textsf{3D}} ~|~ \Scene)
   =
-    P(X_{\textsf{mono}} ~|~ \Scene)
-    P(X_{\textsf{stereo}} ~|~ \Scene)
-    P(X_{\textsf{3D}} ~|~ \Scene) ~.
+    P(\Observations_{\textsf{mono}} ~|~ \Scene)
+    P(\Observations_{\textsf{stereo}} ~|~ \Scene)
+    P(\Observations_{\textsf{3D}} ~|~ \Scene) ~.
+  \label{eq:full-posterior}
 \end{equation}
 Taking logarithms leads to summation over payoffs,
 \begin{equation}
-  \log P(X_{\textsf{mono}}, X_{\textsf{stereo}}, X_{\textsf{3D}} ~|~ \Scene)
+  \log P(\Observations_{\textsf{mono}}, \Observations_{\textsf{stereo}}, \Observations_{\textsf{3D}} ~|~ \Scene)
   = \ScenePayoff_{\textsf{joint}}(\Scene)
 \end{equation}
 where
@@ -604,11 +605,11 @@ where
 Finally, the log posterior is
 \begin{equation}
 \begin{split}
-  \log P(\Scene ~|~ X_{\textsf{mono}}, X_{\textsf{stereo}}, X_{\textsf{3D}})
+  \log P(\Scene ~|~ \Observations_{\textsf{mono}}, \Observations_{\textsf{stereo}}, \Observations_{\textsf{3D}})
   & \propto
-    \log P(X_{\textsf{mono}} ~|~ \Scene)
-    +\log P(X_{\textsf{stereo}} ~|~ \Scene) \\
-  & \quad + \log P(X_{\textsf{3D}} ~|~ \Scene) + \log P(\Scene)\\
+    \log P(\Observations_{\textsf{mono}} ~|~ \Scene)
+    +\log P(\Observations_{\textsf{stereo}} ~|~ \Scene) \\
+  & \quad + \log P(\Observations_{\textsf{3D}} ~|~ \Scene) + \log P(\Scene)\\
   & = \ScenePayoff_{\textsf{joint}}(\Scene) - \ScenePenalty(\Scene)
 \end{split}
 \end{equation}
