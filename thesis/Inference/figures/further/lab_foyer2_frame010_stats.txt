@@ -1,0 +1,9 @@
+Labelling accuracy:                     98.176107%
+Mean depth error:                       1.326612%
+Net score:                              81326.466782
+  Penalties:                            3.785796%
+  Gross payoffs:                        84526.466782
+    Mono payoffs:                       0.2%
+    Stereo payoffs:                     32.9%
+    3D (agreement) payoffs:             58.4%
+    3D (occlusion) payoffs:             8.6%
