@@ -23,4 +23,53 @@ Abstract
 
 \setlength{\baselineskip}{16truept}
 
-This thesis describes stuff aplenty.
+In order for computers to interact with and understand the visual
+world, they must be equipped with reasoning systems that include
+high--level quantities such as objects, actions,
+and scenes. This thesis is concerned with extracting such
+representations of the world from visual input.
+
+The first part of this thesis describes an approach to scene
+understanding in which texture characteristics of the visual world are
+used to infer scene categories. We show that in the context of a
+moving camera, it is common to observe images containing very few
+individually--salient image regions, yet overall texture structure
+often allows our system to derive powerful contextual cues about the
+environment. Our approach builds on ideas from texture recognition,
+and we show that our algorithm out--performs the well--known
+Gist \cite{Torralba03} descriptor on several classification tasks.
+
+In the second part of this thesis we we are interested in scene
+understanding in the context of multiple calibrated views of a scene,
+as might be obtained from a Structure--from--Motion or Simultaneous
+Localization and Mapping (SLAM) system. Though such systems are
+capable of localizing the camera robustly and efficiently, the maps
+produced are typically sparse point-–clouds that are difficult to
+interpret and of little use for higher--level reasoning tasks such as
+scene understanding or human–-machine interaction. In this thesis we
+begin to address this deficiency, presenting progress towards
+modeling scenes using semantically meaningful primitives such as
+“floor”, “wall”, and “ceiling” planes.
+
+To this end we adopt the indoor Manhattan representation, which was
+recently proposed for single--view reconstruction \cite{Lee09}. This
+thesis presents the first in--depth description and analysis of
+this model in the literature. We describe a probabilistic
+model relating photometric features, stereo photo--consistencies, and
+3D point clouds to Manhattan scene structure in a Bayesian
+framework. We then present a fast dynamic programming algorithm that solves
+exact MAP inference in this model in time linear in image size. We
+show detailed comparisons with the state--of--the art in both the
+single-- and multiple--view contexts.
+
+Finally, we present a framework for learning within the indoor
+Manhattan hypothesis class. Our system is capable of extrapolating
+from labelled training examples to predict scene structure for
+unseen images. We cast learning as a structured prediction
+problem and show how to optimize with respect to two realistic loss
+functions. We present experiments in which we learn to recover scene
+structure from both single and multiple views --- from the perspective of
+our learning algorithm these problems differ only by a change of
+feature space. This work constitutes one of the most complicated
+output spaces (in terms of internal constraints) yet considered within
+a structure prediction framework.
