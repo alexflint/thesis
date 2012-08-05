@@ -5,14 +5,15 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Font
-%\usepackage{newcent}         
-%\usepackage{times}         
+%\usepackage{newcent}
+%\usepackage{times}
 \usepackage{palatino}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Size, ams 
 \usepackage{amsmath,amsfonts,amssymb,amsthm}
 \usepackage{graphicx}
-\usepackage{algorithm,algorithmic}
+\usepackage[chapter]{algorithm}
+\usepackage{algorithmic}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Other packages
 \usepackage{xspace}
@@ -22,6 +23,9 @@
 \usepackage{verbatim}
 \usepackage{array}
 \usepackage{rotating}
+\usepackage{longtable}
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Our stuff to set chapters, page size etc
@@ -34,15 +38,14 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define these
-\def\xtitle{Contextual Reasoning for Egocentric Vision}
+\def\xtitle{Geometric Context From Single And Multiple Views}
 \def\xauthor{Alexander John Flint}
 \def\xcollege{Exeter College}
-\def\xterm{Hilary Term 2012}
+\def\xterm{Trinity Term 2012}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\setcounter{tocdepth}{1}
 \begin{document}
 
 \pagestyle{empty}
@@ -56,7 +59,7 @@
 % edit the words in frontmatter/abstract.tex
 \input{frontmatter/abstract}
 
-\setcounter{tocdepth}{4}
+\setcounter{tocdepth}{2}
 \tableofcontents
 \newpage
 % edit the words in frontmatter/acknowledgements.tex
@@ -64,15 +67,20 @@
 \newpage
 % edit the words in frontmatter/notation.tex
 \input{frontmatter/notation}
-\newpage
+%\newpage
 % edit the words in frontmatter/abbreviations.tex
-\input{frontmatter/abbreviations}
+%\input{frontmatter/abbreviations}
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \setcounter{page}{0}
 \pagenumbering{arabic}
 \pagestyle{thesisheadings}
+
+%\dblspace
+\doublespacing
+\parskip 9pt
+%\setlength{\baselineskip}{18truept}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -86,7 +94,7 @@
 %
 \def\localpath{Review}
 \graphicspath{{\localpath/figures/}}
-\chapter{Review}
+\chapter{Literature Review}
 \label{chap:review}
 % If you like chapter abstracts ...
 %\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
@@ -106,7 +114,7 @@
 %
 \def\localpath{Geometry}
 \graphicspath{{\localpath/figures/}}
-\chapter{Geometry of Indoor Environments}
+\chapter{The Geometry of Indoor Environments}
 \label{chap:geometry}
 % If you like chapter abstracts ...
 %\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
@@ -116,7 +124,7 @@
 %
 \def\localpath{RecoveringOrientation}
 \graphicspath{{\localpath/figures/}}
-\chapter{Recovering Orientation}
+\chapter{Identifying Manhattan Orientations}
 \label{chap:orientation}
 % If you like chapter abstracts ...
 %\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
@@ -124,19 +132,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\def\localpath{Models}
-\graphicspath{{\localpath/figures/}}
-\chapter{Probabilistic Models for Manhattan Worlds}
-\label{chap:models}
-% If you like chapter abstracts ...
-%\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
-\input{Models/models}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 \def\localpath{Inference}
 \graphicspath{{\localpath/figures/}}
-\chapter{Inference}
+\chapter{Inference From Single and Multiple Views}
 \label{chap:inference}
 % If you like chapter abstracts ...
 %\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
@@ -146,7 +144,7 @@
 %
 \def\localpath{Learning}
 \graphicspath{{\localpath/figures/}}
-\chapter{Learning}
+\chapter{Learning to Construct Indoor Manhattan Models}
 \label{chap:learning}
 % If you like chapter abstracts ...
 %\begin{quote}{\em \input{Ch2/abstract2}}\end{quote}
@@ -175,9 +173,10 @@
 % Bibstuff
 \pagestyle{bibheadings}
 
+\bibliographystyle{acm}   % For just numbers
 %\bibliographystyle{plain}   % For just numbers
-\bibliographystyle{alpha}   % For initials+year
+%\bibliographystyle{alpha}   % For initials+year
 %\bibliographystyle{apalike} % For full surname
-\bibliography{TransferReport,VisionRefs}
+\bibliography{AVLstrings,TransferRefs,VisionRefs,MendeleyRefs}
 
 \end{document}
