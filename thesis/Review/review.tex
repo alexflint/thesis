@@ -1,24 +1,24 @@
 \section{Introduction}
-In this section we provide a review of the literature relevant this
-thesis. We begin with a review of simultaneous localisations and
-mapping (SLAM) systems, which is relevant because the research
-presented in the remainder of this report involves reasoning processes
-that utilise SLAM systems to provide known camera poses.
-
-We then turn to a review of the use of context in robotics
+In this section we provide a review of the literature relevant to this
+thesis. We begin by examining the literature on context in
+single--view computer vision. This area is of great interest since
+many of the techniques may be transferable to our multiple--view
+setting. We then turn to a review of the use of context in robotics
 applications, a subject that has received somewhat sparse attention in
 the literature and has, as yet, no cohesive formulation or problem
-statement. Following this we examine the more detailed literature on
-context in computer vision. This area is of great interest since many
-of the techniques may be transferable to our setting.
+statement. 
 
+%We close with a review of simultaneous localisation and
+%mapping (SLAM) systems, which is relevant because the research
+%presented in the remainder of this report involves reasoning processes
+%that utilise SLAM systems to recover camera poses.
 
 \section{Context in Computer Vision}
 Over the past decade there has been renewed interest in the use of
 contextual information for computer vision tasks. There are many
 definitions of what ``context'' means and how to represent it. Here we
 review the dominant paradigms that have emerged around contextual
-reasoning in scene understanding. Many of the single--image contextual
+reasoning in scene understanding. Many single--image contextual
 approaches have been targeted at a specific problem --- namely that of
 object recognition --- and while this is not aligned exactly with our
 own goal it is still instructive to review these contributions because
@@ -74,16 +74,11 @@ steps are repeated until convergence.
 \includegraphics[width=0.75\textwidth]{contextual_priming.png}
 \caption{Torralba \etal \cite{Torralba03} is able to improve upon
   traditional interest point detectors by learning the relationship
-  between gist features and likely object locations. Image taken from
-  \cite{Torralba03}.}
+  between gist features and likely object locations. 
+  \textit{Reprinted with express permission of Prof Antonio Torralba.}
+  }
 \label{fig:contextual-priming}
 \end{figure}
-
-\subsubsection{Semantic Segmentation}
-
-TODO: CamVid
-
-
 
 \subsubsection{Scene Classification}
 
@@ -116,20 +111,21 @@ The scale--invariant feature transform (SIFT) was first proposed by
 Lowe \cite{Lowe99} for use in object recognition. Given some input
 image, SIFT generates a set of interest points and corresponding
 feature vectors that are robust to changes in lighting, scale, and
-camera viewpoint. To select salient features at a range of sizes, SIFT
+camera viewpoint. To select salient features at a range of scales, SIFT
 builds a scale--space representation of the image \cite{Lindeberg93}
 and selects locations that are well--localised in both the spatial and
 scale dimensions. Features are generated from a histogram over
 gradient orientations in a patch around each selected interest
-point. SIFT is now used for many tasks throughout computer vision.
+point.
 
 \begin{figure}[tb]
 \centering
 \includegraphics[width=\textwidth]{feifei_dendogram.png}
 \caption{Dendogram showing the relationships between scene categories
   learnt by the system of Fei--Fei and Perona \cite{Fei-fei05}. The
-  model matches human intuition well. Image taken from
-  \cite{Fei-fei05}.}
+  model matches human intuition well.
+  \textit{Reprinted with express permission of Prof Fei--Fei Li.}
+  }
 \label{fig:dendogram}
 \end{figure}
 
@@ -158,7 +154,7 @@ geometric primitives, the authors show that they are able to model
 many useful and interesting types of scenes.
 
 The authors take a machine learning approach to the reconstruction
-problem. First, the image is over segmented into superpixels using the
+problem. First, the image is segmented into superpixels using the
 algorithm of Felzenszwalb \etal \cite{Felzenszwalb04}. Next, pairs of
 adjacent superpixels are merged in order to gradually grow the small
 superpixels into larger regions. To do this, an affinity metric
@@ -188,8 +184,9 @@ performance resulting from the use of geometric context.
 \caption{The left image shows car and pedestrian detections when using
   local features only. The right image shows detections when geometric
   context is leveraged: several false--positives are eliminated and
-  several new correct detections are made. Image taken from
-  \cite{Hoiem06}.}
+  several new correct detections are made.
+  \textit{Reprinted with express permission of Dr Derek Hoiem.}
+  }
 \label{fig:hoiem-result}
 \end{figure}
 
@@ -202,17 +199,16 @@ the scene is piece--wise planar. They allow these planar patchlets to
 take on arbitrary orientations, which they represent with a normal
 vector.
 
-Simpler to Hoiem's approach, Saxena \etal apply a machine learning
-methodology to this problem. They begin by dividing the image into
-superpixels, each of which is associated with a feature vector
-containing the output of a set of filters, including colour, texture,
-and edges. Each superpixel also includes the features of neighbouring
-superpixels so that the inference process can reason in terms of
-broader image properties rather than local statistics alone. In
-addition, each superpixel boundary is associated with a separate set
-of features. These are generated by running segmentations based on
-different image properties and recording whether the boundary is
-present in each.
+Saxena \etal apply a machine learning methodology to this
+problem. They begin by dividing the image into superpixels, each of
+which is associated with a feature vector containing the output of a
+set of filters, including colour, texture, and edges. Each superpixel
+also includes the features of neighbouring superpixels so that the
+inference process can reason in terms of broader image properties
+rather than local statistics alone. In addition, each superpixel
+boundary is associated with a separate set of features. These are
+generated by running segmentations based on different image properties
+and recording whether the boundary is present in each.
 
 The superpixels are organised into a Markov Random Field (MRF), with
 edges between pairs that share a boundary in the image. The node
@@ -233,7 +229,9 @@ of the time. One such result is illustrated in \figref{saxena-result}.
 \caption{Results from the geometric context system of Saxena \etal
   \cite{Saxena09}. From top left to bottom right the panes show (a)
   the original, (b) the superpixels, (c) the inferred 3D model, (d) a
-  re--projection of the 3D scene.}
+  re--projection of the 3D scene.
+  \textit{Reprinted with express permission of Dr Ashutosh Saxena.}
+  }
 \label{fig:saxena-result}
 \end{figure}
 
@@ -274,7 +272,7 @@ class.
 In later work \cite{Hedau2010} the authors connect the cuboid model of
 spatial boundaries to a model of objects within the room. Objects are
 modelled as axis--aligned cuboids resting on the floor. Several such
-cuboids are hypothesized, and the support for each is determined by an
+cuboids are hypothesised, and the support for each is determined by an
 SVM trained with HOG features. The authors further show that by
 reasoning jointly about room boundaries and the objects within, the
 performance of both inference algorithms is improved.
@@ -288,7 +286,9 @@ performance of both inference algorithms is improved.
     \includegraphics[width=0.35\textwidth]{hedau_b.png}
   }
   \caption{Results from the cuboid model of Hedau \etal
-    \cite{Hedua2009,Hedua2010}. Image taken from \cite{Hedua2010}.}
+    \cite{Hedau2009,Hedau2010}.
+    \textit{Reprinted with express permission of Varsha Hedau.}
+  }
   \label{fig:hedau-result}
 \end{figure}
 
@@ -333,7 +333,7 @@ violate a set of easily--checkable rules. They therefore proceed to
 enumerate all valid hypotheses by running a branch--and--bound search
 over all combinations of line segments. This remains tractable because
 the validity check eliminates most combinations at an early stage of
-branching. Of the valid hypotheses they choose the one which is
+branching. Of the valid hypotheses, they choose the one which is
 maximally consistent with surface orientation estimates separately
 inferred from the image. \figref{lee-result} shows some of the
 building structures their system was able to infer.
@@ -346,7 +346,9 @@ category.
   \includegraphics[width=\textwidth]{lee_result.png}
   \caption{Inferred scene structure obtained for single images by Lee
     \etal \cite{Lee09}. Each triplet shows the original image, the
-    detected line segments, and the final scene geometry.}
+    detected line segments, and the final scene geometry.
+    \textit{Reprinted with express permission of David Lee.}
+  }
   \label{fig:lee-result}
 \end{figure}
 
@@ -356,7 +358,7 @@ Furukawa \etal \cite{Furukawa09} used the Manhattan world assumption
 to improve the robustness of multiple--view reconstruction. Large
 textureless surfaces are common within indoor environments --- for
 example walls, ceilings, and floors. Such regions challenge many 3D
-reconstruction techniques since identifying each correspondences
+reconstruction techniques since identifying correspondences
 between views is challenging. To overcome this, Furukawa \etal built a
 3D reconstruction system that leverages the Manhattan world assumption
 to extrapolate the layout of textureless regions from constraints
@@ -388,7 +390,9 @@ the authors show that they are able to model a variety of scenes.
     \includegraphics[width=0.3\textwidth]{gupta_c.png}
   }
   \caption{Results from the blocks world model of Gupta \etal
-    \cite{Gupta10}. Image taken from \cite{Gupta10}.}
+    \cite{Gupta10}.
+    \textit{Reprinted with express permission of Dr Abhinav Gupta.}
+  }
   \label{fig:gupta-result}
 \end{figure}
 
@@ -473,7 +477,9 @@ relationship to car detections.
     Koller \cite{Heitz08}. Shown below each panel is the odds ratios for
     a car appearing near a superpixel from that class. The odds ratio is
     higher for road--like regions than for foliage-- or water--like
-    regions.}
+    regions.
+    \textit{Reprinted with express permission of Prof Daphne Koller.}
+    }
   \label{fig:TAS-regions}
 \end{figure}
 
@@ -481,14 +487,13 @@ relationship to car detections.
 Cameras have long been recognised as a valuable sensor for mobile
 robotics. In addition to visual SLAM, cameras have been used in
 robotics tasks such as place recognition \cite{Cummins08} and scene
-description \cite{Posner08}. Contextual reasoning, in which
-observations are understood in terms of their relationship to ``the
-bigger picture'', has received little attention from the robotics
-community. This section reviews the literature that does exist on this
-topic. We divide the work into two categories: map--centric
-approaches, which integrate sensor data into a map and then reason
-from this representation, and ego--centric approaches, which organise
-sensor data as a time--indexed series of observations.
+description \cite{Posner08}. Contextual reasoning has received little
+attention from the robotics community. This section reviews the
+literature that does exist on this topic. We divide the work into two
+categories: map--centric approaches, which integrate sensor data into
+a map and then reason from this representation, and ego--centric
+approaches, which organise sensor data as a time--indexed series of
+observations.
 
 \subsection{Ego--centric approaches}
 Martinez \etal \cite{Mozos05} have demonstrated that a robot can learn
@@ -505,19 +510,21 @@ the AdaBoost algorithm \cite{Schapire98} using linear classifiers as
 the weak learners. AdaBoost is a popular classifier that learns by
 incrementally adding rules that maximally correct the mistakes it has
 made so far. Martinez \etal show that they are able to differentiate
-rooms, corridors, and doorways at up to 89\% accuracy using this
+rooms, corridors, and doorways at 89\% accuracy using this
 method. Furthermore, in environments that have not been seen before
 the system obtains 82\% accuracy. The results for one environment are
-depicted in \figref{martinez-result}.\\
+depicted in \figref{martinez-result}.
 
 \begin{figure}[tb]
-\centering
-\includegraphics[width=0.5\textwidth]{martinez_result.png}
-\caption{Semantic labels assigned by the range data classification
-  system of Martinez \etal \cite{Mozos05}. 82\% of places were
-  correctly classified, despite the environment not having been seen
-  during training.}
-\label{fig:martinez-result}
+  \centering
+  \includegraphics[width=0.5\textwidth]{martinez_result.png}
+  \caption{Semantic labels assigned by the range data classification
+    system of Martinez \etal \cite{Mozos05}. 82\% of places were
+    correctly classified, despite the environment not having been seen
+    during training.
+    \textit{Reprinted with express permission of Dr Oscar Martinez Mozos.}
+    }
+  \label{fig:martinez-result}
 \end{figure}
 
 Stachniss \etal \cite{Stachniss05} extends this to use visual cues
@@ -539,7 +546,7 @@ empirically. Stachniss \etal show that the addition of visual cues
 allow them to differentiate between rooms with a similar shape but
 different visual appearance (such as bedrooms and living rooms),
 whereas the original range--data--only approach of Martinez would fail
-in this case.\\
+in this case.
 
 Posner \etal \cite{Posner08} show how to learn semantic labels such as
 ``grass'', ``foliage'', or ``wall'' for regions within urban
@@ -582,11 +589,13 @@ on--line operation. An example labelling is illustrated in
 \figref{posner-result}.
 
 \begin{figure}[tb]
-\centering
-\includegraphics[width=0.8\textwidth]{posner_result.png}
-\caption{Semantic labels output by the system of Posner et al
-  \cite{Posner08}.}
-\label{fig:posner-result}
+  \centering
+  \includegraphics[width=0.6\textwidth]{posner_result.png}
+  \caption{Semantic labels output by the system of Posner et al
+    \cite{Posner08}.
+    \textit{Reprinted with express permission of Dr Ingmar Posner.}
+  }
+  \label{fig:posner-result}
 \end{figure}
 
 \subsection{Map--centric approaches}
@@ -644,149 +653,129 @@ of times each object is observed in each type of places versus the
 total number of times the place category has been observed. They then
 assume independence between object observations and compute the
 posterior over place categories by multiplying out the likelihoods for
-each observed object. An example map and the robot's inferences about
-place categories is shown in \figref{vasudevan-result}.
-
-\begin{figure}[tb]
-\centering
-\includegraphics[width=0.75\textwidth]{vasudevan_result.png}
-\caption{Example of an object--centric map of \cite{Vasudevan07}. The
-  blue triangles show object detections, the red and green stars show
-  doorways the system has identified, and the red dot shows the
-  robot's inferred place category for the outlined room, which in this
-  case is an office.}
-\label{fig:vasudevan-result}
-\end{figure}
+each observed object. 
 
 
 
 
+%% \section{SLAM}
+%% In order for a robot to navigate within an unknown environment it must
+%% build a map of its environment and simultaneously localise itself
+%% within that map. The representation of the map and robot pose, and the
+%% techniques used to estimate these quantities, form the problem known
+%% as simultaneous localisation and mapping (SLAM). These problems are
+%% difficult because the solution to either part seems to rely upon the
+%% solution to the other, yet it is also a problem of great importance,
+%% since a working SLAM system is a first requirement for many robotics
+%% and vision tasks, such as navigation, path planning, spatial
+%% reasoning, and augmented reality.
 
-\section{SLAM}
-In order for a robot to navigate within an unknown environment it must
-build a map of its environment and simultaneously localise itself
-within that map. The representation of the map and robot pose, and the
-techniques used to estimate these quantities, form the problem known
-as simultaneous localisation and mapping (SLAM). These problems are
-difficult because the solution to either part seems to rely upon the
-solution to the other, yet it is also a problem of great importance,
-since a working SLAM system is a first requirement for many robotics
-and vision tasks, such as navigation, path planning, spatial
-reasoning, and augmented reality.
+%% Despite the considerable progress of SLAM systems over the past two
+%% decades, implementations remain imperfect and cannot be treated as
+%% infallible black boxes. However, our work is intended to
+%% \textit{utilise} SLAM rather than improve upon the state--of--the--art
+%% so we keep this section brief, simply outlining the major paradigms
+%% within the literature.
 
-Despite the considerable progress of SLAM systems over the past two
-decades, implementations remain imperfect and cannot be treated as
-infallible black boxes. However, our work is intended to
-\textit{utilise} SLAM rather than improve upon the state--of--the--art
-so we keep this section brief, simply outlining the major paradigms
-within the literature.
+%% \subsection{Bundle Adjustment}
 
-\subsection{Bundle Adjustment}
+%% The SLAM problem can be modelled as a maximum--likelihood inference
+%% problem over robot pose and landmark locations. The standard
+%% probabilistic model for SLAM consists of a sequence of poses
+%% $\vect{s_t}$ organised as a Markov chain, a set of landmark locations
+%% $\vect{x_i}$, and at each time step, and a set of landmark
+%% observations $\vect{z_j}$ connecting landmarks and poses. Assuming
+%% Gaussian observation errors, maximum likelihood inference can be
+%% written as a nonlinear least squares optimisation problem known as
+%% bundle adjustment. This is in fact the standard approach to the
+%% offline variant of SLAM known as structure--from--motion, but for
+%% online applications, full bundle adjustment is too expensive in both
+%% time and space. Each SLAM algorithm described below can be viewed as a
+%% particular approximation to the full maximum likelihood solution.
 
-The SLAM problem can be modelled as a maximum--likelihood inference
-problem over robot pose and landmark locations. The standard
-probabilistic model for SLAM consists of a sequence of poses
-$\vect{s_t}$ organised as a Markov chain, a set of landmark locations
-$\vect{x_i}$, and at each time step, and a set of landmark
-observations $\vect{z_j}$ connecting landmarks and poses. Assuming
-Gaussian observation errors, maximum likelihood inference can be
-written as a nonlinear least squares optimisation problem known as
-bundle adjustment. This is in fact the standard approach to the
-offline variant of SLAM known as structure--from--motion, but for
-online applications, full bundle adjustment is too expensive in both
-time and space. Each SLAM algorithm described below can be viewed as a
-particular approximation to the full maximum likelihood solution.
+%% \subsection{Kalman Filtering}
+%% The Kalman filter \cite{Kalman60} is a recursive state estimator that
+%% represents the posterior over states as a Gaussian distribution. The
+%% Extended Kalman Filter (EKF) generalizes this approach to non--linear
+%% observation models, which was applied to SLAM by Smith and Cheeseman
+%% \cite{Smith87}. 
 
-\subsection{Kalman Filtering}
-The Kalman filter \cite{Kalman60} is a recursive state estimator that
-represents the posterior over states as a Gaussian distribution. The
-Extended Kalman Filter (EKF) generalizes this approach to non--linear
-observation models, which was applied to SLAM by Smith and Cheeseman
-\cite{Smith87}. 
+%% The relationship between the EKF and the maximum likelihood approach
+%% is as follows. If the posterior on states is a Gaussian distribution
+%% and the observation model is linear then the EKF is the maximum
+%% likelihood estimator. Unfortunately, the state vector in SLAM includes
+%% entries for all landmarks as well as the robot pose, and in reality
+%% the posterior over these quantities is highly
+%% non--Gaussian. Another drawback of the EKF is the necessity of
+%% maintaining a full covariance matrix over the system state, which in
+%% the case of SLAM grows with the number of landmarks.
 
-The relationship between the EKF and the maximum likelihood approach
-is as follows. If we approximate the posterior on states as a Gaussian
-distribution then the EKF is the maximum likelihood
-estimator. Unfortunately, the state vector in SLAM includes entries
-for all landmarks as well as the robot pose, and in practice the
-posterior over these quantities becomes highly non--Gaussian. Another
-drawback of the EKF is the necessity of maintaining a full covariance
-matrix over the system state, which in the case of SLAM grows with the
-number of landmarks.
+%% \subsection{Particle Filtering}
+%% Particle filters are a class of recursive state estimator that
+%% approximate the posterior over states by sampling from it. At the
+%% first time step, a series of samples are drawn from the prior over
+%% states, then at each time step samples are updated according to new
+%% observations. There are several methods used to perform this update;
+%% for example, the Sequential Importance Resampling algorithm of Gordon
+%% \etal \cite{Gordon} propagates samples through a proposal
+%% distribution, then assigns weights to each sample by evaluating the
+%% posterior. Over time, samples in low--probability regions of the
+%% distribution are deleted and replaced by cloning samples in
+%% high--probability regions.
 
-Montemerlo \etal \cite{Montemerlo02} have proposed a system known as
-FastSLAM to try to overcome some of these problems. FastSLAM maintains
-a particle filter over robot poses, with each particle maintaining a
-separate EKF over landmark locations.
+%% \subsection{Parallel Tracking and Mapping}
+%% Klein and Murray \cite{Klein07} developed an approach to SLAM in which
+%% the posterior over states is approximated by applying bundle
+%% adjustment to a sample of frames from the input sequence. Their
+%% system, known as parallel tracking and mapping (PTAM), uses bundle
+%% adjustment to resolve the 3D locations of a set of landmarks, which
+%% are then tracked through the remainder of the video stream. During the
+%% tracking phase, landmarks are considered fixed, so only the camera
+%% pose is being estimated. When necessary, an incoming frame is selected
+%% as a new key--frame, which adds a new set of landmarks to the map. The
+%% bundle adjuster then updates the position of all landmarks and camera
+%% poses in a separate thread, while the landmarks continue to be tracked
+%% in real--time. This allows the system to maintain an up--to--date
+%% estimate of the camera position without conceding any of the
+%% approximations involved with Kalman filtering or particle filtering.
 
-\subsection{Particle Filtering}
-Particle filters are a class of recursive state estimator that
-approximate the posterior over states by sampling from it. At the
-first time step, a series of samples are drawn from the prior over
-states, then at each time step samples are updated according to new
-observations. There are several methods used to perform this update;
-for example, the Sequential Importance Resampling algorithm of Gordon
-\etal \cite{Gordon} propagates samples through a proposal
-distribution, then assigns weights to each sample by evaluating the
-posterior. Over time, samples in low--probability regions of the
-distribution are deleted and replaced by cloning samples in
-high--probability regions.
+%% PTAM possesses a number of advantages over other SLAM systems. First,
+%% the division of tracking and mapping into separate threads allows PTAM
+%% to maintain very dense maps (thousands of points), which would be
+%% intractable for real--time performance under other SLAM paradigms.
+%% Second, PTAM gains robustness to measurement errors because frames
+%% containing low--quality observations will not be selected as
+%% key--frames. PTAM also gains robustness from the large number of
+%% landmarks it tracks, which allows a robust estimator to reliably find
+%% inliers even in the face of many outliers. For these reasons we use
+%% PTAM throughout the experiments in this thesis, though all of our work
+%% could equally well utilise any other SLAM system.
 
-\subsection{Parallel Tracking and Mapping}
-Klein and Murray \cite{Klein07} developed an approach to SLAM in which
-the posterior over states is approximated by applying bundle
-adjustment to a sample of frames from the input sequence. Their
-system, known as parallel tracking and mapping (PTAM), uses bundle
-adjustment to resolve the 3D locations of a set of landmarks, which
-are then tracked through the remainder of the video stream. During the
-tracking phase, landmarks are considered fixed, so only the camera
-pose is being estimated. When necessary, an incoming frame is selected
-as a new key--frame, which adds a new set of landmarks to the map. The
-bundle adjuster then updates the position of all landmarks and camera
-poses in a separate thread, while the landmarks continue to be tracked
-in real--time. This allows the system to maintain an up--to--date
-estimate of the camera position without conceding any of the
-approximations involved with Kalman filtering or particle filtering.
-
-PTAM possesses a number of advantages over other SLAM systems. First,
-the division of tracking and mapping into separate threads allows PTAM
-to maintain very dense maps (thousands of points), which would be
-intractable for real--time performance under other SLAM paradigms.
-Second, PTAM gains robustness to measurement errors because frames
-containing low--quality observations will not be selected as
-key--frames. PTAM also gains robustness from the large number of
-landmarks it tracks, which allows a robust estimator to reliably find
-inliers even in the face of many outliers.
-
-For these reasons we use PTAM throughout the experiments in this
-thesis, though all of our work could equally well utilise any other
-SLAM system.
-
-\begin{figure}[tb]
-\centering
-\includegraphics[width=0.6\textwidth]{klein_result.jpg}
-\caption{A set of landmarks features identified by PTAM
-  \cite{Klein07}. The colours indicate confidence in the localisation
-  of each landmark.}
-\label{fig:klein-result}
-\end{figure}
-
-
+%% \begin{figure}[tb]
+%%   \centering
+%%   \includegraphics[width=0.6\textwidth]{klein_result.jpg}
+%%   \caption{A set of key--points identified by PTAM
+%%     \cite{Klein07}.
+%%     \textit{Reprinted with express permission of Dr Georg Klein.}
+%%   }
+%% \label{fig:klein-result}
+%% \end{figure}
 
 
 \section{Conclusions}
-Modern SLAM systems generate accurate metric maps of an environment,
-and can do so robustly and efficiently using visual input alone
-\cite{Klein07}. The higher--level problem of deriving semantic context
-from such sensor data has been approached by several authors. Although
-there is not yet a widely agreed--upon problem formulation, current
-work in this area shows that semantics are important for many robotics
-applications, and can be derived from a range of sensor
-types. Important contributions include that of Martinez \cite{Mozos05}
-and Stachniss \cite{Stachniss05}, who show that place categories can
-be obtained from photometric and geometric cues, and Posner
-\cite{Posner08}, who shows that scene regions can be associated with
-semantic categories, again by combining vision and range sensors.
+Modern structure--from--motion systems generate accurate metric maps
+of an environment, and can do so robustly and efficiently using visual
+input alone \cite{Klein07}. The problem of deriving high--level
+semantic context from such sensor data has been approached by several
+authors. Although there is not yet a widely agreed--upon problem
+formulation, current work in this area shows that semantics are
+important for many robotics applications, and can be derived from a
+range of sensor types. Important contributions include that of
+Martinez \cite{Mozos05} and Stachniss \cite{Stachniss05}, who show
+that place categories can be obtained from photometric and geometric
+cues, and Posner \cite{Posner08}, who shows that scene regions can be
+associated with semantic categories, again by combining vision and
+range sensors.
 
 The contextual reasoning problem for single--image vision has received
 comparatively greater attention. Torralba's seminal gist descriptor
