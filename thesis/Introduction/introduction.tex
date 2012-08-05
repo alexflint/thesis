@@ -1,291 +1,203 @@
-%Intro-to-intro
-%- Computer vision generally
-%- augmented reality generally: computers coming to us rather than us coming to computers
-%- problem statement
-%  - extend competence of visual SLAM to semantically meaningful models
-%    - very early work, we did not get all the way there
-%    - will focus on scene understanding from multiple views
-%  - we will sharpen this definition later in this chapter, then again (formally) in later chapters
+Humans are visual in nature and as such we have constructed our world
+around visual cues. We use written street signs rather than, say,
+smells or sounds to navigate the road network because our biological
+vision system has both higher fidelity and wider bandwidth than other
+senses. In order for computers to understand and interact with our
+world we must either develop automated vision systems or re--signpost
+our world. Computer vision is the endeavour to take the former route.
 
-Humans are visual creatures and as such our world is built up around
-visual cues. The reason we use written street signs rather than, say,
-smells or sounds to navigate the road network is that our biological
-vision system has both higher fidelity and larger bandwidth than our
-other senses. In order for computers to parse our world we have the
-choice of imbuing computers with vision--processing systems or
-re--signposting (in the most general sense) our world with cues more
-amenable to automatic extraction. Computer vision could be seen as the
-endeavour to acomplish the former route.
-
-This thesis was originally motivated by the specific application area
-of augmented reality (AR). In the broadest possible terms, AR is the
-idea of teaching computers to become fluent in the visual experience
-of a human, rather than having humans interact with computers on
-the computer's terms. The great vision of AR is to have computers
-parse, track, and understand the visual field--of--view of a human in
-real--time, and seamlessly overlay text and graphics for the benefit
-of the wearer.
-
-The problem addressed in this thesis is the development of a computer
-vision system that understands the geometry of the environment at a
+This thesis addresses the problem of developing a computer vision
+system that understands the geometry of the environment at a
 semantically meaningful level. By ``semantically meaningful'' we mean
-at the level of an architectural blueprint or a city roadmap, complete
-with annotations and symbols, rather than, say, the level of a set of
-points floating in space. Inspired originally by the application of
-these ideas to AR we will pay special attention to continuous video
-streams (rather than individual frames) and to frame--rate processing
-capacity (rather than batch processing). We will refine this problem
-statement later in this chapter, then again, quantitatively, in later
-chapters.
+at the level of objects and events relevant to humans and human
+interactions, as in the difference between an city roadmap (which we
+would say is semantically meaningful on account of its high--level
+representation of quantities such as roads and addresses) and a set of
+3D points in space. Our goal is to recover semantically meaningful models
+of the world from visual input.
 
+To this end we explore two types of models. The first relates
+low--level photometric information directly to high--level concepts
+such as the function of an environment and the location of objects
+within it. Building on recent progress in contextual computer vision,
+we show how to derive visual context directly from an environment's
+texture structure. The second type of model we explore relates images
+to high--level concepts via an intermediate representation of
+high--level scene geometry. Contrary to much previous work in
+geometric computer vision, we select a representation that leads
+naturally to semantic--level reasoning tasks such as place recognition
+and object detection, for which we argue that the indoor Manhattan
+model is an attractive choice. Much of this thesis concerns the
+estimation of indoor Manhattan models from single and multiple images.
 
 \section{Motivation}
 
-%Motivations
-%- SLAM is not the end of the story for AR
-%
-%- Semantic structure from motion: using geometry for high-level inference
-%- Scene understanding, single-view geometry, and the under-utilization of photometric information for structure recovery
+The research presented here has been motivated from a variety of
+angles over time. This thesis was originally motivated by the
+application area of augmented reality (AR). In the broadest sense, AR
+systems aim to overlay relevant information onto a human's visual
+field--of--view. One important challenge is to build a 3D model of the
+environment and track the sensor with respect to it in order to create
+the illusion of annotations that move with 3D objects in the
+environment. This problem is known as simultaneous localisation and
+mapping (SLAM), and has seen great progress over the past several
+decades. In particular, visual SLAM, in which the sensing apparatus is
+a camera, has taken great strides, moving from single rooms to a
+entire cities, and from costly off--line processing to real--time
+systems. However, in order to select relevant information and have
+annotations interact seamlessly with other visual stimulus, the AR
+system must have some understanding of the visual world beyond the
+low--level point clouds generated by SLAM systems.
 
-%- context in vision
+It is neither surprising nor objectionable that so much effort towards
+AR has focussed on visual SLAM, but now that high--performance SLAM
+systems \textit{are} available, the question that naturally presents
+itself is: \textit{are we done yet?} In this thesis we will argue that
+while SLAM is an important first step, many challenging and general
+computer vision problems remain to solve before AR systems can be
+fully realised. For example, the relevance of certain types of
+information to the wearer varies with the type of environment that the
+wearer is moving within. Directions to a restaurant may be relevant
+while outdoors but directions to the kitchen are less likely to be
+helpful within the wearer's own house. Within the home, the
+augmentations most useful in the kitchen are likely to be different to
+those suitable to the bedroom. Furthermore, the likely locations of
+various objects is tightly coupled to the surfaces and boundaries
+within an environment. A human would not search for lost keys on the
+ceiling first, nor outside a window, but to make this inference an AR
+system must first identify key surfaces and their orientations. These
+problems are not immediately solved by the ability to locate oneself
+within an arbitrary 3D coordinate frame, though a major theme of this
+thesis is how to use such information together with other image
+evidence for high--level reasoning tasks.
 
-%- interesting sensors: phone cameras, internet videos, and Kinect and Kinect-like sensors
+Although this thesis was originally motivated by applications within
+AR, much inspiration was drawn from the single--view computer vision
+literature, principally from the literature dedicated to \textit{scene
+  understanding}, which is the problem of understanding images in
+terms of objects, actions, and semantically meaningful geometric
+primitives. Scene understanding has a long history within the
+single--view computer vision literature but a shorter history within
+the multiple--view literature. One motivation for this
+research is the extension of traditional scene understanding
+techniques to the context of multiple views. This is a challenging
+problem because single--view techniques are commonly cast in terms of
+rectangular arrays of pixels, which do not naturally incorporate the
+kind of geometric information available in a multiple view context.
 
-The research presented in thesis has been motivated from a variety of
-angles. An early motivation was the extension of visual tracking and
-mapping systems to high--level reasoning about the visual
-environment. Simultaneous localisation and mapping (SLAM) --- the
-problem of precisely mapping a novel environment whilst simultaneously
-locating oneself within it --- has seen terrific progress over the
-past several decades. In particular, visual SLAM, in which the sensing
-apparatus is a camera, has taken great strides in the last ten
-years. The typical experiments expected of a visual SLAM paper in a
-top conference have moved from a single room to an entire city;
-real--time processing is now expected rather than impressive; and one
-can even expect to see system that reconstruct every pixel in a video
-stream rather than just a set of interest points.
+There is a very large literature on single--view scene understanding, and a
+corresponding plethora of models to choose from. The focus of this
+thesis is on the extraction of high--level geometric information
+within indoor--type environments, with relevance to scene
+categorisation and object localisation. The hope is that this problem
+is large enough to be interesting, small enough to be tractable, and
+perhaps insightful enough to be instructive for future research in
+the relatively new domain of multiple--view scene understanding.
 
-Visual SLAM is a challenging requirement for a convincing AR system,
-since to place augmentations contextually within the wearer's
-field--of--view, an AR system must first be able to locate itself
-pricesly and quickly within the environment. It is neither surprising
-nor objectionable, therefore, that so much of the effort towards AR
-has focussed on visual SLAM; but now that high--performance SLAM
-systems \textit{are} available, the question naturally presents
-itself: ``are we done yet?'' Or, in other words, does a ``SLAM
-oracle'' that precisely locates the camera at every point in time
-completelty solve the AR problem?
-
-The answer I will argue for in this thesis is that no, SLAM is not the
-end of the story. While SLAM is certainly a central and important
-problem, there remain interesting, challenging, and general computer
-vision problems to solve before AR can be fully realised. For example,
-the relevance of some piece of information to the wearer varies with
-the type of environment within which the wearer is moving. Directions
-to a restaurant may be relevant while outdoors but directions to the
-kitchen are less likely to be helpful within the wearer's own
-house. Within a house, the visual augmentations most likely to be
-desirable while in the kitchen are likely to be different to those
-suitable to the bedroom. Furthermore, the likely locations of various
-objects is tightly coupled to the surfaces and boundaries within an
-room. A human would not search for a lost set of keys on the ceiling
-first, not outside a window, but to make this inference one must first
-identify the orientation of the floor and ceiling and the position of
-room boundaries. These problems are not immediately solved by the
-ability to locate oneself within an arbitrary 3D coordinate frame ---
-though that ability almost certainly helps, as we will show.
-
-Although this thesis was originally motivated from the perspective of
-real--time AR, I found much inspiration from the single--view computer
-vision community, principally from the literature dedicated to
-\textit{scene understanding}, which is the problem of understanding
-images in terms of objects, actions, and semantically meaningful
-geometric primitives. Scene understanding has a long history within
-the single--view computer vision literature but a much shorter history
-within the multiple--view and SLAM literature. In the single--view
-context, scene understanding is necessarily cast in terms of
-photometric sensor data. The question that naturally presented itself
-during the development of this research was, ``can we do scene
-understanding using multiple views of a scene?''.
-
-The enormity of the scene understanding literature is testament to the
-number of different ways that the problem can be cast. Everything from
-scene category recognition to semantic segmentation and single--view
-reconstruction has been cast within the circle of scene
-understanding. The extension of scene understanding to multiple views
-opens up perhaps an even broader multitude of approaches, so it would
-be foolish to try to present a definitive account of multiple--view
-scene understanding within a single thesis. Instead, I have carved off
-a piece of the problem that I believe to be large enough to be
-interesting, small enough to be tractible, and hopefully insightful
-enough to be instructive for future research in this new and exciting
-domain. The piece of the puzzle that I have chosen is the extraction
-of high--level geometric information within indoor--type environments,
-with relevance to scene categorisation and object localisation. I have
-worked with both pure photometric models and joint
-photometric/geometric models.
-
-%TODO: context in computer vision, semenatic geometry as context
-
-%TODO: put this somewhere? [[There will always be a place for pure computer
-%vision. Never--the--less, as new sensors become cheaper and more
-%prevalent, it makes sense to use such sensors to the extent that they
-%are helpful and cost--effective for the problem at hand.]]
-
-A final motivation that bears mentioning is the exciting acceleration
-over the past several years of new platforms suitable for computer
-vision applications. Firstly, video on the
+There are many reasons that utilising multiple views is an attractive
+direction for scene understanding research. Firstly, video on the
 internet has become increasingly important over the past several
-years, heightening the relevance of computer vision systems that
-process video streams rather than single images. It is perhaps
-startling to be reminded that the popular internet video website,
-YouTube, was founded a mere 6 years ago in 2006, and did not gain
-widespread popularity until 2008. Secondly, mobile phones have become
-enormously more powerful as computing devices and the cameras now
-ubiquitously attached to them have improved in quality by several
-orders of magnitude. The reality and relevance of algorithms for
-understanding and providing feedback on video streams in real--time
-have never been clearer. Finally, depth sensing cameras such as the
-Kinect have made an explosive entry into the consumer hardware market
-and provide a compelling case for moving beyond
-
-\section{The Need For Geometry}
-
-%The need for geometry
-%- experience with photometric-only inference
-%  - surprisingly good
-%  - to go further, need *coarse*, *semantically helpful* geometry
-%- indoor manhattan worlds
-%  - simple
-%  - good starting point for this new problem
-%  - surprisingly broad applicability
-%- the value of geometric theorems from an earlier CV period 
-
-We have thus far made the argument that AR needs scene understanding,
-but does scene understanding need geometry? Perhaps we could
-completely discard structure--from--motion and build AR systems using
-the purly photometric approaches of single--view scene
-understanding. This seems to me also to be an unreasonably extreme
-position. Much amount of work has been dedicatd to understanding
-the geometry of cameras and multiple viewpoints; this thesis tries to
-show that this work can indeed be leveraged in pursuit of solutions to
-semantic--level computer vision problems.
-
-The presentation of this thesis follows, roughly, the chronological
-order of the research itself. \Chapref{appearance-only} discusses an
-early phase in which I pursued an ``appearance--only'' model for
-drawing high--level inferences from video input. While I was impressed
-by how far this approach could be pushed, I ultimately decided some
-coarse knowledge of the geometric structure of the environment was
-needed to answer the semantical--level questions I was pursuing, and
-as a result the later chapters are conspicuously geometry--heavy.
-
-The distinction between a ``geometry--less'' and a ``geometry--laden''
-approach is of course a soft and conceptual one: In either case one
-is, at the end of the day, drawing probabilistic inferences from one
-or more input arrays of pixel intensities. The distinction is over of
-how those inputs are combined, which conditional independences are
-assumed, how a hypothesis class is formulated, and so on.
-
-This thesis is concerned with the recovery of geometry for the sake of
-the high--level inference that it enables, not for the sake of the
-geometry itself, and our choice of geometric representation reflects
-this. We seek a representation which is both suited to semantic--level
-scene understanding, and general enough to encompass an interesting
-range of environments. A paper by David Lee \cite{Lee09} in 2009
-provided the pivotal insight that the so--called ``indoor Manhattan
-model'' provided an excellent trade--off between generality and
-concision.
-
-Under the indoor Manhattan assumption, the world is composed of a
-floor plane, ceiling plane, and a set of vertical walls that meet at
-vertical edges. While a strong assumption, this hypothesis class can
-represent exactly or approximately a surprisingly broad range of
-indoor environments, as well as some outdoor environments dominated by
-human structures. Furthermore, the location of the floor, walls, and
-ceiling are among the geometric cues most relevant to the
-semantic--level scene understanding questions that originally
-motivated this thesis. As an illustration of this, consider the image
-shown in figure TODO. Despite the low information content of the image
-(it consists of just three colours and a set of lines defined by a
-mere handful of vertices), it seems that an average human would be
-able to make some reasonable inferences about this environment. For
-example, we claim that a human would be able to say \textit{something}
-in response to the following questions (in order of increasing
-uncertainty).
-\begin{enumerate}
-  \item{What is the direction of gravity?}
-  \item{Where would doors most likely be found?}
-  \item{Where would a person be most likely to stand?}
-  \item{Is this an office or a house?}
-  \item{What is the absolute scale of the environment?}
-\end{enumerate}
-Of course, counter--examples could be constructed to render the answer
-to any of these questions arbitrarily erronous. We do not claim that
-any of these questions could be answered with certainty, only that the
-information in figure TODO would provide non--trivial evidence in
-support of answers to the questions above.
+years, increasing the relevance of computer vision systems that
+process video streams rather than single images. Secondly, mobile
+phones have become more attractive devices for vision systems as the
+processors and cameras now ubiquitously attached to them continue to
+become more powerful. Finally, depth sensing cameras have entered the
+mainstream consumer hardware market and are likely to become more
+common over the coming years.
 
 \section{Our Approach}
 
-In this thesis we present two approaches to extending the competence
-of AR system to semantic--level scene understanding. The first is a
-purely photometric approach based on textons. We consider a video
-sequence to be a simple time--varying signal, ignoring geometric
-constraints. We associate each pixel with a representative texton,
-which are exemplars of image patch clusters identified in a training
-phase. We show how textons can help answer two semantic--level
-questions: scene recognition and object search. Despite the simplicity
-of this approach, we show that this appearance--only method is
-surprisingly effective for these questions.
+\begin{figure}[tb]%
+  \centering
+    \includegraphics[width=0.5\textwidth]{manhattan-scene}
+    \caption{An example of an indoor Manhattan scene.}
+  \label{fig:manhattan-eg}
+\end{figure}
 
-To push this approach further, the second part of this thesis shows
-how to integrate coarse geometric information including major surfaces
-and scene boundaries. We argue that the recently proposed ``indoor
-Manhattan model'' provides a compelling trade--off between robustness,
-flexibility, and efficiency. Under this model the environment is
-represented by a small number of major surfaces such as the floor,
-wall, and ceiling of an indoor environment. There is little prior work
-on this model (just 2 published conference papers besides our own at
-the time of writing), so we dedicate a full chapter to defining the
-model formally, working through some simple corollaries, and
-discussing two important parametrisations. We then turn to the problem
-of probabilistic reasonining within this hypothesis class, which
-occupies the final three chapters. In order, we define a probabilistic
-model, reduce inference in this model to a particular class of
-optimisation problem, solve this optimisation problem using dynamic
-programming, then present a discriminative training regime to fix
-the free parameters.
+In this thesis we present two approaches to deriving semantic--level
+scene information from visual input. 
 
-The overall approach to the work in this thesis is basic on three
-underlying assumptions. First, we believe that probability is the
-appropriate language for reasoning from image evidence. As far as
-possible we try to present graphical models that make clear our
-assumptions before discussing any algorithmic details. Second, we
-believe that it is worth leveraging the considerable literature on
-camera geometry wherever possible. Finding minimal parametrisations
-pays off as robustness and speed of the final algorithm. Finally, we
-see computational efficiency as a crucial consideration that rightly
-affects both the choice of hypothesis class and the design of
-inference algorithms.
+\subsection{Photometric Models}
 
-Overall
-- Bayesian
-- ``proof in the pudding'': experiments justify our modelling approximations
-  - the hypothesis we test: this model will perform well in practice
-    - mind projection falacy?
-- separate modelling from inference
-  - but choose model judiciously
-- relationship between geometry and probability
-  - define a hypothesis class using hard geometric constraints
-  - connect with sensor data using probabilistic models
-  - devise inference algorithms using algorithmic insight
-  - mind projection falacy: the wall is not soft, but our estimate of its position is
-- inference from ``generative'' standpoint
-- learning from ``discriminative'' standpoint
-- speed is important
-  - cannot really separate performance from speed
-  - concentrate on algorithmic complexity not constant-time speedup
+The first model we present is a purely photometric approach and builds
+on ideas from texture analysis, in particular the texton model. This
+model associates each pixel with a discrete texture element, which is
+then related to the semantic--level variable of interest. We show how
+textons can be leveraged toward the problems of scene recognition and
+contextual object search. Despite the simplicity of this approach, we
+show that it is effective for the proposed problems.
+
+In contrast to systems based on edges, interest points, or local
+descriptors, utilising texture information allows us to leverage
+visual information in non--salient image regions. This is particularly
+important for environments in which there are few individually
+distinctive image patches, yet the overall scene appearance conveys
+significant information.
+
+We present qualitative results motivating the use of texture structure
+for the stated task, followed by a formal probabilistic model and
+quantitative comparisons with the state--of--the--art.
+
+\subsection{Coarse Geometric Models}
+
+The second part of this thesis focusses on capturing geometric
+information in a form well--suited to semantic--level reasoning. This
+represents a departure from much of the scene understanding
+literature, in which geometric information is captured implicitly,
+rather than via explicit geometric assumptions. Our decision to work
+with explicit geometric models is motivated by the observation that
+much about scenes and objects is tied to the high--level shape of the
+environment, particularly the location of major surfaces and
+boundaries.
+
+As a simple illustration of this, consider the image shown in
+\figref{manhattan-eg}. Despite the low information content of the
+image -- it is defined by just a handful of vertices -- a human can
+make many high--level inferences about this environment, including
+answers to questions such as (in order of increasing difficulty):
+\begin{enumerate}
+  \item{What is the direction of gravity?}
+  \item{Where would doors most likely be found?}
+  \item{Where would a person be most likely to stand and at what scale?}
+  \item{Is this an office or a house?}
+  \item{What is the absolute scale of the environment?}
+\end{enumerate}
+
+While the image does not provide enough information for definitive
+answers to any of these questions, it does provide surprisingly strong
+evidence given that it consists of just a few hundred bits of
+information. Thus it seems that coarse geometric information is
+particularly valuable for high--level inference.
+
+The image in \figref{manhattan-eg} shows one example of an indoor
+Manhattan environment \cite{Lee09}, which is the hypothesis class we
+adopt for geometric reasoning in this thesis. Under this model the
+world is composed of a floor plane, ceiling plane, and a set of
+vertical walls that meet at vertical edges. Indoor manhattan
+environments constitute a subset of the more general set of Manhattan
+environments, in which any arrangement of surfaces in three dominant
+directions is permitted. It is an attractive model for a number of
+reasons. Firstly, as argued above, it captures geometric information
+of high value for semantic--level reasoning. Secondly, despite the
+strong geometric assumptions, a surprisingly broad range of
+environments can be represented exactly or approximately as indoor
+Manhattan models. Thirdly, strong geometric assumptions assist in the
+interpretation of ambiguous image evidence, since salient information
+in one region can constrain the interpretation of other
+regions. Finally, an efficient inference algorithm exists for this
+hypothesis class, which is the subject of later chapters.
+
+There is no hard distinction between a ``geometry--less'' and a
+``geometry--laden'' approach to scene understanding. In either case
+one is drawing probabilistic inferences from images; the distinction
+is in how those inputs are combined, which conditional independences
+are assumed, and how the hypothesis class is formulated. Our choice to
+incorporate geometry corresponds to a particular choice of
+independence assumptions, which differ from those typically chosen in
+photometrically inspired models. This thesis is concerned with the
+recovery of geometry for the sake of the high--level inference that it
+enables, not for the sake of the geometry itself, and our choice of
+model reflects this.
 
 \section{Exegesis}
 
@@ -296,33 +208,42 @@ and scene understanding, the literature review breaks down into scene
 understanding work that has touched on geometry, and SLAM work that
 has touched on scene understanding.
 
-Chapter 3 then presents an appearance--only approach to scene
-understanding in the context of a moving camera. We work with textons
-as the basic observation--unit and present a probabilistic model
-connecting to scene categories and object locations.
+Chapter 3 presents an appearance--only approach to scene understanding
+in the context of a moving camera. We work with textons as the basic
+observation unit and present a probabilistic model connecting these to
+scene categories and object locations.
 
-We then begin the presentation of our work on indoor Manhattan
-models. Chapter 4 presents the model formally, and covers all the
-geometric insights necessary for the later chapters.
+We then begin the presentation of our work concerning indoor Manhattan
+models. Chapter 4 presents the model formally, and covers various
+geometric observations on which later chapters rest. There is little
+prior work on the indoor Manhattan model, so we dedicate a full
+chapter to defining the model formally and describing several useful
+representations. We then turn in Chapter 5 to identifying the
+orientation of three cardinal Manhattan directions given multiple
+calibrated views. We show that estimating scene rotation jointly from
+all available views is a dramatic improvement over the standard
+approach of identifying vanishing points separately in each image. We
+also show an order of magnitude improvement over approaches that use
+surface normals estimated from a reconstructed point cloud.
 
-Chapter 5 switches into the language of probability. We present
-graphical models relating sensor data to the geometric primitives we
-wish to extract. We give separate probabilistic models for photometric
-features, stereo data, and point clouds. We then show how to combine
-any combination of these into a joint model, allowing our system to be
-easily tailored to many different contexts.
-
-Chapter 6 presents a dynamic programming algorithm that solves the
-inference problem for the model presented in chapter 5. It is both
-fast and exact, making a compellinge alternative to previous
-approaches that fitted neither of these descriptions. We present
-compelling comparisons with previous approaches.
+Chapter 6 presents a probabilistic model relating sensor data to the
+geometric quantities we wish to extract. We give separate
+probabilistic models for photometric features, stereo data, and point
+clouds, then we show how to combine these into a fully Bayesian model,
+allowing our system to be easily tailored to a variety of contexts. We
+present a dynamic programming algorithm that solves both
+maximum--aposteriori and maximum--likelihood inference within our
+model. This inference procedure is both fast and exact, making a
+compelling alternative to previous approaches that explode
+combinatorially in model complexity.
 
 Chapter 7 presents a learning routine in which we learn to reconstruct
-Manhattan environments from training examples. We cast the learning
-problem in a discriminative framework and use state--of--the--art
-tools from the structured prediction literature to achieve
-polynomial--time training.
+Manhattan environments based on training examples. We cast the
+learning problem in a discriminative framework and use
+state--of--the--art tools from the structured prediction
+literature. We show that learning with respect to single versus
+multiple views differs only by a change in feature space, and we
+present extensive results for both contexts. 
 
-Finally, chapter 8 summarises key results, discusses their
-ramifications, and suggests directions for future work.
+Finally, chapter 8 summarises key results and suggests directions
+for future work.
