@@ -1,20 +1,76 @@
+\begin{quote}
+  This chapter explores an approach to scene understanding that
+  relates low--level image information directly to high--level
+  variables describing scene categories and coarse geometry. We
+  build on a well--known texture analysis approach in which pixels are
+  identified with characteristic texture units known as
+  textons. Extending previous work in texture analysis and image
+  recognition, we show that this approach --- which has previously been
+  applied to recognition of uniform textures --- extends to 
+  high--level scene understanding problem in which the input image is
+  composed of many objects and surfaces. We propose a novel
+  recognition model in which we measure the displacement between
+  texton occurrences in an image rather than their absolute location
+  or overall frequency. We apply our ideas to two classification
+  tasks: place recognition and camera orientation
+  classification. Comparisons with the gist descriptor of Torralba
+  \etal show superior performance on both tasks.\footnotemark
+\end{quote}
+
+\footnotetext{This work was published in part in:
+
+{ \setlength{\parindent}{0pt} 
+  \textit{Flint, Murray, and Reid,} ``Learning Textons For
+  Real--Time Scene Context'', in \textit{Proceedings of the
+    First International Workshop on Ego--Centric Vision, 2009}\cite{Flint09}
+} 
+}
+
 \section{Introduction}
 One important aspect of scene understanding is the ability to
 differentiate between logical areas within an environment, such as
-rooms in a house. This problem is important because knowledge of the
-wearer's location will give a strong indication of the activities the
-wearer might undertake and the objects with which they are likely to
-interact.
+rooms in a house. This problem is important in the domain of augmented
+reality because knowledge of the location of a user will give a strong
+indication as to the activities the user might undertake and the
+objects with which they are likely to interact. 
 
-In this chapter we propose a texture analysis approach to this
-problem. First we introduce the notion of textons, which form the
-basis of our approach. Next we motivate the use of textons for this
-particular problem by exploring the relationship between textons and
-scenes. In \sectref{approach} we describe our model relating textons
-to place recognition in detail. We then conclude this chapter with a
-short discussion of some code optimisations for our algorithm.
+Outside this specific application area, place recognition can be used
+as a generic source of context for further scene understanding
+tasks. Object recognition, semantic segmentation, and semantic
+reconstruction are all likely to benefit from a prior on place
+categories, since such information would correlate well with the
+location of objects, the function of surfaces, and the geometric
+structure of the environment.
 
-\section{Textons}
+The place recognition problem we propose in this chapter associates
+many images of a logical region --- rooms within a house in our case
+--- with a single place category. This means that there may be image
+pairs observing no common 3D locations, yet are associated with the
+same category, and hence the system will be expected to recognise them
+as associated with the same logical place. We also tackle the problem
+of identifying the approximate tilt of the camera from a single
+image. This problem requires the categorisation of images into 3
+categories: ``upwards--facing'', ``downward-facing'', and
+``straight-facing''.
+
+We pursue an approach motivated by the texton model developed by
+Julesz \cite{Julesz81} and introduced to the computer vision community
+somewhat later \cite{Zhu02}. We show that low--level texture elements
+can be related to the high--level variables of interest to us, and
+that doing so yields state--of--the--art results for both scene
+understanding problems.
+
+The remainder of this chapter is organised as follows. First we
+introduce the notion of textons, which form the basis of our
+approach. Next we motivate the use of textons for scene understanding
+problems in general by exploring the relationship between textons and
+scenes. We then describe our probabilistic model relating textons to
+place recognition and camera classification in detail. Next we present
+an empirical comparison between our system and the gist descriptor of
+Torralba \etal, followed by discussion and concluding remarks.
+
+\section{Background}
+\label{sec:background}
 The notion of textons as atomic texture elements was born in the
 neuroscience community when in 1981 Julesz \cite{Julesz81} introduced
 textons as part of his theory of human visual attention. Julesz
@@ -33,18 +89,17 @@ At evaluation time the input images are passed through the same set of
 filters, and each pixel is again associated with a feature vector
 containing the filter responses at that point. Next, each pixel is
 labelled according to the index of the texton exemplar (from the
-training phase) closest to it in the Euclidean sense. The image is
+training phase) closest to it in the L2 sense. The image is
 henceforth represented as an array of texton indices (the ``texton
 map''); the remainder of the image data is discarded.
 
 \begin{figure}[htp]
   \centering
-  \includegraphics[width=\textwidth]{texton_process.png}
+  \includegraphics[width=\textwidth]{texton_process}
   \caption{The texton generation process.}
   \label{fig:texton-process}
 \end{figure}
 
-\subsection{Texture Recognition}
 In the past textons have been successfully used to classify close--up
 photos of materials such as wood, paper, and glass. Varma and
 Zisserman \cite{Varma05} tackled this problem using the texton model
@@ -53,16 +108,11 @@ the occurrences of each texton, with the resultant histogram over
 texton frequencies forming the model by which input images are matched
 to their category. In their work, Varma and Zisserman apply a nearest
 neighbour approach to classify the models, using the $\chi^2$
-statistic to measure distances.
+statistic to measure distances. Representing data by a histogram over
+quantised features in this way has since become known by the
+terminology ``bag--of--features'' or ``bag--of--words''.
 
-Representing data by a histogram over quantised features in this way
-has since become known as the bag--of--features method. One of the
-advantages of this general methodology is the dimensionality reduction
-obtained through quantisation: high--dimensional feature vectors are
-projected to discrete labels, allowing accurate learning from small
-datasets and avoids the other symptoms of the curse of dimensionality.
-
-\subsection{Textons for High--Level Reasoning}
+\section{Textons for Scene Understanding}
 Textons are a widely used and well--understood within the computer
 vision community \cite{Zhu02,Varma05,Malik99}. However, their use has
 mostly been limited to low--level image analysis tasks, such as
@@ -80,7 +130,7 @@ distinctive landmarks. However, these systems are fundamentally
 limited to a feature--centric view of the world in which only local
 information about interest points is utilised.
 
-We believe that there is unleveraged information in the texture
+We believe that there is un--leveraged information in the texture
 structure within images, and that this can be used for scene
 understanding tasks such as place recognition. Many images of indoor
 scenes contain extremely poor visual information, particularly small,
@@ -88,7 +138,7 @@ empty environments like corridors and
 foyers. \figref{low-saliency-frames} shows some examples of these. Yet
 despite this information poverty, humans are capable of deducing much
 from these images. For example, consider the image at the right of
-\figref{low-saliency-frames}: there is hardly a location here that
+\figref{low-saliency-frames}: there is barely one location here that
 would yield a useful SIFT feature, yet a human can identify the part
 of the environment that the image represents (a corner between wall
 and ceiling), and a human familiar with the environment can easily
@@ -111,24 +161,24 @@ examined the textons generated by the algorithm described above. Our
 dataset consisted of $10,555$ frames from $5$ rooms in a hostel. Some
 qualitative findings are described in the following sections.
 
-\subsubsection{Textons Select Salient Image Elements}
+\subsection{Textons Select Salient Image Elements}
 \figref{textons-generated} shows $25$ textons generated for this
 dataset, in order of their frequency of occurrence. The first $7$
-correspond to essentially untextured regions of the image --- \ie
+correspond to untextured regions of the image --- \ie
 patches with near--uniform intensity. This is expected since the
 majority of pixels lie within object or region boundaries, where
-either the texture is too fine for the camera to detect (the carpet,
-for example) or there simply is no texture (the white walls, for
+either the texture is too fine for the camera to detect (a carpet,
+for example) or there simply is no texture (a white wall, for
 example).
 
 The next most frequent textons are those corresponding to edges and
 bars at various orientations. Many image understanding algorithms
 explicitly employ a line detector \cite{Forsyth02}, whereas in this
-case we can see that the use of textons has allowed the system to
-learn to identify these elements unsupervised.
+case the use of textons has allowed the system to learn to identify
+these elements unsupervised.
 
 At the other end of the frequency distribution, the least numerous
-textons are those corresponding to exotic image structures such as
+textons are those corresponding to image structures such as
 junctions and line endpoints. These structures are also sought
 explicitly in many image understanding algorithms \cite{Forsyth02},
 whereas the use of textons selects these structures automatically and
@@ -136,13 +186,18 @@ unsupervised.
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=\textwidth]{eg_filters.png}
-\caption{Textons generated for our dataset. Sorted from left to right,
-  top to bottom by descending frequency.}
+\includegraphics[width=0.6\textwidth]{eg_filters}
+\caption{Visualisation of textons identified for our dataset during
+  the offline training stage. Each image shows a weighted sum over the
+  filter kernels in our filter bank, with the weights set to the
+  coefficient from one identified cluster centre. Each image therefore
+  shows the ``ideal'' patch corresponding to one of the textons added
+  to the codebook. The textons are sorted by decreasing frequency from
+  top to bottom, left to right.}
 \label{fig:textons-generated}
 \end{figure}
 
-\subsubsection{Textons Focus Attention on Salient Image Regions}
+\subsection{Textons Focus Attention on Salient Image Regions}
 \figref{texton-freq-distr} shows the frequency of each texton within
 our entire dataset. The most frequent textons at the left of the graph
 account for a disproportionately large number of pixels, whereas the
@@ -155,20 +210,24 @@ structures.
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=0.8\textwidth]{texton_freq.png}
-\caption{Frequency distribution of textons.}
+\includegraphics[width=0.8\textwidth]{texton_frequencies}
+\caption{Frequency distribution of textons. The texton generation
+  process assigns more textons to describing salient but rare image
+  structures such as junctions and line end points than it assigns to
+  frequent but non--discriminative image regions such as textureless
+  patches.}
 \label{fig:texton-freq-distr}
 \end{figure}
 
-\subsubsection{Textons Correlate With Scene Structure}
+\subsection{Textons Correlate With Scene Structure}
 To further explore the relationship between textons and scene
 structure we divided all frames within our dataset into three
 orientation categories: ``straight'' (for which the camera's optical
 axis was within $\pm 22.5\degrees$ of the horizontal), ``up'' (above
 $22.5\degrees$), and ``down'' (below $22.5\degrees$). Next we computed
 an average occupancy map for each texton within across each
-category. Several per--texton heatmaps are shown in
-\figref{eg-textons}. The first two rows show heatmaps for textons that
+category. Several per--texton heat--maps are shown in
+\figref{eg-textons}. The first two rows show heat--maps for textons that
 correspond roughly to ``floor'' and ``wall/ceiling''. We can see that
 these reflect the image regions in which we would expect to find these
 scene parts given the various camera orientations.
@@ -177,7 +236,7 @@ Perhaps the most instructive example of the texton/scene structure
 relationship, however, is that of the textons that represent edge
 elements, two of which are shown in the lower two rows of
 \figref{eg-textons}. Consider the third row in this figure: The
-stratification evident in the heatmap for downward--facing frames
+stratification evident in the heat--map for downward--facing frames
 indicates a common intersection somewhere above the image, whereas
 that for the upward--facing frames indicates an intersection below the
 image, and in the forward--facing frames the lines are close to
@@ -208,30 +267,33 @@ model that explicitly relates these to each other in the next section.
 \end{figure*}
 
 \section{Learning and Inference}
-\label{sect:approach}
+\label{sec:approach}
 Having motivated the use of textons for image understanding we now
-describe our probabilistic model that relates textons to scenes. We
-wish to model image categories according to the locations in which
-textons appear. One popular approach is the bag--of--features model
-\cite{Jebara03} but this would remove all information about the
-locations of the textons, which as we have seen is a principal source
-of salient information. Instead we propose a new
+describe our probabilistic model that relates textons to scene
+categories. For an input image $I$, we wish to discover the associated
+place category $c$. For each category we are given a set of example
+images at training time. We wish to model categories $c$ according
+to the pixel locations in which textons appear within images
+associated with each category. One popular approach is the
+bag--of--features model \cite{Jebara03} but this would remove all
+information about the locations of the textons, which as we have seen
+is a principal source of salient information. Instead we propose a new
 bag--of--texton--pairs model in which an image is represented as a
 collection of observed texton pairs $\{(t_i, t_j, s_{i,j})\}$ where
-$t_i$ and $t_j$ are the texton labels and $s_{i,j}$ is the
-displacement between the image locations at which they were
-observed. By considering only displacements and not absolute pixel
-locations in our model we gain some robustness to camera orientation.
+$t_i$ and $t_j$ are texton labels and $s_{i,j}$ is the displacement
+between the image locations at which they were observed. By
+considering only displacements and not absolute pixel locations in our
+model we gain some robustness to camera orientation.
 
 For an image $I$ containing $N$ pixels there are $N^2$ such
-pairwise observations. We model the likelihood given class $c$ as
+pairwise observations. Our class--conditional likelihood is
 \begin{equation}
-p(I ~|~ c) = \prod_{i=0}^N \prod_{j=0}^N
-p(t_i, ~ t_j, ~ s_{i,j} ~|~ c) \label{lik}
+P(I ~|~ c) = \prod_{i=0}^N \prod_{j=0}^N
+P(t_i, ~ t_j, ~ s_{i,j} ~|~ c) \label{lik}
 \end{equation}
 where we have assumed independence between observations for
 tractability. We compute the likelihood \eqref{lik} by estimating the
-joint distribution $p(t_i,t_j,s_{i,j},c)$ using a histogram. We could
+joint distribution $P(t_i,t_j,s_{i,j},c)$ using a histogram. We could
 have used Parzen windowing \cite{Parzen62} for the continuous variable
 $s_{i,j}$ but due to the very large number of samples we obtain for
 each image, we found this to be unnecessary.
@@ -255,8 +317,8 @@ multiplying the entry we make in the histogram by $n^a_i n^b_j$, and
 during evaluation the aggregate observations correspond to
 multiplications in the class--conditional log likelihood
 \begin{eqnarray}
-\log p(I ~|~ c) & = & \sum_{a=0}^{M^2} \sum_{b=0}^{M^2} \sum_{i=0}^K  \sum_{j=0}^K
- n^a_in^b_j \log p(t_i ~ t_j ~ s_{a,b} ~|~ c)
+\log P(I ~|~ c) & = & \sum_{a=0}^{M^2} \sum_{b=0}^{M^2} \sum_{i=0}^K  \sum_{j=0}^K
+ n^a_in^b_j \log P(t_i, ~ t_j, ~ s_{a,b} ~|~ c)
 \end{eqnarray}
 In both cases the aggregated observations can be evaluated in a single
 step so the complexity is reduced from $O(N^2)$ to $O(M^4 K^2)$. In
@@ -265,6 +327,7 @@ much of the salient image information, while allowing our system to run
 at video frame rate.
 
 \section{Place Recognition}
+\label{sec:place-recognition}
 We applied our system to the problem of place recognition. Our data
 set consisted of several video sequences captured in a hostel
 using a low--quality camera with a resolution of $320 \times 240$,
@@ -273,25 +336,22 @@ frequent motion blur and rapid variations in camera orientation.
 
 We labelled each frame with the place that it was captured in. There
 were five labels: bedroom, kitchen, common room, garden, and
-corridor. As an added challenge we gave all frames captured in
-corridors the same label (there were four different corridors in the
-sequence with considerable variations in appearance).
-
-This experiment does not correspond to place {\em category}
+corridor. We gave all frames captured in corridors the same
+label. This experiment does not correspond to place {\em category}
 recognition since most of the labels included frames from only one
 place instance. However, it is harder than strict landmark--style
-localisations because, as shown in \figref{nonoverlapping}, many images
+localisation because, as shown in \figref{nonoverlapping}, many images
 with the same label contain non--overlapping views of the room they
 were captured in, yet the system is expected to recognise all of them
 as belonging to the same place.
 
 \begin{figure}[htp]
-\centering
-\includegraphics[width=\textwidth]{nonoverlapping.png}
-\caption{Four frames with the ``bedroom'' label. There are almost no
-  overlapping scene parts but the system is required to (and did
-  successfully) recognise each of them as part of the same place.}
-\label{fig:nonoverlapping}
+  \centering
+  \includegraphics[width=\textwidth]{nonoverlapping.png}
+  \caption{Four frames with the ``bedroom'' label. There are almost no
+    overlapping scene parts but the system is required to (and did
+    successfully) recognise each of them as part of the same place.}
+  \label{fig:nonoverlapping}
 \end{figure}
 
 We compared our system with the gist descriptor of Torralba \etal and
@@ -310,16 +370,17 @@ row of \tableref{place-cla-results} and in
 large margin. We suspected that the poor performance of Torralba's
 system was due to the training data not sufficiently populating the
 32--dimensional feature space. This exemplifies one of the major
-advantages of our approach, namely the ability to learn from limited
-training data. However, to show that this is not the \textit{only}
-advantage of our approach we ran auxiliary experiments with larger and
-smaller training sets. When the training set was enlarged our system
+advantages of our approach: the ability to learn from limited training
+data. However, to show that this is not the \textit{only} advantage of
+our approach we ran auxiliary experiments with larger and smaller
+training sets. When the training set was enlarged our system
 outperformed Torralba's by a significant but smaller margin, and when
-the training set was decreased our decreased only slightly whereas
-Torralba's system was unable to estimate the Gaussian mixture due to
-the sparsity of training samples. The latter case corresponds to just
-20 examples per label. These results are shown in the top and bottom
-rows of \tableref{place-cla-results}.
+the training set was decreased, the performance of our system
+decreased only slightly whereas Torralba's system was unable to
+estimate the Gaussian mixture due to the sparsity of training
+samples. The latter case corresponds to just 20 examples per
+label. These results are shown in the top and bottom rows of
+\tableref{place-cla-results}.
 
 Figures \ref{fig:pos-examples} and \ref{fig:neg-examples} show
 positive and negative results from our system. Note how our system
@@ -327,40 +388,48 @@ recognises images containing disjoint views of a room as belonging to
 the same place.
 
 \begin{table}[htb]
-\centering
-\begin{tabular}{ l || l | l | l }
-\# train frames & Our system & Torralba {\em et al.} & KNN \\
-\hline			
-  103 & \textbf{81\%} & --- & 45\% \\
-  230 & \textbf{83\%} & 62\% & 52\% \\
-  565 & \textbf{85\%} & 70\% & 55\% \\
-\end{tabular}
-\caption{Place recognition results with varying numbers of training
-  frames (total for all labels). For the experiment with 103 training
-  frames (top row) we were unable to estimate the Gaussian mixtures
-  required for Torralba's system due to the sparsity of the training
-  examples in feature space.}
-\label{table:place-cla-results}
+  \centering
+  \begin{tabular}{@{}p{40mm}p{30mm}p{30mm}p{40mm}@{}}
+    \toprule
+      No. training frames &
+      This chapter &
+      Torralba \etal &
+      Nearest neighbours \\
+    \midrule
+      103 & \textbf{81\%} & --- & 45\% \\
+      230 & \textbf{83\%} & 62\% & 52\% \\
+      565 & \textbf{85\%} & 70\% & 55\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Recognition rate for the place recognition problem with
+    varying numbers of training examples. The reported accuracy is the
+    mean over the on--diagonal elements of the confusion matrix. The
+    left column reports the total number of training examples for all
+    categories. For the experiment with 103 training examples we were
+    unable to estimate the Gaussian mixtures required for the system
+    of Torralba \etal due to the sparsity of the training
+    examples. The nearest neighbours baseline was computed by resizing
+    images to 64 by 64 pixels and comparing raw pixel intensities in
+    the L2 sense.}
+  \label{table:place-cla-results}
 \end{table}
 
 \begin{figure}[htp]
-\centering
-\includegraphics[width=0.4\textwidth]{place_confusion.png}
-\caption{Confusion matrix for place recognition.}
-\label{fig:place-confusion}
+  \centering
+  \includegraphics[width=0.4\textwidth]{place_confusion}
+  \caption{Confusion matrix for place recognition. This figure
+    corresponds to the bottom row of \tableref{place-cla-results}.}
+  \label{fig:place-confusion}
 \end{figure}
 
 \begin{figure*}[htp]
 \centering
 \includegraphics[width=\textwidth]{pos_examples.png}
-\caption{Example frames for which our classifier succeeded. The ground
-  truth label is underlined and the output from our system is
-  starred. We show the log likelihoods not the actual posterior
-  because the large number of terms in \eqref{lik} causes the
-  posterior to always be sharply peaked and hence the log likelihood
-  is more informative for visualisation. Note the variation between
-  frames with the same label, and the poverty of the information
-  contained in many frames.}
+\caption{Example frames for which our classifier produced the correct
+  output. The ground truth label is underlined and the output from our
+  system is starred. We show the posterior distribution over class
+  labels in black. Note the variation between images with the same
+  label, and the low quality of many images.}
 \label{fig:pos-examples}
 \end{figure*}
 
@@ -373,22 +442,23 @@ the same place.
 \end{figure*}
 
 \section{Camera Orientation Classification}
+\label{sec:camera-orientation}
 In this section we show how our system can deduce a coarse camera
 orientation from a single image. We are interested only in the tilt of
 the camera with respect to the ground plane. Our intention is to make
 a rapid but coarse estimate of camera orientation. We pose the problem
-as a classification task with three possible labels: ``up'',
-``straight'', and ``down'' (see \figref{camorients}). The ``straight''
-label represents images taken with the camera axis parallel to the
-ground plane, plus or minus $22.5^{\circ}$, and the ``up'' and
-``down'' labels represent all orientations facing further upwards or
-downwards respectively.
+as a classification task with three labels: ``up'', ``straight'', and
+``down''. The ``straight'' label represents images taken with the
+camera axis parallel to the ground plane, plus or minus
+$22.5^{\circ}$, and the ``up'' and ``down'' labels represent all
+orientations facing further upwards or downwards respectively (see
+\figref{camorients}).
 
 \begin{figure}[htp]
-\centering
-\includegraphics[width=0.4\textwidth]{camorients.png}
-\caption{Labels for camera orientation classification.}
-\label{fig:camorients}
+  \centering
+  \includegraphics[width=0.4\textwidth]{camorients}
+  \caption{Definition of the labels for camera orientation recognition.}
+  \label{fig:camorients}
 \end{figure}
 
 We captured three sequences in which the camera orientation was fixed
@@ -412,25 +482,36 @@ interest is our system's ability to generalise across images taken
 with the same camera orientation at several different locations.
 
 \begin{table}[htb]
-\centering
-\begin{tabular}{ l || l | l | l }
-\# train frames & Our system & Torralba {\em et al.} & KNN \\
-\hline			
-88 & \textbf{70\%} & 61\% & 59\% \\
-728 & \textbf{79\%} & 63\% & 59\% \\
-\end{tabular}
-\caption{Camera orientation classification results using small and
-  large training sets. We were able to estimate the Gaussians for
-  Torralba's system using only 88 training examples because there were
-  fewer labels than in the place recognition problem.}
-\label{table:orient-cla-results}
+  \centering
+  \begin{tabular}{@{}p{40mm}p{30mm}p{30mm}p{40mm}@{}}
+    \toprule
+      No. training frames &
+      This chapter &
+      Torralba \etal &
+      Nearest neighbours \\
+    \midrule
+      88 & \textbf{70\%} & 61\% & 59\% \\
+      728 & \textbf{79\%} & 63\% & 59\% \\
+    \bottomrule
+  \end{tabular}
+    \caption{Camera orientation classification results using small and
+      large training sets. The reported accuracies are the average of
+      the on--diagonal entries in the confusion matrix. In this case
+      we were able to estimate the Gaussians for Torralba's system
+      using only 88 training examples because there were fewer categories
+      than in the place recognition problem. The nearest neighbours
+      baseline was computed by resizing images to 64 by 64
+      pixels and comparing raw pixel intensities in the L2 sense.}
+  \label{table:orient-cla-results}
 \end{table}
 
 \begin{figure}[htp]
-\centering
-\includegraphics[width=0.25\textwidth]{orient_confusion.png}
-\caption{Confusion matrix for camera orientation classification.}
-\label{fig:orient-confusion}
+  \centering
+  \includegraphics[width=0.25\textwidth]{orient_confusion}
+  \caption{Confusion matrix for camera orientation
+    classification. This figure shows results corresponding to the
+    bottom row in \tableref{orient-cla-results}.}
+  \label{fig:orient-confusion}
 \end{figure}
 
 \begin{figure}[htp]
@@ -443,136 +524,108 @@ with the same camera orientation at several different locations.
 \end{figure}
 
 
-\section{Code Optimisations}
-The most computationally demanding aspect of our system turns out to
-be the convolutions needed to generate the pixel features. In this
-section we describe several optimisations for the convolution
-operation. Timing results are shown in \figref{convolve-timing} at the
-end of this chapter.
+\section{Computational Concerns}
+The most computationally demanding aspect of our system is the
+convolutions needed to generate the pixel features. In this section we
+describe several optimisations for the convolution operation. Timing
+results are shown in \tableref{convolve-timing} at the end of this
+section.
 
 \subsection{Separable Kernels}
-A function of two variables is \textit{separable} if it can be
-factorised into two functions of one variable each. Convolving an
-image with a separable 2D kernel can be decomposed into two 1D
-convolutions along each axis \cite{Lindeberg93}. Separable
-convolutions are widely used in signal processing and computer vision
-since executing two 1D convolutions is faster than a full 2D
-convolution. 
-
 The Gabor function, which we use to generate pixel features, in its
 canonical form is a complex--valued function and can be trivially
 separated. However, in our work we use just the real part,
 \begin{eqnarray}
   H_{real}(x,y) & = & g_2(x,y) \cos(kx\cos\theta + ky\sin\theta) ~,
 \end{eqnarray}
-where and $g_2$ represents the two--dimensional Gaussian
-function. Making appropriate substitutions for $a$ and $b$,
+where $g_2$ is the two--dimensional Gaussian
+function. This can be written as the difference between two separable
+function as
 \begin{eqnarray}
-  H_{real}(x,y) & = & g_2(x,y) \cos((ax) + (by))\\
-  & = & g_1(x)g_1(y) \Bigl(\cos (ax)\cos (by) - \sin (ax)\sin (by)
-  \Bigr) \label{sep2}\\
-  & = & \Bigl(g_1(x)\cos (ax)\Bigr) \Bigl(g_1(y)\cos (by)\Bigr)
-  - \Bigl(g_1(x)\sin (ax)\Bigr)\Bigl(g_1(y)\sin (by)\Bigr)
-  \label{sep3}
+  %H_{real}(x,y) & = & g_2(x,y) \cos(ax + by)\\
+  %  & = & g_1(x)g_1(y) \Bigl(\cos ax\cos (by) - \sin ax \sin by
+  %    \Bigr) \label{sep2}\\
+   H_{real}(x,y) & = & \Bigl(g_1(x)\cos ax\Bigr) \Bigl(g_1(y)\cos by\Bigr)
+      - \Bigl(g_1(x)\sin ax\Bigr)\Bigl(g_1(y)\sin by\Bigr)
 \end{eqnarray}
-where in \eqref{sep2} we have used the cosine expansion formula and
-replaced the Gaussian function with its well--known separated
-form. \eqref{sep3} shows that the real Gabor function can be expressed
-as the difference between two separable functions. We implement this
-by running two separated convolutions (consisting of two 1D
-convolutions each) and then taking the difference between the results,
-which is significantly faster than performing the original
-convolution.
+where $g_1$ is the one--dimensional Gaussian function and we have used
+the cosine expansion formula. We implement this by running two
+separated convolutions and then taking their difference, which is
+significantly faster than performing the original convolution.
 
 \subsection{Parallelization over filters}
-Generating the pixel features requires involving an input image with
+Generating the pixel features requires convolving an input image with
 12 different filters. To leverage the parallelization capabilities of
-modern multi--core CPUs we implemented a version of the code that
-executes the convolutions in parallel where possible. This approach
-allows parallelization within a single scale, but requires
-synchronisation upon completion of each scale due to the
+modern multi--core CPUs we execute the convolutions in parallel where
+possible. This approach allows parallelization within a single scale,
+but requires synchronisation upon completion of each scale due to the
 down--sampling operation.
 
-\subsection{Parallelization over images}
-During training all images are available at the outset, so it is
-possible to parallelize over images rather than over filters. Since
-each image can be processed independently strategy outperforms
-parallelization over filters, which requires synchronisation at
-certain points. The reduced synchronisation results in higher
-processor utilisation and a corresponding increase in performance.
-This strategy is, of course, only possible during training since at
-evaluation time frames arrive one--by--one and must be processed as
-they arrive.
-
 \subsection{Parallelization over pixels}
-Modern graphics hardware is designed to allow efficient
-ultra--small--scale parallelization, such as per--pixel
-parallelization. This is is well suited to performing convolutions
-since each output pixel is functionally independent. To leverage this
-we implemented our convolutions in CUDA, which is a C--like language
-designed by NVidia for programming graphics hardware. We transmit
-frames to the GPU as they arrive, wherein the convolutions are
-performed and then transferred back to the CPU. This results in a
-substantial performance gain over the CPU implementation.
-
-We note that further improvements may be possible since in the current
-implementation, the majority of the time is spent transferring data
-between the CPU and GPU, in comparison to which the time spent
-performing the convolutions is negligible. This bottleneck could be
-partially avoided if we performed the texton labelling in the GPU and
-transferred only the final texton map back to the CPU. We plan to
-implement this if it becomes necessary in order to attain frame rate
-performance.
+Modern graphics hardware allows efficient parallelization of
+small--scale computations such as per--pixel operations. This is is
+well suited to performing convolutions since each output pixel is
+functionally independent of all others. To leverage this we
+implemented convolutions using a C--like language designed
+specifically for programming graphics hardware. We note that further
+improvements may be possible since under the current implementation,
+much time is spent transferring data between the CPU and GPU, in
+comparison to which the time spent performing the convolutions is
+small. This bottleneck could be partially avoided if we performed the
+texton labelling in the GPU and transferred only the final texton map
+back to the CPU.
 
 \subsection{Timing results}
 Results from timing evaluations are shown in
-\figref{convolve-timing}. The GPU strategy outperforms all others and
-this is the implementation we use throughout the rest of this
-report. It improves over the baseline strategy by a factor of $5$ for
+\tableref{convolve-timing}. The GPU strategy outperforms all
+others. It improves over the baseline strategy by a factor of $5$ for
 the $320 \times 240$ image and by a factor of $6$ for the $640 \times
-480$ image. As well as meeting our frame--rate performance
-goal, this speedup allows us to rapidly test new algorithms within the
-rest of our system, which improves productivity substantially.
+480$ image.
 
 It is interesting to note that the when the image is enlarged to
-include four times as many pixels, the three strategies that execute
-on the CPU all perform very close to four times slower, whereas the
-GPU implementation degrades by a factor closer to three. This
-indicates that this tasks saturates the CPU performance but that a
-significant overhead remains in the GPU implementation. This matches
-our observation in the previous section transmitting data between the
-CPU and GPU consumes much of the time taken by that strategy, and that
-further performance improvements are possible.
+include four times as many pixels, the three CPU--based strategies
+degrade by a factor very close to four, whereas the GPU implementation
+degrades by a factor closer to three. This indicates that this task
+saturates CPU performance but that a significant overhead remains in
+the GPU implementation. This matches our observation in the previous
+section that transmitting data between the CPU and GPU consumes much
+time, and that further performance improvements are possible.
 
-\begin{figure}[htp]
-\centering
-\begin{tabular}{ l || l | l | l | l | }
-  & \multicolumn{2}{c|}{\textbf{640 $\times$ 480}}
-    & \multicolumn{2}{c|}{\textbf{640 $\times$ 480}} \\
-  \textbf{Strategy} & \textbf{Time per frame} & \textbf{FPS}
-    & \textbf{Time per frame} & \textbf{FPS} \\
-  \hline
-  No parallelization & 115.0ms & 8.69Hz & 463.6ms & 2.16Hz \\
-  Filter--parallel & 38.0ms & 26.3Hz & 148.0ms & 6.76Hz \\
-  Image--parallel & 32.1ms & 31.2Hz & 125.6ms & 8.02Hz \\
-  Pixel--parallel (GPU) & 23.5ms & 42.5Hz & 78.1ms & 12.80Hz \\
-\end{tabular}
-\caption{Timing results for the four parallelization strategies. Each
-  strategy was evaluated for two image sizes. All strategies utilise
-  separated filters. Results are averages over 10 invocations.}
-\label{fig:convolve-timing}
-\end{figure}
+
+
+\begin{table}[htp]
+  \centering
+  \begin{tabular}{@{}p{40mm}p{20mm}p{20mm}p{20mm}p{20mm}@{}}
+    \toprule
+      & \multicolumn{2}{c}{\textbf{320 $\times$ 240}}
+      & \multicolumn{2}{c}{\textbf{640 $\times$ 480}} \\
+      \textbf{Strategy} &
+      \textbf{Per Frame} &
+      \textbf{Frame Rate} &
+      \textbf{Per Frame} &
+      \textbf{Frame Rate} \\
+    \midrule
+      No parallelization & 115.0ms & 8.69Hz & 463.6ms & 2.16Hz \\
+      Filter--parallel & 38.0ms & 26.3Hz & 148.0ms & 6.76Hz \\
+      Image--parallel & 32.1ms & 31.2Hz & 125.6ms & 8.02Hz \\
+      Pixel--parallel (GPU) & 23.5ms & 42.5Hz & 78.1ms & 12.80Hz \\
+    \bottomrule
+  \end{tabular}
+  \caption{Timing results for the four parallelization strategies. Each
+    strategy was evaluated for two image sizes. All strategies utilise
+    separated filters. Results are averages over 10 invocations.}
+  \label{table:convolve-timing}
+\end{table}
 
 \section{Conclusions}
-In this section we have shown that texture structure is useful for
-deducing high--level information about indoor scenes. We have
+In this chapter we have shown that texture structure can be leveraged
+to deduce high--level information about image scenes. We have
 motivated the use of textons for this purpose with several qualitative
 examples, and have presented results from two in--depth
 experiments. In both cases our system based on relative displacements
 between textons obtains highly encouraging results. Furthermore, by
-utilising highly--parallel graphics hardware our system is capable of
-operating at video frame rate. In the next chapter we extend our
-system to reason about object locations.
+utilising graphics hardware our system is capable of operating at
+video frame rate.
 
 %% We also note an intruiging line of investigation in which we could
 %% treat the labelling process as a classification task with the values
@@ -583,7 +636,7 @@ system to reason about object locations.
 %% matching steps. The challenge, of course, would be to build a
 %% classifier fast enough that this substitution resulted in a beneficial
 %% trade--off. Perhaps randomized forrests would be suitable here. We
-%% intend to pursue this line of investigation only if it is neccessary
+%% intend to pursue this line of investigation only if it is necessary
 %% to achieve real--time performance.
 
 %% \section{Choice of Filter Banks}
