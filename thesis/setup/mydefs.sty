@@ -123,8 +123,14 @@
 \newcommand\NumViews{K}
 
 \newcommand\Pixel{\vect{p}}
+\newcommand\Pixelx{\vect{p_x}}
+\newcommand\Pixely{\vect{p_y}}
 \newcommand\OtherPixel{\vect{q}}
+\newcommand\OtherPixelx{\vect{q_x}}
+\newcommand\OtherPixely{\vect{q_y}}
 \newcommand\AuxPixel{\vect{q}}
+\newcommand\AuxPixelx{\vect{q_x}}
+\newcommand\AuxPixely{\vect{q_y}}
 
 \newcommand\TruncScene{\Scene'}
 \newcommand\CfScene{\OtherScene}
@@ -223,7 +229,7 @@
 
 \newcommand\DepthAtPGivenModel{\ComputedDepth(\Pixel;\Scene)}
 \newcommand\DepthAtPGivenY{\ComputedDepth(\Pixel;\seam_j)}
-\newcommand\Dmax{N_d}
+\newcommand\Dmax{d_{\mbox{max}}}
 \newcommand\RoundoffEps{\epsilon}
 \newcommand\SceneAtX{y_x} % remove
 
@@ -232,7 +238,7 @@
 \newcommand\Image{I}
 
 \renewcommand\vect[1]{\boldsymbol{#1}}
-\newcommand\Reconstruction{M}
+\newcommand\Reconstruction{G}
 \newcommand\Poly{P}
 \newcommand\vertex{\vect{v}}
 \newcommand\othervertex{\vect{u}}
@@ -253,7 +259,7 @@
 \newcommand\enpt{\vect{v}}
 
 \newcommand\Camera{C}
-\newcommand\CamMatrix{H}
+\newcommand\CamMatrix{K}
 \newcommand\CamR{R}
 \newcommand\CamTr{\vect{t}}
 \newcommand\RetProj[1]{\CamR #1 + \CamTr}
