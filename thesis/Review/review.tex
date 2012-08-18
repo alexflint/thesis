@@ -251,7 +251,7 @@ the hypothesis class one must search over.
 
 \subsubsection{Cuboid Models}
 
-Hedau \etal \cite{Hedau2009} reason about indoor environments by
+Hedau \etal \cite{Hedau09} reason about indoor environments by
 modelling the scene as the interior of an axis--aligned cuboid. This
 is perhaps the simplest possible instantiation of the indoor Manhattan
 assumption, but the authors show that even this restrictive model can
@@ -262,12 +262,12 @@ observed line segments. Next, a cuboid is identified by casting two
 rays from each vanishing point.
 
 The authors use a structured prediction model to learn how to select
-bounds for the cuboid. Given training examples they use train an SVM
-to rank cuboid hypotheses within a feature space defined over inputs
-(image features) and outputs (cuboids). This approach follows a
-similar methodology to the approach we propose in \chapref{learning}
-of this thesis, though we learn within a much more general hypothesis
-class.
+bounds for the cuboid. Given training examples they train an SVM to
+rank cuboid hypotheses within a feature space defined over inputs
+(image features) and outputs (cuboids)\changedsinceviva. This approach
+follows a similar methodology to the approach we propose in
+\chapref{learning}, though we learn within a much more general
+hypothesis class.
 
 In later work \cite{Hedau2010} the authors connect the cuboid model of
 spatial boundaries to a model of objects within the room. Objects are
@@ -286,7 +286,7 @@ performance of both inference algorithms is improved.
     \includegraphics[width=0.35\textwidth]{hedau_b.png}
   }
   \caption{Results from the cuboid model of Hedau \etal
-    \cite{Hedau2009,Hedau2010}.
+    \cite{Hedau09,Hedau2010}.
     \textit{Reprinted with express permission of Varsha Hedau.}
   }
   \label{fig:hedau-result}
@@ -352,6 +352,30 @@ category.
   \label{fig:lee-result}
 \end{figure}
 
+\subsubsection{Oriented Plane Sweeps}
+
+Gaullup \etal \cite{Gallup2007} present a fast stereo algorithm based
+on plane sweeping with respect to Manhattan--like surface
+orientations. They proceed by (1) selecting a vertical direction based
+on the camera trajectory; (2) identifying one horizontal and several
+upright surface orientations based on lines and estimated vanishing
+points; (3) performing plane sweep stereo with respect to each of
+these orientations; and (4) fusing the result into a depth map. The
+resulting depth map naturally encodes Manhattan scene structure since
+each pixel is implicitly associated with one of the upright or
+horizontal orientations.\changedsinceviva
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{gallup_result}
+  \caption{Manhattan--like scene structure obtained from the
+    multi--way plane sweep approach of Gallup
+    \etal \cite{Gallup2007}.
+    \textit{Reprinted with express permission of David Gallup.}
+  }
+  \label{fig:gallup-result}
+\end{figure}
+
 \subsubsection{Manhattan World Stereo}
 
 Furukawa \etal \cite{Furukawa09} used the Manhattan world assumption
@@ -414,7 +438,7 @@ Expectation--Maximization algorithm for maximum--likelihood inference,
 and component--wise logistic regression to learn the CRF parameters
 from training data.
 
-Felzenszwalb and Veksler \cite{Felzenszwalb2010} discuss a class of
+Felzenszwalb and Veksler \cite{Felzenszwalb10} discuss a class of
 dynamic programming algorithms capable of maximum--likelihood
 image segmentation under various shape priors. One of the applications
 to which they apply their algorithm is single--image reconstruction.
@@ -424,6 +448,39 @@ vertical segments running from left to right in the image. We take
 advantage of a similar decomposability within indoor Manhattan
 environments in the inference algorithm that we propose in
 \chapref{inference}.
+
+\subsubsection{3D stages}
+
+Nedovic \etal \cite{Nedovic2010} derive geometric context by
+classifying images into 15 ``stage categories''. Each category
+consists of an arrangement of surfaces such as ``ground'', ``sky'',
+``upright'', ``background'', and ``figure'', such as those shown in
+\figref{nedovic-stages}. Their principal contribution is a large
+selection of powerful visual features containing salient geometric
+information, including cues derived from color, shape, texture
+gradients, atmospheric scattering, line segments, and segmentation
+boundaries. The authors train an SVM to associate input images with
+one of the 15 stage categories.\changedsinceviva
+
+Their work relates to ours as follows. 13 of the 15 proposed stages
+are special cases of indoor Manhattan environments, which we analyse
+extensively in this thesis. The remaining two include an upright
+``person'' segment, which we do not consider. The learning scheme we
+propose in \chapref{learning} is also based upon large margin
+principles, but whereas Nedovic \etal learn with respect to 15
+categories, we learn with respect to the much larger space of all
+possible indoor Manhattan models. The features they propose seem well
+suited to our own purposes and so future work could apply our
+inference and learning strategies to their features.\changedsinceviva
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.75\textwidth]{nedovic_stages}
+  \caption{Three categories of ``3D stages'' defined by Nedovic \etal
+    \cite{Nedovic2010}, with examples of representative images.
+    \textit{Reprinted with express permission of Vladimir Nedovic.}}
+  \label{fig:nedovic-stages}
+\end{figure}
 
 \subsection{Texture Recognition}
 
@@ -436,17 +493,18 @@ the appearance of their surroundings. For example, cars and bikes are
 likely to appear near road--like texture, whereas aeroplanes are
 likely to appear against a sky--like background.
 
-They begin by running the normalised graph cuts algorithm of Ren and
-Malik \cite{Ren03} to produce roughly homogeneous regions called
-superpixels. Each such region is associated with a feature vector
-comprising various colour and texture statistics, which, in their
-model, is assumed to have arisen from a latent category variable, the
-intention being that superpixels will be clustered into meaningful
-groups like ``road'' and ``sky''. Meanwhile, a set of candidate object
-detections is generated by invoking a standard object detector and
-taking all detections above a certain threshold. The ``things'' are
-related to the ``stuff'' by a set of observed variables representing
-spatial relationships such as ``above'', ``beneath'', and ``next to''.
+They begin by identifying superpixels using the segmentation algorithm
+described by Ren and Malik \cite{Ren03}, which is extends the
+normalised cuts algorithm due to Shi and Malik \cite{Shi2000}\changedsinceviva. Each
+such region is associated with a feature vector comprising various
+colour and texture statistics, which, in their model, arises from a
+latent category variable, the intention being that superpixels will be
+clustered into meaningful groups like ``road'' and ``sky''. Meanwhile,
+a set of candidate object detections is generated by invoking a
+standard object detector and taking all detections above a certain
+threshold. The ``things'' are related to the ``stuff'' by a set of
+observed variables representing spatial relationships such as
+``above'', ``beneath'', and ``next to''.
 
 An advantage of the this model is that while object labels are
 required for training, no explicit segmentations or labels are

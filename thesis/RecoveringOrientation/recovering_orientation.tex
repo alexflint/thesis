@@ -45,7 +45,7 @@ available, such as might be provided by a structure--from--motion
 system. We will not use any point cloud generated from
 structure--from--motion in this chapter. We assume that the provided
 camera poses are measured in a fixed but arbitrary coordinate
-frame. The problem of determining $\SceneR$ in the context of a single
+frame. Determining $\SceneR$ in the context of a single
 image is equivalent to detecting vanishing points since three
 vanishing points and a calibrated camera are sufficient to recover
 $\SceneR$. However, in the multiple view context it makes sense to
@@ -133,12 +133,33 @@ Expectation--Maximisation approach of Schindler and Dellaert
 optimisation over rotations, leveraging the maximum likelihood
 reprojection error of Hartley and Zisserman\cite{Hartley04}.
 
-Recently, Mirzaei and Roumeliotis \cite{Mirzaei2011} showed that
+Sinha \etal \cite{Sinha2008} show how vanishing points in different
+views can be optimized jointly with structure and motion inside a
+single bundle adjustment. Their approach fixes the
+line/vanishing--point associations using multi--hypothesis RANSAC in
+individual views. Structure, motion, and vanishing directions are then
+optimized jointly while holding the data associations fixed. Our approach
+differs from theirs in that (1) we optimize the data association
+variables linking lines to vanishing points jointly with the vanishing
+point locations; and (2) we do not refine structure and motion using
+the vanishing points\changedsinceviva.
+
+Mirzaei and Roumeliotis \cite{Mirzaei2011} showed that
 minimising the algebraic error for three mutually orthogonal vanishing
 points can be solved globally using a polynomial solver. Their
 approach assumes the algebraic error; it is not clear whether the
 reprojection error leads to a likelihood that is amenable to a
 polynomial solution.
+
+Bazin \etal \cite{Bazin2012} recently proposed a novel
+globally--optimal vanishing point algorithm based on
+branch--and--bound. They search over partitions of the observed
+line segments, constrained by the requirement that each partition must
+be consistent with some vanishing point to a tolerance $\tau$. This
+approach is attractive because it is guaranteed to find the global
+optimum. The authors optimize an objective function based on the
+number of consistent line segments, whereas most previous approaches
+optimize a log--likelihood.\changedsinceviva
 
 \subsection{Multiple View Approaches}
 
@@ -176,6 +197,18 @@ can relate line segments in all views directly to $\SceneR$ and
 therefore incorporate all available evidence into a joint
 estimation. We show that this is both computationally efficient and
 avoids the fragile single--view estimation scenario.
+
+The structure--from--motion system we have chosen to work with is the
+parallel tracking and mapping (PTAM) approach of Klein and Murray
+\cite{Klein07}. This approach is suitable for online experiments,
+although this comes at the cost of reduced accuracy compared to global
+bundle adjustment. Importantly, PTAM can encounter scale and
+orientation drift, so the maps it builds may not be perfectly
+metric. While our results with this system are promising, we do notice
+small vanishing point inconsistencies between frames, which can lead
+to errors in our reconstructions. When operating offline, this could
+be alieviated by running global bundle adjustment prior to executing
+our system.\changedsinceviva
 
 \section{Generative Model}
 
@@ -337,7 +370,7 @@ drawn from a different distribution depending on $\Indicator_i$:
     & \mbox{if } \Indicator_i = \Spurious ~.
   \end{cases}
 \end{eqnarray}
-However, due to our definition of $\Indicator_i$ as a binary vector we can
+Due to our definition of $\Indicator_i$ as a binary vector we can
 express this likelihood in the following analytic form,
 \begin{equation}
   \label{eq:complete-likelihood}
@@ -492,6 +525,7 @@ a complexity for the E--step linear in the number of observed line
 segments.
 
 \subsection{M--step}
+\label{sect:mstep}
 
 During this phase we compute $\SceneR^{t+1}$ as the maximiser of the
 expectation of the complete data log--likelihood under the (fixed)
@@ -682,15 +716,15 @@ descent.
 
 We evaluated our approach using a dataset of 18 video sequences of 8
 unique places, which we collected in indoor environments such as homes
-and office spaces. We ran a off--the--shelf bundle adjuster on each
-sequence to yield calibrate views, then transformed each sequence by a
-random 3D rotation to eliminate any bias in the initial conditions for
-our optimisation that might have been introduced by
-structure--from--motion. We manually provided the ground truth scene
-orientation $\SceneR$ for each sequence. We sampled frames at regular
-intervals of approximately one second, then divided all sequences into
-successive 7--frame blocks. Each such block is a single ``evaluation
-instance'' in our dataset.
+and office spaces. We ran an\changedsinceviva off--the--shelf bundle
+adjuster on each sequence to yield calibrated views, then transformed
+each sequence by a random 3D rotation to eliminate any bias in the
+initial conditions for our optimisation that might have been
+introduced by structure--from--motion. We manually provided the ground
+truth scene orientation $\SceneR$ for each sequence. We sampled frames
+at regular intervals of approximately one second, then divided all
+sequences into successive 7--frame blocks. Each such block is a single
+``evaluation instance'' in our dataset.
 
 We compared four approaches including our own. First, the
 surface--normal--based approach of \cite{Furukawa09} described at the
@@ -781,7 +815,7 @@ and \ref{fig:vpt-example3}.
     for MUL \\
     \midrule
     \tt{Kitchen}  & 0.53   & 0.59   & 0.037  & \textbf{0.019} \\
-    \tt{Foyer 1}   & 0.72   & 0.77   & 0.054  & \textbf{0.39} \\
+    \tt{Foyer 1}   & 0.72   & 0.77   & 0.054  & \textbf{0.039} \\
     \tt{Foyer 2}  & 0.81   & 0.75   & 0.070  & \textbf{0.021} \\
     \tt{Bursary}  & 0.50   & 0.53   & 0.067  & \textbf{0.030} \\
     \tt{Ground}   & 0.90   & 0.68   & \textbf{0.55}   & 0.66 \\

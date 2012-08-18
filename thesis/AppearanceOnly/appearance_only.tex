@@ -185,16 +185,22 @@ whereas the use of textons selects these structures automatically and
 unsupervised.
 
 \begin{figure}[htp]
-\centering
-\includegraphics[width=0.6\textwidth]{eg_filters}
-\caption{Visualisation of textons identified for our dataset during
-  the offline training stage. Each image shows a weighted sum over the
-  filter kernels in our filter bank, with the weights set to the
-  coefficient from one identified cluster centre. Each image therefore
-  shows the ``ideal'' patch corresponding to one of the textons added
-  to the codebook. The textons are sorted by decreasing frequency from
-  top to bottom, left to right.}
-\label{fig:textons-generated}
+  \centering
+  \includegraphics[width=\textwidth]{texton_exemplars}
+  \caption{Textons identified for our dataset during the offline
+    training stage. Each panel shows a representative image patch for
+    one of the cluster identified by K--means. The patches were
+    selected by identifying the feature closest to each cluster
+    center, and then extracting a small patch about the image position
+    from which it arose. The textons are sorted by
+    decreasing frequency from top to bottom, left to right. Image
+    patches are converted to grayscale before filtering, but here we
+    show them in colour to assist visualization. The patches vary in
+    size due to clipping near image boundaries (this does not affect
+    clustering).
+    % \changedsinceviva
+  }
+  \label{fig:textons-generated}
 \end{figure}
 
 \subsection{Textons Focus Attention on Salient Image Regions}
@@ -209,14 +215,14 @@ the small fraction of pixels representing the most salient image
 structures.
 
 \begin{figure}[htp]
-\centering
-\includegraphics[width=0.8\textwidth]{texton_frequencies}
-\caption{Frequency distribution of textons. The texton generation
-  process assigns more textons to describing salient but rare image
-  structures such as junctions and line end points than it assigns to
-  frequent but non--discriminative image regions such as textureless
-  patches.}
-\label{fig:texton-freq-distr}
+  \centering
+  \includegraphics[width=0.8\textwidth]{texton_frequencies}
+  \caption{Frequency distribution of textons. The texton generation
+    process assigns more textons to describing salient but rare image
+    structures such as junctions and line end points than it assigns to
+    frequent but non--discriminative image regions such as textureless
+    patches.}
+  \label{fig:texton-freq-distr}
 \end{figure}
 
 \subsection{Textons Correlate With Scene Structure}
@@ -299,18 +305,22 @@ $s_{i,j}$ but due to the very large number of samples we obtain for
 each image, we found this to be unnecessary.
 
 For images of reasonable size the cost of enumerating all $N^2$ texton
-pairs is prohibitively expensive. We overcome this by overlaying a $M
+pairs is prohibitively expensive. We overcome this by overlaying an $M
 \times M$ grid on the image and counting the occurrences of each
 texton within each grid cell. We then enumerate all pairs of grid
 cells and evaluate the texton pairs in aggregate. Hence for grid cells
-$C_a$ and $C_b$ containing $n^a_i$ and $n^b_j$ instances of texton $t_i$
-and $t_j$ respectively, we evaluate $n^a_i n^b_j$ instances of the
-observation $(t_i,t_j,s_{a,b})$ where $s_{a,b}$ is the
-distance between the centres of the grid cells. We have lost some
-precision in the texton locations since each texton is effectively
-moved to the centre of the grid cell containing it, but our
-experiments show that we are still able to capture sufficient salient
-information.
+$C_a$ and $C_b$ containing $n^a_i$ and $n^b_j$ instances of texton
+$t_i$ and $t_j$ respectively, we evaluate $n^a_i n^b_j$ instances of
+the observation $(t_i,t_j,s_{a,b})$ where $s_{a,b}$ is the distance
+between the centres of the grid cells. We have lost some precision in
+the texton locations since each texton is effectively moved to the
+centre of the grid cell containing it, but our experiments show that
+we are still able to capture sufficient salient information. We also
+note that quantizing displacements in this way implicitly shares
+information between similar displacements. One could think of this
+operation as an efficient approximation to building the full joint
+distribution and then smoothing along the displacement
+axis.\changedsinceviva
 
 During training we evaluate these aggregated observations by
 multiplying the entry we make in the histogram by $n^a_i n^b_j$, and
@@ -582,7 +592,7 @@ others. It improves over the baseline strategy by a factor of $5$ for
 the $320 \times 240$ image and by a factor of $6$ for the $640 \times
 480$ image.
 
-It is interesting to note that the when the image is enlarged to
+It is interesting to note that when the image is enlarged to
 include four times as many pixels, the three CPU--based strategies
 degrade by a factor very close to four, whereas the GPU implementation
 degrades by a factor closer to three. This indicates that this task
