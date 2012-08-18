@@ -199,8 +199,8 @@ respectively. Our prior on scenes is a geometric distribution in
 $\vect{n}=(n_1,n_2,n_3)$,
 \begin{eqnarray}
   \label{eq:scene-prior}
-  P(\Scene ~|~ \Penalties) &=& \frac{1}{Z} ~,
-%    {\PenaltyConc}^{n_1} {\PenaltyConv}^{n_2} {\PenaltyOccl}^{n_3}\\
+  P(\Scene ~|~ \Penalties) &=& \frac{1}{Z}
+    {\PenaltyConc}^{n_1} {\PenaltyConv}^{n_2} {\PenaltyOccl}^{n_3}~,
 %  Z &=& \frac{\mu(n_1,n_2,n_3)}{(1-\PenaltyConc)(1-\PenaltyConv)(1-\PenaltyOccl)}~,
 \end{eqnarray}
 where $Z$ is a normalizing term that we will not need to compute in
@@ -367,7 +367,7 @@ easily to MAP inference also.)
   \label{fig:backproject}
 \end{figure}
 We now formulate the payoff function $\StereoPayoff$ for the case that
-multiple views of the scene are available. We assume that there one
+multiple views of the scene are available. We assume that one
 image is identified as the base view $\Image_0$; the remaining
 $\NumViews$ images are denoted
 $\Image_1,\ldots,\Image_{\NumViews}$. All images have size
@@ -376,7 +376,6 @@ the action of the $i$\th camera on a 3D point $X$ being
 \begin{equation}
   \CamMatrix_i (\CamR_i X + \CamTr_i) ~.
 \end{equation}
-We normalise images intensities to zero mean and unit variance.
 
 Intuitively, we treat inference in this settings as follows. We
 consider models $\Scene$ in terms of their projection into
@@ -948,7 +947,7 @@ equation \eqnref{wall-def}.
 
 \begin{definition}
   \label{def:truncation}
-  The truncation of the partial scene $\PartialScene$ is scene obtained
+  The truncation of the partial scene $\PartialScene$ is obtained
   by removing the last wall from $\PartialScene$,
   \begin{equation}
     \PartialScene_{-1} = 
@@ -1564,11 +1563,11 @@ $O(L^3)$.
 \subsection{Second Refinement: From $O(L^3)$ to $O(L^2)$}
 \label{sec:line-jump}
 Evaluating \eqnref{fin-recurrence-second} remains an $O(W)$ operation
-due to the minimisation over $x'$. In this section we to reduce this
+due to the minimisation over $x'$. In this section we reduce this
 to $O(1)$.
 
 Consider recurrence relation \eqnref{fin-recurrence-second}. The
-maximisation is over columns $x-1,x-2,\ldots,1$. Suppose we pick a
+maximisation is over columns $x-1,x-2,\ldots,1$. Suppose we pick
 some $z$ and divide the columns into two sets,
 $Z_+=\{x-1,x-2,\ldots,z\}$ and $Z_-=\{z-1,z-2,\ldots,1\}$. Then
 expanding the maximisation of \eqnref{fin-recurrence-second} we have
@@ -1749,7 +1748,8 @@ room, we consider that a \textit{success}.
 The monocular features $\Feature_i$ consist of 3 RGB channels, 3 HSV
 channels, 24 Gabor filters (4 scales, 6 orientations), and 3 binary
 line sweep features \cite{Lee09}. For stereo we use patches of size
-$5 \times 5$.
+$5 \times 5$ and when computing photoconsistency terms we normalize
+all images to zero mean and unit variance.
 
 For these experiments, we fixed the various hyper--parameters using a
 simple bootstrapping algorithm evaluated on a separate training

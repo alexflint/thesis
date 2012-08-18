@@ -63,7 +63,7 @@ several popular image--level losses.
 
 For learning we employ the tools of structured prediction --- in
 particular, the structured support vector machine
-\cite{Tsochantaridis04}. The use of these tools is part part of a long
+\cite{Tsochantaridis04}. The use of these tools is part of a long
 trend within computer vision towards statistically rigorous,
 well--understood convex optimisation techniques. Recent successfully
 applications of the structured SVM include detection
@@ -114,22 +114,26 @@ minimising the expected loss
 \end{equation}
 with respect to the predictor $\Predictor$, where $\Loss$ is a loss
 function. Given training samples
-$(\inp_i,\outp_i)\in\mathcal{X}\cross\mathcal{Y}$, the integral above is
-approximated by
+$(\inp_i,\outp_i)\in\mathcal{X}\cross\mathcal{Y}$, the integral above
+is approximated by\changedsinceviva
+\begin{equation}
+  \label{eq:erm}
+  \sum_i \Loss\bigl(\Predictor(\inp_i),\outp_i\bigr)~.
+\end{equation}
+Structural risk minimisation techniques add a regulariser
+$\mathcal{R}$, yielding\changedsinceviva
 \begin{equation}
   \label{eq:srm}
   \mathcal{R}(\Predictor) + \sum_i \Loss\bigl(\Predictor(\inp_i),\outp_i\bigr)
 \end{equation}
-where $\mathcal{R}(\Predictor)$ is a regulariser on
-$\Predictor$. Structural risk minimisation does
-not specify any particular form for the input space, output space,
-predictor class, or loss function. Many machine learning algorithms
-can be viewed as instantiations of structural risk minimisation for
-particular predictor classes and loss functions. For example, the
-classic support vector machine (SVM) \cite{Cortes1995} is defined for
-Hilbert input spaces, binary output spaces, the hypothesis class of
-linear predictors, and the Hinge loss function. In this case equation
-\eqnref{srm} becomes
+Structural risk minimisation does not specify any particular form for
+the input space, output space, predictor class, or loss function. Many
+machine learning algorithms can be viewed as instantiations of
+structural risk minimisation for particular predictor classes and loss
+functions. For example, the classic support vector machine (SVM)
+\cite{Cortes1995} is defined for Hilbert input spaces, binary output
+spaces, the hypothesis class of linear predictors, and the Hinge loss
+function. In this case equation \eqnref{srm} becomes
 \begin{equation}
   \|\Model\|^2 + \sum h(\outp_i, \Model \cdot \inp_i))
 \end{equation}
