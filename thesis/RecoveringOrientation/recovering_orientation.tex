@@ -704,6 +704,23 @@ function. Convergence is detected when $\gamma<\epsilon_1$ and the
 value of the error function decreases by less than $\epsilon_2$ in any
 one update.
 
+\subsection{Initialization}
+
+We initialize our EM algorithm using the clustering approach described
+by Koseck\`{a} and Zhang \cite{Zhang02}. This process begins by
+clustering observed line segments according to their orientation in
+the image plane, the basis for this being that Manhattan environments
+often contain Manhattan--oriented lines that are close to one another
+(relative to the distance to the vanishing point), and hence appear
+almost parallel. We run K--means clustering on all line segments in
+each image separately (with $K=5$) then we estimate a least--squares
+vanishing point for each cluster that has at least 5 associated line
+segments. Finally we project vanishing points from all frames onto the
+plane at infinity and pick three that are close to mutually orthogonal
+(by enumerating all combinations). We initialize the EM algorithm with
+an (orthonormalized) rotation matrix containing the chosen vanishing
+points as columns.\changedsinceviva
+
 \subsection{Summary}
 To obtain $\SceneR$ we iterate between updating $\PosteriorEst$ (the
 E--step) and optimising $\SceneR$ (the M--step). Each M step consists
@@ -759,10 +776,15 @@ sparse structure--from--motion point clouds --- it was proposed in the
 context of dense reconstructions. Strikingly, the multiple--view
 algebraic minimiser performs consistently worse than single--image
 estimation. Our investigations suggest that this is because the
-algebraic error is an even poorer approximation in the multiple view
-context than in the single--view context, since among many frames
-there is a greater chance of observing vanishing points close to
-infinity, which is where the algebraic error breaks down.
+algebraic error is an even poorer approximation to the reprojection
+error in the multiple view context than in the single--view context,
+since among many frames there is a high likelihood of observing a
+vanishing point close to infinity. As a vanishing point moves towards
+infinity, the algebraic error diverges from the reprojection error,
+and the error terms for vanishing points near infinity to dominate the
+objective function. This leads to poorly reconstructed vanishing
+points since the optimization focusses almost exclusively on these
+very large error terms, ignoring the majority of the image evidence.\changedsinceviva
 
 We ran a separate experiment to explore the relationship between the
 number of frames used for estimation and the quality of the estimated
@@ -839,20 +861,19 @@ and \ref{fig:vpt-example3}.
 \begin{figure}[p]
   \centering
   \subfloat[Estimation error versus number of input frames.]{
-    \includegraphics[width=0.65\textwidth]{plots/error_vs_nframes}
+    \includegraphics[width=0.65\textwidth]{plots/error_vs_nframes_with_errorbars}
   }
   \\
   \subfloat[A magnification of the third series above.]{
-    \includegraphics[width=0.65\textwidth]{plots/error_vs_nframes_oursonly}
+    \includegraphics[width=0.65\textwidth]{plots/error_vs_nframes_oursonly_with_errorbars}
   }
   \caption{Plots showing the performance of three algorithms as the
     number of input frames is increased. We compute each data point by
     executing the relevant algorithm on sets of $n$ consecutive frames
     drawn from our dataset, where $n$ is the value shown on the
-    $x$--axis. The $y$--axis then shows the average distance between
-    the estimated and ground truth rotation. The lower figure shows
-    the series corresponding to our algorithm on an magnified set of
-    axes.}
+    $x$--axis. The $y$--axis shows the average distance between the
+    estimated and ground truth rotation, with error bars showing 90\%
+    confidence intervals for the observed error distributions.}
   \label{fig:error-vs-nframes}
 \end{figure}
 
@@ -961,7 +982,12 @@ correctly in all of our evaluation sequences.
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=0.5\textwidth]{fcmap}
+  \subfloat[]{
+    \includegraphics[width=0.4\textwidth]{manhattan-homology}
+  }\quad
+  \subfloat[]{
+    \includegraphics[width=0.4\textwidth]{manhattan-homology-realworld}
+  }
   \caption{The mapping $\Hcf$ transfers points between the ceiling and
     floor in the image domain. $\Hcf$ is a planar homology.}
   \label{fig:fcmap}
