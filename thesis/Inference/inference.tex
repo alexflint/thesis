@@ -266,7 +266,12 @@ $\Orient\in\Orientations$ (\cf
 \algref{computing-from-scene}), which is deterministic given $\Scene$
 and is included in the graphical model for notational convenience
 only. Finally a feature $\Feature$ is sampled from a distribution that
-is conditionally independent of $\Scene$ given $\Orient$.
+is conditionally independent of $\Scene$ given $\Orient$. In practice
+we use the following features: three RGB colour components,
+three HSV color components, two binary line sweep features described
+by Lee \etal \cite{Lee09}, and twelve Gabor responses (three scales,
+four orientations). In \chapref{learning} we drop the
+Gabor responses for efficiency reasons.\changedsinceviva
 
 We assume a exponential--family likelihood for pixel features,
 \begin{equation}
@@ -298,7 +303,7 @@ We now derive MAP inference. The likelihood for $\Scene$ is
             P(\Orient_i ~|~ \Scene)
   \intd \Orients ~.
 \end{equation}
-In the integration over the latent variables $\Orient_i$ the only
+In the integration over the latent variables, the only
 non--zero term is the one for which all $\Orient_i$ are equal to that
 predicted by \algref{computing-from-scene}. Therefore, denoting by
 $\PredictedOrient_i$ the orientation output by
@@ -393,12 +398,16 @@ is to show that (i) in the particular case of indoor Manhattan models,
 photo--consistency can be expressed as a payoff matrix; (ii) that we
 can therefore perform efficient and exact global optimisation; and
 (iii) that this fits naturally within a Bayesian framework alongside
-monocular and 3D features.
+monocular and 3D features. Our approach also bears some similarity to
+Cornells \etal \cite{Cornells2006}, who reconstruct building facades
+from a moving vehicle by analyzing a related cost function derived
+from stereo pairs. Like us, they employ dynamic programing, although
+they do not constrain the arrangement of the vertical facades.\changedsinceviva
 
 In \secref{metric-recovery} we showed how to convert a scene in vertex
 representation to a 3D reconstruction. Since all cameras are
 calibrated we can use this reconstruction to re--project any pixel
-$\Pixel$ in the base view into all auxiliary views, as illustrated in
+$\Pixel$ from the base view into all auxiliary views, as illustrated in
 \figref{backproject}. Let $\AuxPixel_k(\Pixel;\Scene)$ be the
 re--projection of $\Pixel$ into view $k$ via the scene hypothesis
 $\Scene$. Let each pixel $\Pixel_i$ in the base image be associated
@@ -718,108 +727,6 @@ chapter focusses on solving optimisation problems of the form
 \eqnref{opt-scene}.
 
 
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section{Intuition}
-
-%Consider a path finding problem in which we must are asked to identify
-%the path from left to right through a cost matrix that minimises the
-%sum of costs along the path. An example cost matrix and the
-%least--cost path is shown in \figref{seam-carving}. The solution to
-%this simple problem is a special case of Dijkstra's algorithm and is
-%well known in the literature, but for pedagogical purposes we describe
-%it here.
-
-%One view of the solution --- slightly non--standard but relevant to
-%the algorithm to come --- is as a series of sub--problems as
-%follows. Let $h(\Pixel)$ be the sub--problem: ``what is the minimum
-%energy path from any point on the left edge of the matrix to
-%$\Pixel$?'' Then we say that any a path $\vect{Y}$ \textit{satisfies}
-%$h(\Pixel)$ if the last entry in $\vect{Y}$ equals $\Pixel$, and that
-%$\vect{Y}$ \textit{solves} $h(\Pixel)$ if, in addition, $\vect{Y}$ has
-%minimal cost among all such paths.
-
-%These definitions are useful because we can solve each sub--problem in
-%terms of other sub--problems, all the way down to a trivial boundary
-%condition,
-%\begin{equation}
-%  \label{eq:seam-carving}
-%  h(x,y) = 
-%  \begin{cases}
-%    \min \Bigl(
-%      h(x-1,y-1),
-%      h(x-1,y),
-%      h(x-1,y+1)
-%    \Bigr) + c(x,y),
-%    & \mbox{if } x>0 \\
-%    0 & \mbox{if } x=0
-%  \end{cases}
-%\end{equation}
-%where $c$ is the cost matrix. The algorithm corresponding to
-%\eqnref{seam-carving} is simply a recursive function of $(x,y)$ that
-%evaluates \eqnref{seam-carving}, then the least--cost path is
-%recovered by back--tracking afterwards.
-
-%The optimisation problem that is the subject of this chapter can be
-%thought of as a path--finding problem where the seam representation
-%constitutes a path from left--to--right through the image, and the
-%payoff function constitutes a cost matrix. Unfortunately, however, the
-%penalty term has no counterpart in the above framework, so
-%\eqnref{opt-scene} cannot be solved using recurrence relations of the
-%form \eqnref{seam-carving}. This is because the framework above has no
-%regularisation term to penalise complicated paths over those
-%comprising simple straight edges.
-
-%\subsection{Viterbi Decoding}
-%Let us generalise \eqnref{seam-carving} by removing the continuity
-%constraint on paths and introducing a penalty for transitions. Let the
-%cost of transitioning from $(x,y)$ to $(x+1,z)$ be $a(y,z)$. Then the
-%cost of a path $\vect{Y}$ is
-%\begin{equation}
-%  \label{eq:viterbi-cost}
-%  \sum_{i=1}^n c(i,Y_i) - a(Y_i,Y_{i+1})
-%\end{equation}
-%and the corresponding recurrence relation is
-%\begin{equation}
-%  \label{eq:viterbi-recurrence}
-%  h(x,y) = 
-%  \begin{cases}
-%    \min_{1\leq z\leq m}\limits h(x-1,z) - a(z,y),& \mbox{if } x>0\\
-%    0,& \mbox{if } x=0 ~.
-%  \end{cases}
-%\end{equation}
-%If the cost and transition matrices correspond to log--likelihoods
-%then this is precisely the Viterbi algorithm for maximum--likelihood
-%inference in hidden Markov models.
-
-%Unfortunately, we are still unable to express the penalty term
-%$\ScenePenalty(\Scene)$ in a framework such as
-%\eqnref{viterbi-recurrence} because $\ScenePenalty$ introduces a bias
-%for solutions that consists of a few straight edges, but there is no
-%notion of ``straightness'' in \eqnref{seam-carving}. Indeed the
-%problem is worsened considerably because we seek a path that
-%corresponds to some 3D reconstruction, but many paths will not
-%correspond to any physically realisable reconstruction.
-
-%\subsection{The Diagonal Route Model}
-
-%Model where paths can go straight or along either of two diagonals.
-
-%The recurrence relation looks like
-%\begin{equation}
-%  h(x,y,a) = \max \Bigl[ h(x-1,y+a,a), 
-%    \max_{a'}\limits \bigl( h(x-1, ya-', a'), T(a',a) \bigr) \Bigl]
-%\end{equation}
-
-%We have managed to express a prior on the number of straight
-%sub--segments in a dynamic programming formulation.
-
-%There's a lot further to go yet, but the final model will look
-%something like the above.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{MAP Inference Using Dynamic Programming}
 
@@ -859,29 +766,238 @@ restricts which labels can be assigned to other pixels in the same
 column. We therefore cast the optimisation directly in terms of the
 vertex representation introduced in \chapref{geometry}.
 
-We have already seen that every indoor Manhattan scene can be
-represented as a left--to--right sequence of wall segments, and every
-image column intersects exactly one wall segment. A direct result is
-that the placement of each wall is conditionally independent of the
-other walls given its left and right neighbours. For example,
-\figref{partial-scene} shows a partial scene as well as several wall
-segments that could be appended to it. Some of the candidates are
-feasible (green dashes) and some are not (red dashes); however, note
-that once the wall segment from $c_3$ to $c_4$ is fixed, the choices
-for walls following $c_4$ are independent of choices made for wall
-segments prior to $c_3$. Later we will formalise and prove this
-statement; for now we proceed conceptually.
+We present our solution by first describing a simple but inefficient
+version, followed by two refinements that give an $O(N)$ algorithm. At
+each stage we first describe our algorithm conceptually, then
+formally.
 
-We are led to a decomposition of the problem into a series of
-sub--problems of the form ``find the optimal \textit{partial} model
-spanning columns $0 \ldots x$'' for various $x$. To solve this we
-enumerate over all possible walls that terminate at $x$, then for each
-we recursively solve sub--problems corresponding to the left extent of
-that wall. With each recursion, $x$ moves to the left, and this
-process terminates at the boundary of the image. As in all dynamic
-programming, the solution to each sub--problem is cached to avoid
-redundant computation, and a simple counting argument shows that the
-algorithm has polynomial complexity.
+\subsection{Basic Algorithm}
+\label{sect:basic-alg}
+
+We have already seen that every indoor Manhattan scene can be
+represented as a left--to--right sequence of wall segments. Our
+approach is founded on the construction of a graph over all possible
+indoor Manhattan scenes. This graph has nodes representing pixels and
+edges that represent vanishing lines. By constructing this graph and
+assigning certain weights to the edges, we reduce the optimization
+problem \eqnref{opt-scene} to a graph search problem, which is
+informally depicted in \figref{dp-graph-search}.
+
+\textbf{State space.} Our state space contains two states for each
+pixel. Each state corresponds to a sub--problem of the form,
+\textit{``What is the optimal indoor Manhattan scenes spanning the
+  part of the image to the left of pixel $\Pixel$?''}. We further
+divide scenes according to the orientation of the rightmost
+wall. There is therefore one such sub--problem for each
+$($pixel$,$orientation$)$ pair, giving the $2N$ state space. We write
+states as pairs, as in
+$\State=(\Pixel,\WallOrient)$. \figref{state-space} shows our state
+space graphically, and some examples of the corresponding
+sub--problems are depicted in XXX.
+
+\begin{figure}[tb]
+  \centering
+  %\includegraphics[width=0.6\textwidth]{dp-earch-graph}
+  \caption{The search graph corresponding to the first version of our
+    dynamic programming algorithm. We show all the outgoing edges for
+    a particular pixel $\vect{p}$.}
+  \label{fig:dp-seach-graph}
+\end{figure}
+
+\textbf{Feasible set.} The feasible set describes the connections
+between states. In graph parlance, the feasible set is equivalent to
+the adjacency matrix: a state $\OtherState$ is in the feasible set for
+$\State$ if and only if there is an edge from $\State$ to
+$\OtherState$. In our algorithm the feasible set for a state
+$(\Pixel,\WallOrient)$ consists of all pixels that are to the left of
+$\Pixel$ that fall on the vanishing line connecting $\Pixel$ and
+$\vpt_{\WallOrient}$. This is depicted in \figref{dp-graph}.
+
+\begin{figure}[tb]
+  \centering
+  %\includegraphics[width=0.6\textwidth]{state-space}
+  \caption{The state space for our algorithm. We show all the outgoing
+    edges from $\Pixel$.}
+  \label{fig:state-space}
+\end{figure}
+
+\textbf{Value function.} The value function describes the quantity
+being optimized at each state. Our value function maps \textit{paths
+  through the image} to real numbers. More specifically, the domain of
+our value function is the set of paths from any pixel $\Pixel$ to the
+left edge of the image. We define its value to be the sum of the
+entries in the payoff matrix along this path minus the penalty for the
+corners along the path, \ie
+\begin{equation}
+  \Objective(\PartialScene) = \sum
+    \PixelPayoff(j,\seam_j,\WallOrient_j) -
+    \sum_{i=0}^{\SceneLen} \CornerPenalty(i;\PartialScene) ~.
+  \label{eq:scene-value}
+\end{equation}
+\figref{partial-seam} shows one such path and the elements of the
+payoff matrix that are summed to compute its value. The motivation for
+choosing this particular value function is that for pixels on the
+right edge of the image it is equal to the full objective function
+\eqnref{opt-scene}. Note that for pixels \textit{not} on the right
+edge of the image it is probably most helpful to think of
+\eqnref{scene-value} as an aribtrary function disconnected from any
+probabilistic interpretation and useful only insofar as it helps to
+solve the full optimization \eqnref{opt-scene}.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.35\textwidth]{partial-seam}
+  \caption{A path from the left edge of the image to a particular
+    state $\State$. The value of this path is the sum of all entries
+    in the payoff matrix along the path highlighted in red.}
+  \label{fig:partial-seam}
+\end{figure}
+
+\textbf{Optimization step.} We now describe how to maximize the value
+function at each state. This is best explained by considering a single
+state $\State$ and assuming that we already know the solutions for all
+sub--problems preceeding it. That is, for each state $\OtherState$ to
+the left of $\State$, let us assume that we already know the optimal
+path from $\OtherState$ to the left edge of the image, and also the
+value of that path. Let this quantity be
+\begin{equation}
+  \bestvalue(\OtherState) = \argmax \Objective(\Scene)
+\end{equation}
+where the maximization is over paths terminating at $\OtherState$. Our
+task is to use the known values for the preceeding states to discover
+the optimal value for the state $\State$ under consideration. We
+accomplish this as follows
+\begin{enumerate}
+  \item{Enumerate all states $\OtherState$ that are connected to
+    $\State$ (\ie all states in the feasible set for $\State$).}
+  \item{For each, compute
+    \begin{equation}
+      \label{eq:optimization-step}
+      \bestvalue(\OtherState)+\edgevalue(\OtherState,\State)-\lambda ~,
+    \end{equation}
+    where $\edgevalue$ is the sum over the payoff function along the
+    line from $\OtherState$ to $\State$ and $\lambda$ is the penalty
+    associated wtih the new corner at $\OtherState$ (see
+    \figref{recurrence-value}).}
+  \item{Set $\bestvalue(\State)$ to the maximum value computed in
+    step 2.}
+\end{enumerate}
+
+\begin{figure}[tb]
+  \centering
+  %\includegraphics[width=0.35\textwidth]{recurrence-value}
+  \caption{The computation of the value function at $\State$. This
+    figure shows just one term in the maximization
+    $\eqnref{optimization-step}$; computing $\bestvalue(\State)$
+    involves maximization over all states $\OtherState$.}
+  \label{fig:recurrence-value}
+\end{figure}
+
+\textbf{Full algorithm.} Our first solution to the optimization
+problem \eqnref{opt-scene} recursively applies the procedure described
+above to compute the value $\bestvalue(\State)$ for all states. We
+start at the pixels on the right edge of the image and whenever we
+need to evaluate $\bestvalue$ for a state not yet considered, we
+simply recursively apply the same procedure. This are no circular
+dependencies because our state space is a directed acyclic
+graph. After evaluating $\bestvalue$ at each state we cache the result
+in a lookup table for re--use next time the same state is
+encountered \footnote{Far from being a minor optimization, the caching
+  of intermediate results makes the difference between an exponential
+  and polynomial--time algorithm!}. The recursion terminates whenever
+we encounter a pixel on the left edge of the image --- for these
+states $\bestvalue$ returns zero. After applying this procedure
+recursively we will have computed the the value of the optimal model
+for every state. The final solution to our optimization problem is
+obtained by identifying the largest value among all states on the
+right edge of the image.
+
+\textbf{Complexity.} Analyzing the complexity of dynamic programming
+algorithms is easy because computation is bounded by the product of
+(1) the number of states and (2) the stfewamount of computation per
+state ignoring the cost of recursive evaluations. For an image of size
+$L \times L$ the algorithm described above consists of $2L^2$ states
+and each state involves a maximization over $O(L)$ preceeding
+states. Each term in the maximization costs $O(L)$ to compute, giving
+an overall complexity of $O(L^4)$.
+
+\textbf{Short--commings.} The algorithm described thus far does not
+permit occluding corners, so if the true indoor Manhattan scene
+contains occluding corners, this algorithm will not find it. We
+rectify this in the following section.
+
+\subsection{First Refinement: Occluding Corners}
+
+In order to account for occluding corners we need to ammend two
+parts of the algorithm from \sectref{basic-alg}: the
+feasible set and the optimization step.
+
+\textbf{Feasible set.} The feasible set described in the previous
+section consisted of the set of states along the vanishing line
+associated with $\State$. Here we revise the feasible set to include
+\textit{all} states to the left of $\State$, where for states
+$\OtherState$ not on the vanishing line, stepping from $\State$ to
+$\OtherState$ corresponds to moving first along the vanishing and then
+vertically up or down to $\OtherState$.
+
+\textbf{Optimization step.} Our optimization step remains very similar
+to that described in \sectref{basic-alg}. For each state $\State$ we
+consider all preceeding states $\OtherState$. We add the value of
+$\OtherState$ to the value associated with the edge between the
+states, which is now computed by summing the payoff matrix along the
+vanishing line from $\State$ to the column containing $\OtherState$, as
+shown in \figref{recurrence-value-occluding}.
+
+The introduction of occluding corners means that our algorithm can now
+generate configurations that are physically impossible, such as the
+examples shown in \figref{impossible-configurations}. We can easily
+detect and exclude such configurations by checking each state in the
+feasible set against the rules described by Lee \etal \cite{Lee09},
+and, if violated, excluding that state from the feasible set. The
+revised optimization routine is therefore:
+\begin{enumerate}
+  \item{Enumerate all states $\OtherState$ in the feasible set for
+    $\State$.}
+  \item{For each $\OtherState$, check whether connecting $\State$ to $\OtherState$
+    would yeild a physically unrealisable configuration.}
+  \item{If not, compute
+    \begin{equation}
+      \label{eq:optimization-step-occluding}
+      \bestvalue(\OtherState)+\edgevalue(\OtherState,\State)-\lambda ~,
+    \end{equation}
+    where $\edgevalue$ is the sum over the payoff function along the
+    vanishing line from $\State$ to the column containing
+    $\OtherState$ and $\lambda$ is the penalty associated wtih the new
+    corner at $\OtherState$ (see \figref{recurrence-value-occluding}).}
+  \item{Set $\bestvalue(\State)$ to the maximum value computed in
+    step 3.}
+\end{enumerate}
+
+\begin{figure}[tb]
+  \centering
+  %\includegraphics[width=0.35\textwidth]{recurrence-value-occluding}
+  \caption{The computation of the value function at $\State$. This
+    figure shows just one term in the maximization
+    $\eqnref{optimization-step-occluding}$; computing $\bestvalue(\State)$
+    involves maximization over all states $\OtherState$.}
+  \label{fig:recurrence-value-occluding}
+\end{figure}
+
+\textbf{Complexity.} The only changed introduced in this section that
+is relevant to computational complexity is the expansion of the
+feasible set by a factor of $O(L)$, meaning that the maximization
+\eqnref{optimization-step-occluding} is now over $O(L^2)$ terms. The
+physical realisability conditions can be evaluated in constant time so
+do not affect computational complexity. This brings the computation
+complexity of the revised algorithm to $O(L^5)$.
+
+\subsubsection{Correctness}
+
+We now pause to prove the correctness of the algorithm presented
+thus far. Dynamic programming algorithms are correct only when an
+optimal subustructure property holds for the optimization problem
+being considered. Here we prove the optimal subustructure property
+correseponding to inference of indoor Manhattan scenes.
 
 \subsection{Preliminaries}
 \label{sect:preliminaries}
@@ -1107,11 +1223,12 @@ for their corresponding sub--problems. We formalise this below.
 
 \begin{definition}
   \label{def:sub-problem-in}
-  A scene $\Scene$ satisfies the sub--problem $\SubProbIN(x,y,a)$ if
-  $\Scene$ is feasible and $\Scene$ terminates at $(x,y,a)$.
-  A scene $\Scene$ solves the sub--problem $\SubProbIN(x,y,a)$ if it
-  satisfies $\SubProbIN(x,y,a)$ and there is no other scene satisfying
-  $\SubProbIN(x,y,a)$ that obtains a greater value.
+  A scene $\Scene$ satisfies the sub--problem
+  $\SubProbIN(x,y,\WallOrient)$ if $\Scene$ is feasible and $\Scene$
+  terminates at $(x,y,\WallOrient)$.  A scene $\Scene$ solves the
+  sub--problem $\SubProbIN(x,y,\WallOrient)$ if it satisfies
+  $\SubProbIN(x,y,\WallOrient)$ and there is no other scene satisfying
+  $\SubProbIN(x,y,\WallOrient)$ that obtains a greater value.
 \end{definition}
 
 \Figref{fin-examples} shows three examples of different scenes
@@ -1121,7 +1238,7 @@ satisfying a particular sub--problem.
   \centering
   \includegraphics[width=\textwidth]{fin-hypotheses}
   \caption{Three models satisfying the sub--problem
-    $\SubProbIN(x,y,a)$.}
+    $\SubProbIN(x,y,\WallOrient)$.}
   \label{fig:fin-examples}
 \end{figure}
 
@@ -1241,7 +1358,7 @@ feasible set,
     \Scene = \Scene' \concat \Wall
   \end{equation}
   is feasible, where $\Scene'$ is any feasible model terminating at
-  $\State'$ and $\Wall=(x',y',a,x)$.
+  $\State'$ and $\Wall=(x',y',\WallOrient,x)$.
 \end{definition}
 
 Intuitively one can think of the feasible set as the set of states
@@ -1442,10 +1559,10 @@ recurrence relations, which we introduce below.
     \label{eq:fup-recurrence}
     \SubProbUP(x,y,\WallOrient) &=& 
     \begin{cases}
-      \max \Bigl(\SubProbIN(x,y,a),
+      \max \Bigl(\SubProbIN(x,y,\WallOrient),
       \SubProbUP(x,y-1,\WallOrient) \Bigr), &
       \mbox{if } y > 1 \\
-      \SubProbIN(x,y,a), & \mbox{if } y=1
+      \SubProbIN(x,y,\WallOrient), & \mbox{if } y=1
     \end{cases}\\
     \label{eq:fdown-recurrence}
     \SubProbDOWN(x,y,\WallOrient) &=& 
@@ -1464,13 +1581,13 @@ recurrence relations, which we introduce below.
   Let $\Scene$ be a solution to $\SubProbUP(x,y,\WallOrient)$ and let
   its terminating state be $(x_b,y_b,\WallOrient_b)$. Consider first
   the case that $y=1$. By the definition of $\SubProbUP$ it must be
-  that $\Scene$ terminates at $(x,y,a)$, in which case the
+  that $\Scene$ terminates at $(x,y,\WallOrient)$, in which case the
   conditions on $\Scene$ now exactly match those for $\SubProbIN$
   given in definition \ref{def:sub-problem-in}.
 
   Now suppose $y>1$. Then either $y_b=y$ or $y_b \leq y-1$, with the
-  former corresponding again to the sub--problem $\SubProbIN(x,y,a)$
-  and the latter to the sub--problem $\SubProbUP(x,y-1,a)$. Therefore,
+  former corresponding again to the sub--problem $\SubProbIN(x,y,\WallOrient)$
+  and the latter to the sub--problem $\SubProbUP(x,y-1,\WallOrient)$. Therefore,
   we may simply maximise over those two cases.
 \end{proof}  
 
@@ -1809,6 +1926,18 @@ any points, whereas stereo or monocular cues alone often perform
 better in such regions but can lack precision at corners and
 boundaries.
 
+We have noticed that one source of errors is vanishing points that are
+slightly mis--estimated, which is often due to errors in the
+underlying reconstruction provided by structure--from--motion. When
+vanishing points deviate slightly from their true position, our
+reconstruction system inserts very narrow wall segments to ``correct''
+for the mis--localization, forming small zig--zags in order to track
+the observed image gradients. Examples of this phenomenon are shown in
+rows 6 and 7 of \tableref{showcase}. Although this does not pose a
+major concern for our system, one way to correct for it would be to
+jointly refine structure, motion, and vanishing points, as in
+\cite{Sinha2008}.
+
 \Figref{timing} shows timing results for our system. For each triplet
 of frames, our system requires on average less than one second to
 compute features for all three frames and less than 100 milliseconds to perform
@@ -1931,6 +2060,7 @@ optimisation.
       view, the middle panel shows the two auxiliary views used for
       photo--consistency calculations, and the right panel shows the
       MAP scene $\Scene$ inferred by our system.}\\
+    \label{table:showcase}
 
     \ColHeadings
     \endfirsthead
