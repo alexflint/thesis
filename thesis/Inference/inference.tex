@@ -879,8 +879,8 @@ accomplish this as follows
     line from $\OtherState$ to $\State$ and $\lambda$ is the penalty
     associated wtih the new corner at $\OtherState$ (see
     \figref{recurrence-value}).}
-  \item{Set $\bestvalue(\State)$ to the maximum value computed in
-    step 2.}
+  \item{Set $\bestvalue(\State)$ to the maximum over the values
+    computed in step 2.}
 \end{enumerate}
 
 \begin{figure}[tb]
@@ -927,6 +927,7 @@ contains occluding corners, this algorithm will not find it. We
 rectify this in the following section.
 
 \subsection{First Refinement: Occluding Corners}
+\label{sec:amended-alg}
 
 In order to account for occluding corners we need to ammend two
 parts of the algorithm from \sectref{basic-alg}: the
@@ -944,17 +945,18 @@ vertically up or down to $\OtherState$.
 to that described in \sectref{basic-alg}. For each state $\State$ we
 consider all preceeding states $\OtherState$. We add the value of
 $\OtherState$ to the value associated with the edge between the
-states, which is now computed by summing the payoff matrix along the
-vanishing line from $\State$ to the column containing $\OtherState$, as
-shown in \figref{recurrence-value-occluding}.
+$\OtherState$ and $\State$, which is now computed by summing entries
+from the payoff matrix along the vanishing line from $\State$ to the
+column containing $\OtherState$ (as shown in
+\figref{recurrence-value-occluding}).
 
 The introduction of occluding corners means that our algorithm can now
-generate configurations that are physically impossible, such as the
-examples shown in \figref{impossible-configurations}. We can easily
-detect and exclude such configurations by checking each state in the
-feasible set against the rules described by Lee \etal \cite{Lee09},
-and, if violated, excluding that state from the feasible set. The
-revised optimization routine is therefore:
+generate configurations that are physically impossible, such as those
+shown in \figref{impossible-configurations}. We can easily detect and
+exclude such configurations by checking each state in the feasible set
+against the rules described by Lee \etal \cite{Lee09}, and, if
+violated, excluding that state from the feasible set. The revised
+optimization routine is therefore:
 \begin{enumerate}
   \item{Enumerate all states $\OtherState$ in the feasible set for
     $\State$.}
@@ -983,7 +985,7 @@ revised optimization routine is therefore:
   \label{fig:recurrence-value-occluding}
 \end{figure}
 
-\textbf{Complexity.} The only changed introduced in this section that
+\textbf{Complexity.} The only change introduced in this section that
 is relevant to computational complexity is the expansion of the
 feasible set by a factor of $O(L)$, meaning that the maximization
 \eqnref{optimization-step-occluding} is now over $O(L^2)$ terms. The
@@ -991,183 +993,68 @@ physical realisability conditions can be evaluated in constant time so
 do not affect computational complexity. This brings the computation
 complexity of the revised algorithm to $O(L^5)$.
 
-\subsubsection{Correctness}
+\subsection{Correctness of \sectref{amended-alg}}
 
-We now pause to prove the correctness of the algorithm presented
-thus far. Dynamic programming algorithms are correct only when an
-optimal subustructure property holds for the optimization problem
-being considered. Here we prove the optimal subustructure property
-correseponding to inference of indoor Manhattan scenes.
+We now pause to prove the correctness of the algorithm presented thus
+far. All dynamic programming algorithms are associated with an optimal
+subustructure property of the underlying optimization problem. Here we
+prove the optimal subustructure property correseponding to indoor
+Manhattan scene inference.
 
-\subsection{Preliminaries}
-\label{sect:preliminaries}
+\subsubsection{Preliminaries}
 
-\subsubsection{Partial Scene}
+We begin by formalizing several concepts introduced in the preceeding
+sections. What we have heretofore called a ``path from the left edge
+of the image to $\State$'' will henceforth be called a \textit{partial
+  scene}. In vertex representation, a partial scene is identical to an
+ordinary scene except that the last $x$--coordinate might be smaller
+than the image width. Partial scenes have a seam representation
+mirroring that for full scenes, as depicted in \figref{partial-seam}.
 
-We begin by introducing the notion of partial scenes, which span the
-portion of the image from its left edge to some image column $x$, $0
-\leq x \leq W$. Partial scene are related to the state space in the
-dynamic programming algorithm below. An example of a partial scene is
-shown in \figref{partial-scene} and \figref{partial-seam}.
-
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=0.3\textwidth]{partial-model}
-  \caption{A partial scene terminating at column $c_4$ with several
-    feasible (green dashed) and infeasible (red dashed) wall
-    segments.}
-  \label{fig:partial-scene}
-\end{figure}
+The \textit{truncation} of the partial scene $\PartialScene$ is
+obtained by removing the last right--most from $\PartialScene$. We
+will write $\PartialScene_{-1}$. The \textit{concatenation} of 
+$\PartialScene$ with the wall $(x_a,y,\WallOrient,x_b)$ is
+defined if and only if $\PartialScene$ terminates at column $x_a$ and
+equals
+\begin{equation}
+  \PartialScene \concat \Wall = 
+  ( x_1,y_1,\WallOrient_1,
+  \ldots,
+  ~x_{n-1},y_{n-1},\WallOrient_{n-1},
+  ~x_a, y, \WallOrient, ~ x_b )
+\end{equation}
 
 \begin{figure}[tb]
   \centering
   \includegraphics[width=0.35\textwidth]{partial-seam}
   \caption{A partial scene and the corresponding partial seam. The
-    black dot shows the terminating state of the scene.}
+    black dot shows the terminating state.}
   \label{fig:partial-seam}
 \end{figure}
 
-\begin{definition}
-  \label{def:scene-len}
-  The length of a scene $\Scene$ in vertex representation
-  \eqnref{vertex-repr} is the number of distinct walls in $\Scene$ and
-  is denoted $\Length{\Scene}$.
-\end{definition}
+We will also refer to the \textit{terminating state} of a scene, which
+is the state for the lower--right corner of the rightmost wall (see
+\figref{partial-seam}).
 
-\begin{definition}
-  \label{def:partial-scene}
-  A partial scene $\PartialScene$ is a scene with
-  $x_{\Length{\Scene}}<\Width$. The corresponding seam representation
-  is
-  \begin{equation}
-    \PartialSeam = \{(\seam_j,\WallOrient_j)\}_{j=0}^{\Length{\PartialScene}}
-  \end{equation}
-  where the values $\seam_j,\WallOrient_j$ are defined as for ordinary
-  seams by equation \eqnref{seam-from-scene}.
-\end{definition}
-
-We now define two operations for manipulating scenes. Walls are
-represented by the 4--tuple $(x_a,y_a,\WallOrient,x_b)$ as defined by
-equation \eqnref{wall-def}.
-
-\begin{definition}
-  The termination point of a wall $\Wall$ is the triple
-  $(x_b,y_b,\WallOrient)$ where $(x_b,y_b)$ is the location of the
-  lower--right corner of $\Wall$ as defined by equation
-  \eqnref{qi}. We say that a scene $\Scene$ terminates at
-  $(x_b,y_b,\WallOrient)$ if its right--most wall terminates at
-  $(x_b,y_b,\WallOrient)$. We will also say that a scene terminates at
-  column $x_b$ if it terminates at $(x_b,y_b,\WallOrient)$ for some
-  $y_b,\WallOrient$. This is illustrated in \figref{partial-seam}.
-\end{definition}
-
-\begin{definition}
-  \label{def:truncation}
-  The truncation of the partial scene $\PartialScene$ is obtained
-  by removing the last wall from $\PartialScene$,
-  \begin{equation}
-    \PartialScene_{-1} = 
-    ( x_1,y_1,\WallOrient_1,
-    \ldots,
-    ~x_{\SceneLen-2},y_{\SceneLen-2},\WallOrient_{\SceneLen-2},
-    ~x_{\SceneLen-1} )~.
-  \end{equation}
-\end{definition}
-
-\begin{definition}
-  \label{def:concatenation}
-  The concatenation of the scene $\PartialScene$ with the wall
-  $\Wall=(x_a,y,\WallOrient,x_b)$ is defined if and only if
-  $\PartialScene$ terminates at column $x_a$ and equals
-  \begin{equation}
-    \PartialScene \concat \Wall = 
-    ( x_1,y_1,\WallOrient_1,
-    \ldots,
-    ~x_{\SceneLen-1},y_{\SceneLen-1},\WallOrient_{\SceneLen-1},
-    ~x_a, y, \WallOrient, ~ x_b )
-  \end{equation}
-\end{definition}
-
-\subsubsection{Value Function}
-
-We now introduce a value function for walls and scenes. Our
-definitions broadly mirror the definition for full scenes in equation
-\eqnref{scene-payoff}, the only difference being that we evaluate the
-summations over a subset of the image. This is a subtle but important
-distinction since there is no simple probabilistic
-interpretation for partial scenes. This poses no difficulty to the
-probabilistic consistency of our algorithm since in this setting we are
-simply solving the optimisation problem \eqnref{opt-scene}. If
-$\PixelPayoff$ has been configured to represent the log--likelihood of
-some probabilistic model then the solution we find will correspond to
-MAP inference, but we are not concerned with the specifics of the
-probabilistic model in this section.
-
-\begin{definition}
-  \label{def:scene-value}
-  The value obtained by a partial scene $\PartialScene$ that
-  terminates at column $x_b$ under the payoff function $\ScenePayoff$
-  is
-  \begin{equation}
-    \Objective(\PartialScene) = \sum_{j=0}^{x_b} 
-      \PixelPayoff(j,\seam_j,\WallOrient_j) - 
-      \sum_{i=0}^{\SceneLen} \CornerPenalty(i;\PartialScene)
-    \label{eq:scene-value}
-  \end{equation}
-\end{definition}
-
-\begin{definition}
-  \label{def:wall-value}
-  The payoff for a wall $\Wall=(x_a,y,\WallOrient,x_b)$ under the
-  payoff function $\ScenePayoff$ is
-  \begin{equation}
-    \WallPayoff(\Wall) = \sum_{j=x_a}^{x_b-1}
-      \PixelPayoff(j,\seam_j,\WallOrient_j) ~.
-  \end{equation}
-\end{definition}
-
-We note the following additivity property of the value function.
+The correctness of our algorithm depends in part on the structure of
+the physical realisability constraints described by Lee \etal
+\cite{Lee09}. We do not wish to repeat their work here, but for
+completeness we re--state the relevant properties
 
 \begin{lemma}
-  \label{lemma:additive-values}
-  Let $\Scene$ be a scene and $\Wall$ be a wall and suppose
-  $\Scene\concat\Wall$ is well--defined. Then the value obtained by
-  $\Scene\concat\Wall$ is
-  \begin{equation}
-    \Objective(\Scene\concat\Wall) = 
-      \Objective(\Scene) + \WallPayoff(\Wall) - 
-      \CornerPenalty(\Scene,\Wall)
-  \end{equation}
-  where $\CornerPenalty(\Scene,\Wall)$ is the penalty
-  for the corner added to the scene as a result of appending $\Wall$.
-\end{lemma}
-\begin{proof}
-  Follows directly from Definitions \ref{def:scene-value} and
-  \ref{def:wall-value}.
-\end{proof}
-
-\subsubsection{Feasibility}
-
-Not all scenes permitted by the vertex representation are physically
-realisable. Lee \etal \cite{Lee09} showed that physical realisability
-can be deduced from simple tests on the ordering of walls and the
-relative positions of vanishing points. Although we do not wish to
-repeat their work here, several decomposability properties of the
-physical realisability tests are central to the validity of the
-dynamic programming algorithm to be presented, so we re--state them
-here
-
-\begin{definition}
   \label{def:feasible-corners}
-  The $i$\th corner of the scene $\Scene$ is feasible if and only if
-  it passes the tests described in \cite{Lee09}, which is a
-  function of the values,
+  The phsical realisability of the $i$\th corner of the scene $\Scene$
+  is a function of the four values:
   \begin{equation}
-    y_b,~\WallOrient_i,~x_{i+1},~y_{i+1},~\WallOrient_{i+1}
+    y,~\WallOrient_i,~x_{i+1},~y_{i+1},~\WallOrient_{i+1}
   \end{equation}
   where the $i$\th wall in $\Scene$ terminates at
-  $(x_{i+1},y_b,\WallOrient_i)$.
-\end{definition}
+  $(x_{i+1},y,\WallOrient_i)$.
+\end{lemma}
+\begin{proof}
+  See \cite{Lee09}
+\end{proof}
 
 \begin{lemma}
   \label{def:feasible-scenes}
@@ -1210,74 +1097,74 @@ here
 \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Optimal Substructure}
+\subsubsection{Optimal Substructure}
 
-We now present the sub--problems and corresponding recurrence
-relations comprising our first algorithmic solution to
-\eqnref{opt-scene}. Proving that our algorithm solves the optimisation
-problem of interest hinges on an optimal substructure property of
-indoor Manhattan scenes. Roughly, this property
-states that if a particular scene is optimal for a particular
-sub--problem, then its ``predecessors'' (truncations) are each optimal
-for their corresponding sub--problems. We formalise this below.
+Proving that our algorithm solves the optimisation problem
+\eqnref{opt-scene} hinges on an optimal substructure property of
+indoor Manhattan scenes. Roughly, this property states that if a
+particular scene is optimal for a particular sub--problem, then its
+``predecessors'' (truncations) are each optimal for their
+corresponding sub--problems. We formalise this below.
 
 \begin{definition}
   \label{def:sub-problem-in}
-  A scene $\Scene$ satisfies the sub--problem
-  $\SubProbIN(x,y,\WallOrient)$ if $\Scene$ is feasible and $\Scene$
-  terminates at $(x,y,\WallOrient)$.  A scene $\Scene$ solves the
-  sub--problem $\SubProbIN(x,y,\WallOrient)$ if it satisfies
-  $\SubProbIN(x,y,\WallOrient)$ and there is no other scene satisfying
-  $\SubProbIN(x,y,\WallOrient)$ that obtains a greater value.
+  Let the sub--problem $\SubProb$ be defined as follows.
+
+  A scene $\Scene$ \textit{satisfies} $\SubProb(x,y,\WallOrient)$ if
+  $\Scene$ is feasible and $\Scene$ terminates at $(x,y,\WallOrient)$.
+  A scene $\Scene$ \textit{solves} the sub--problem
+  $\SubProb(x,y,\WallOrient)$ if it satisfies
+  $\SubProb(x,y,\WallOrient)$ and there is no other scene satisfying
+  $\SubProb(x,y,\WallOrient)$ that obtains a greater value.
 \end{definition}
 
-\Figref{fin-examples} shows three examples of different scenes
-satisfying a particular sub--problem.
+\Figref{fin-examples} shows three scenes satisfying one
+sub--problem.
 
 \begin{figure}[tb]
   \centering
   \includegraphics[width=\textwidth]{fin-hypotheses}
   \caption{Three models satisfying the sub--problem
-    $\SubProbIN(x,y,\WallOrient)$.}
+    $\SubProb(x,y,\WallOrient)$.}
   \label{fig:fin-examples}
 \end{figure}
 
 \begin{lemma}
   \label{lemma:solutions-exist}
-  There is a solution to $\SubProbIN(x,y,\WallOrient)$ for all $1 \leq x \leq W$,
+  There is a solution to $\SubProb(x,y,\WallOrient)$ for all $1 \leq x \leq W$,
   $1 \leq y \leq H$, $\WallOrient\in\{1,2\}$.
 \end{lemma}
 \begin{proof}
-  Simply construct a scene $\Scene$ with a sequence of alternating
+  Construct a scene $\Scene$ with a sequence of alternating
   concave/convex corners in the interval $[1,x]$. Non--occluding
   corners are always feasible \cite{Lee09}, so $\Scene$ satisfies
-  $\SubProbIN(x,y,\WallOrient)$. There are finitely many scenes and at
-  least one satisfies $\SubProbIN(x,y,\WallOrient)$; therefore
-  $\SubProbIN(x,y,\WallOrient)$ has a solution.
+  $\SubProb(x,y,\WallOrient)$. There are finitely many scenes and at
+  least one satisfies $\SubProb(x,y,\WallOrient)$; therefore
+  $\SubProb(x,y,\WallOrient)$ has a solution.
 \end{proof}
 
 We now turn to the optimal substructure theorem, which is the central
-theorem of this chapter. The quantities in the proof below are
-depicted in \figref{proof-sketch}.
+theorem of this chapter. \figref{proof-sketch} gives a graphical
+sketch of the proof.
 
 \begin{theorem}
   Let $\Scene$ be a scene terminating at $(x,y,\WallOrient)$. Let
   $\TruncScene$ be the 1--truncation of $\Scene$ and let
   $(x',y',\WallOrient')$ be the terminating state of
-  $\TruncScene$. If $\Scene$ solves $\SubProbIN(x,y,\WallOrient)$
-  then $\TruncScene$ solves $\SubProbIN(x',y,'\WallOrient')$.
+  $\TruncScene$. If $\Scene$ solves $\SubProb(x,y,\WallOrient)$
+  then $\TruncScene$ solves $\SubProb(x',y,'\WallOrient')$.
   \label{thm:substructure}
 \end{theorem}
 \begin{proof}
   First note that $\TruncScene$ satisfies
-  $\SubProbIN(x',y',\WallOrient')$ since it terminates at
+  $\SubProb(x',y',\WallOrient')$ since it terminates at
   $(x',y',\WallOrient')$ and is feasible by Lemma
   \ref{lemma:trunc-feasibility}.
 
-  We show that $\TruncScene$ solves $\SubProbIN(x',y',\WallOrient')$
+  We show that $\TruncScene$ solves $\SubProb(x',y',\WallOrient')$
   by appeal to \textit{reductio}. If $\TruncScene$ does not solve
-  $\SubProbIN(x',y',\WallOrient')$ then there exists a scene
-  $\CfTruncScene$ satisfying $\SubProbIN(x',y',\WallOrient')$ such
+  $\SubProb(x',y',\WallOrient')$ then there exists a scene
+  $\CfTruncScene$ satisfying $\SubProb(x',y',\WallOrient')$ such
   that
   \begin{equation}
     \label{eq:cf-value}
@@ -1285,7 +1172,7 @@ depicted in \figref{proof-sketch}.
   \end{equation}
   Let $\Wall$ be the right--most wall in $\Scene$ and let $\CfScene =
   \CfTruncScene \concat \Wall$. We have that $\CfScene$ satisfies
-  $\SubProbIN(x,y,\WallOrient)$ because:
+  $\SubProb(x,y,\WallOrient)$ because:
   \begin{enumerate}
     \item{$\CfScene$ terminates at $(x,y,\WallOrient)$ since its
       right--most wall is $\Wall$, which terminates at
@@ -1322,7 +1209,7 @@ depicted in \figref{proof-sketch}.
     \Objective(\CfScene) > \Objective(\Scene) ~,
   \end{equation}
   but this contradicts the assumption of $\Scene$ as a solution to
-  $\SubProbIN(x,y,\WallOrient)$.
+  $\SubProb(x,y,\WallOrient)$.
 \end{proof}
 
 \begin{figure}[tb]
@@ -1338,6 +1225,10 @@ depicted in \figref{proof-sketch}.
     and $\CfScene$.}
   \label{fig:proof-sketch}
 \end{figure}
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{First Algorithm}
@@ -1847,7 +1738,7 @@ unique sub--problems, which is $O(L^2)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
-\label{sect:results}
+\label{sec:results}
 Our data--set consists of 18 manually annotated video sequences of 8
 unique indoor locations averaging 59 seconds in duration. We sample
 frames at one second intervals and divide frames into consecutive
