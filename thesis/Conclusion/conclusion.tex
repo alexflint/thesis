@@ -192,18 +192,15 @@ algorithm to jointly estimate these wall orientations together with
 the scene orientation.
 
 A second relaxation would be to permit walls that do not project to
-straight lines on the floor plane. This could be accomplished in a
-range of ways depending on the restriction that is chosen to replace
-straightness. One could parametrise walls in pixel coordinates and
-simply allow walls to change direction arbitrarily. While this would
-permit a wide range of environments to be represented, it is not clear
-that this is desirable since it removes the implicit penalisation of
-highly complex models. A different approach would be to permit
-parametric curves so that pillars and circular wall segments could be
+straight lines on the floor plane. Zeisl \etal \cite{Zeisl2011} show
+one way to accomplish this: by parametrising walls in pixel
+coordinates and penalising smoothness in the transition matrix between
+successive columns. A different approach would be to permit parametric
+curves so that pillars and circular wall segments could be
 represented. This could be accomplished without expanding the
-state--space of the dynamic programming at all; it would simply entail
-integrating the parametric family into the maximisation in
-\eqnref{fin-split}.
+state--space of the dynamic programming algorithm at all; it would
+simply entail integrating the parametric family into the maximisation
+in \eqnref{fin-split}.\changedsinceviva
 
 Another promising direction for relaxation would be to target outdoor
 areas by removing the assumption of a fixed ceiling plane. Many

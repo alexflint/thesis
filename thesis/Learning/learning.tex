@@ -67,9 +67,10 @@ particular, the structured support vector machine
 trend within computer vision towards statistically rigorous,
 well--understood convex optimisation techniques. Recent successfully
 applications of the structured SVM include detection
-\cite{blaschko2008learning}, segmentation \cite{taskar2004max}, and
-scene classification \cite{Yang2010}. In the domain of reconstruction,
-structured prediction ideas have been applied to several simple models
+\cite{blaschko2008learning}, segmentation
+\cite{Szummer2008,taskar2004max}, and scene classification
+\cite{Yang2010}\changedsinceviva. In the domain of reconstruction,
+structured prediction ideas have been applied to several simple model
 classes such as stereo disparities \cite{li2008learning} and cuboids
 \cite{Hedau09}.
 
@@ -121,7 +122,7 @@ is approximated by\changedsinceviva
   \sum_i \Loss\bigl(\Predictor(\inp_i),\outp_i\bigr)~.
 \end{equation}
 Structural risk minimisation techniques add a regulariser
-$\mathcal{R}$, yielding\changedsinceviva
+$\mathcal{R}$:\changedsinceviva
 \begin{equation}
   \label{eq:srm}
   \mathcal{R}(\Predictor) + \sum_i \Loss\bigl(\Predictor(\inp_i),\outp_i\bigr)
@@ -138,9 +139,9 @@ function. In this case equation \eqnref{srm} becomes
   \|\Model\|^2 + \sum h(\outp_i, \Model \cdot \inp_i))
 \end{equation}
 where $h$ is the hinge loss, and learning consists of minimisation
-with respect to $\Model$. Rewriting the hinge loss as a soft
-constraint leads to the well--known quadratic programming formulation
-of the SVM \cite{Cortes1995}.
+with respect to $\Model$. Rewriting the hinge loss as a penalized
+linear constraint leads to the well--known quadratic programming
+formulation for the SVM \cite{Cortes1995}.
 
 Extending binary classification to more general output spaces is a
 major research programme within machine learning; an excellent
@@ -373,7 +374,9 @@ first order Taylor expansion about $\IndModelo$ as follows.
       {P(\Depth_i~|~\Seam,\Ind) P(\Ind~|~\IndModel)}
       {\sum_{\Ind} P(\Depth_i~|~\Seam,\Ind_i) P(\Ind~|~\IndModelo)} + O(1) ~.
 \end{eqnarray}
-It follows that by defining
+In our experiments we linearize about
+$\IndModelo=(\frac{1}{3},\frac{1}{3},\frac{1}{3})$. It follows that by
+defining
 \begin{equation}
   \JointFtr_{\textsf{3D}}(\Depths,\Seam) =
   \frac{1}{\sum_{\Ind} P(\Depth_i~|~\Seam,\Ind) P(\Ind~|~\IndModelo)}
@@ -722,6 +725,20 @@ seconds in duration. We sampled key--frames at regular intervals. Each
 ``instance'' in our training and hold--out sets consists of one base
 frame together with four auxiliary frames.
 
+Ground truth for this dataset was acquired by reconstructing the
+camera trajectory using a SLAM system (we worked with PTAM
+\cite{Klein07}). This system is designed for real--time operation and
+as such its reconstructs are not always perfect, so some errors in the
+training set arise from errors in the underlying structure from motion
+system. Furthermore, some environments in our dataset are not ideal
+indoor Manhattan scenes, and so there is some ambiguity in how we
+should construct the ground--truth floorplans. For example, there is a
+stairwell at the end of one sequence, which is shown near the bottom
+of \tableref{learned-showcase}. It is hard to define any sensible
+indoor Manhattan model from this environment, but rather than
+eliminating it from the dataset, we leave it in to understand the
+performance of our system in adverse conditions.\changedsinceviva
+
 We compared with the bootstrapping approach described in
 \cite{Flint11} and outlined in the preceding chapter. Our metrics
 differ from those of the previous chapter in two ways. Firstly, the
@@ -739,7 +756,7 @@ always be interchanged.
 
 We described two loss functions above: the relative depth error and
 the labelling error. We also described two feature spaces: one
-containing exclusively single view features and one containing and
+containing exclusively single view features and one containing
 multiple view features. In total we trained four predictors,
 corresponding to all combinations of feature spaces and loss
 functions. For clarity we will use the following notation throughout
@@ -836,7 +853,7 @@ losses on held--out instances.
     in the top row of each table --- see the main text for details on
     these symbols. Note that even when a predictor is trained with
     respect to a particular loss function, we may still evaluate it
-    with respect to a different metric (though as expected, the
+    with respect to a different metric (though as expected the
     predictors perform best when evaluated by the same error metric
     that they were trained for).}
   \label{table:learning-performance}
@@ -939,6 +956,22 @@ alone}
   \label{fig:psi-evolution}
 \end{figure}
 
+\begin{figure}[tb]
+  \centering
+  \subfloat[Weight vector learned for single view features]{
+    \includegraphics[width=0.8\textwidth]{weights-singleview}
+  }
+  \\
+  \subfloat[Weight vector learned for multiple view features]{
+    \includegraphics[width=0.8\textwidth]{weights-multiview}
+  }
+  \caption{Final weight vector that was learned for the single-- and
+    multiple--view feature spaces. The two figures each show the
+    weights learned when minimizing the labelling loss and when
+    minimizing the depth loss.}
+  \label{fig:learned-weights}
+\end{figure}
+
 \section{Single View Results}
 \label{sec:sv-results}
 
@@ -995,6 +1028,7 @@ higher volatility during the exploration phase.
       is ground truth. This figure shows samples from the hold--out
       set, and were selected uniformly at random for inclusion
       here.}\\
+    \label{table:learned-showcase}
 
     $\Fmviewdepth$ & $\Fmviewdepth$ & \chapref{inference} & Ground Truth \\
     \endfirsthead
