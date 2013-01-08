@@ -191,6 +191,7 @@ intersection at the horizon, or by modifying the rotation estimation
 algorithm to jointly estimate these wall orientations together with
 the scene orientation.
 
+\changedsinceviva{
 A second relaxation would be to permit walls that do not project to
 straight lines on the floor plane. Zeisl \etal \cite{Zeisl2011} show
 one way to accomplish this: by parametrising walls in pixel
@@ -200,7 +201,8 @@ curves so that pillars and circular wall segments could be
 represented. This could be accomplished without expanding the
 state--space of the dynamic programming algorithm at all; it would
 simply entail integrating the parametric family into the maximisation
-in \eqnref{fin-split}.\changedsinceviva
+for each sub--problem.
+}
 
 Another promising direction for relaxation would be to target outdoor
 areas by removing the assumption of a fixed ceiling plane. Many

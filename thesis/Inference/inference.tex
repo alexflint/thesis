@@ -63,7 +63,7 @@ features, stereo photo--consistency, and 3D point clouds. These three
 quantities are commonly available in a moving camera setup, but our
 system can be used unchanged with any combination of the three,
 including a single--view setting. The second part of this chapter then
-focusses on finding the most likely explanation for a set of
+focuses on finding the most likely explanation for a set of
 observations given the assumptions made by our model. A major focus of
 this chapter is the development of an efficient and exact dynamic
 programming that solves both maximum--aposteriori (MAP) and
@@ -145,7 +145,7 @@ again, we have not defined any particular $\CornerPenalty$; any that
 takes the the form \eqnref{scene-penalty} is suitable for the
 optimisation problem to follow. Later we will describe specific forms
 for $\CornerPenalty$ corresponding to particular choices of prior in
-model.
+our model.
 
 Given any such $\ScenePayoff$ and $\ScenePenalty$, the associated
 optimisation problem is as follows. Let
@@ -160,7 +160,7 @@ optimisation problem is as follows. Let
 then we seek
 \begin{equation}
   \label{eq:opt-scene}
-  \EstimatedScene = \argmax_{\Scene\in\SetOfScenes}\limits \Objective(\Scene) ~.
+  \OptimalScene = \argmax_{\Scene\in\SetOfScenes}\limits \Objective(\Scene) ~.
 \end{equation}
 
 Note that the objective $\Objective$ is defined partially in the scene
@@ -178,14 +178,14 @@ will work in seam representation to define  $\ScenePayoff$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Probabilistic Model}
 
-In this section we develop a probabilistic model to guide the
-recovery of indoor Manhattan scenes from observations. We assume
-that three types of observations are available: photometric image
-features, calibrated stereo pairs, and 3D point clouds. These
-quantities might be acquired, for example, as the output of a SLAM or
-structure--from--motion system. We now describe
-probabilistic relationships between each type of observation and the
-indoor Manhattan scene structure that we wish to infer.
+In this section we develop a probabilistic model for estimating indoor
+Manhattan scenes from observations. We assume that three types of
+observations are available: photometric image features, calibrated
+stereo image pairs, and 3D point clouds. These quantities might be
+acquired, for example, as the output of a SLAM or
+structure--from--motion system. We now describe probabilistic
+relationships between each type of observation and the indoor
+Manhattan scene structure that we wish to infer.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Scene Prior}
@@ -193,17 +193,17 @@ indoor Manhattan scene structure that we wish to infer.
 We turn first to the prior on scenes, $P(\Scene~|~\Penalties)$, which
 is governed by a set of hyper--parameters $\Penalties$. As discussed in
 \secref{corner-categories}, corners between successive walls can be
-classified as concave, convex, and occluding. Let $n_1, n_2,$ and $n_3$
+classified as concave, convex, or occluding. Let $n_1, n_2,$ and $n_3$
 be the number of corners in $\Scene$ of each category
-respectively. Our prior on scenes is a geometric distribution in
-$\vect{n}=(n_1,n_2,n_3)$,
+respectively. \changedsinceviva{Our prior on scenes is a geometric distribution in
+$\vect{n}=(n_1,n_2,n_3)$,}
 \begin{eqnarray}
   \label{eq:scene-prior}
   P(\Scene ~|~ \Penalties) &=& \frac{1}{Z}
     {\PenaltyConc}^{n_1} {\PenaltyConv}^{n_2} {\PenaltyOccl}^{n_3}~,
 %  Z &=& \frac{\mu(n_1,n_2,n_3)}{(1-\PenaltyConc)(1-\PenaltyConv)(1-\PenaltyOccl)}~,
 \end{eqnarray}
-where $Z$ is a normalizing term that we will not need to compute in
+where $Z$ is a normalising term that we will not need to compute in
 order to perform maximisation. Our choice of \eqnref{scene-prior} is
 motivated by the desire to penalise scenes for additional complexity,
 where we measure complexity by the number of distinct walls. We
@@ -266,12 +266,13 @@ $\Orient\in\Orientations$ (\cf
 \algref{computing-from-scene}), which is deterministic given $\Scene$
 and is included in the graphical model for notational convenience
 only. Finally a feature $\Feature$ is sampled from a distribution that
-is conditionally independent of $\Scene$ given $\Orient$. In practice
+is conditionally independent of $\Scene$ given $\Orient$. \changedsinceviva{In practice
 we use the following features: three RGB colour components,
-three HSV color components, two binary line sweep features described
+three HSV colour components, two binary line sweep features described
 by Lee \etal \cite{Lee09}, and twelve Gabor responses (three scales,
 four orientations). In \chapref{learning} we drop the
-Gabor responses for efficiency reasons.\changedsinceviva
+Gabor responses for efficiency reasons.
+}
 
 We assume a exponential--family likelihood for pixel features,
 \begin{equation}
@@ -372,7 +373,7 @@ easily to MAP inference also.)
   \label{fig:backproject}
 \end{figure}
 We now formulate the payoff function $\StereoPayoff$ for the case that
-multiple views of the scene are available. We assume that one
+multiple views of the scene are available. We assume \changedsinceviva{that one}
 image is identified as the base view $\Image_0$; the remaining
 $\NumViews$ images are denoted
 $\Image_1,\ldots,\Image_{\NumViews}$. All images have size
@@ -384,8 +385,8 @@ the action of the $i$\th camera on a 3D point $X$ being
 
 Intuitively, we treat inference in this settings as follows. We
 consider models $\Scene$ in terms of their projection into
-$\Image_0$. We explained in \secref{model} that models parametrized in
-image coordinates specify unique 3D models. Any model hypothesized in
+$\Image_0$. We explained in \secref{model} that models parametrised in
+image coordinates specify unique 3D models. Any model hypothesised in
 $\Image_0$ can therefore be re--projected into the auxiliary views,
 giving pixel--wise correspondences between frames (\cf
 \figref{backproject}). From this we compute a photo--consistency
@@ -398,11 +399,12 @@ is to show that (i) in the particular case of indoor Manhattan models,
 photo--consistency can be expressed as a payoff matrix; (ii) that we
 can therefore perform efficient and exact global optimisation; and
 (iii) that this fits naturally within a Bayesian framework alongside
-monocular and 3D features. Our approach also bears some similarity to
+monocular and 3D features. \changedsinceviva{Our approach also bears some similarity to
 Cornells \etal \cite{Cornells2006}, who reconstruct building facades
-from a moving vehicle by analyzing a related cost function derived
+from a moving vehicle by analysing a related cost function derived
 from stereo pairs. Like us, they employ dynamic programing, although
-they do not constrain the arrangement of the vertical facades.\changedsinceviva
+they do not constrain the arrangement of the vertical facades.
+}
 
 In \secref{metric-recovery} we showed how to convert a scene in vertex
 representation to a 3D reconstruction. Since all cameras are
@@ -452,7 +454,7 @@ photo--consistency terms,
   \centering \includegraphics[width=0.8\textwidth]{reprojected-columns}
   \caption{Two hypotheses for the location of the seam and the
     reprojections they imply for each image column in an auxiliary
-    image. The blue dot happens to be a correct hypothesis (unbeknownst
+    image. The blue dot happens to be a correct hypothesis (unbeknown
     to the system), while the red dot is incorrect. As a result, the
     blue line corresponds to the same set of 3D locations in both
     images but the red line does not.}
@@ -691,7 +693,10 @@ where
 Finally, the log posterior is
 \begin{equation}
   \begin{split}
-    \log P(\Scene ~|~ \Observations_{\textsf{mono}}, \Observations_{\textsf{stereo}}, \Observations_{\textsf{3D}})
+    \log P(\Scene ~|~
+           \Observations_{\textsf{mono}},
+           \Observations_{\textsf{stereo}},
+           \Observations_{\textsf{3D}})
     & \propto
       \log P(\Observations_{\textsf{mono}} ~|~ \Scene)
       +\log P(\Observations_{\textsf{stereo}} ~|~ \Scene) \\
@@ -707,10 +712,10 @@ independent of the quantity that we are maximising. We can now cast
 maximum--likelihood and maximum--aposteriori inference in the form
 \eqnref{scene-objective},
 \begin{eqnarray}
-  \EstimatedScene_{\mbox{\tt ML}} &=& 
+  \OptimalScene_{\mbox{\tt ML}} &=& 
     \argmax_{\Scene\in\SetOfScenes}\limits~
     \ScenePayoff_{\textsf{joint}}(\Scene)\\
-  \EstimatedScene_{\mbox{\tt MAP}} &=& 
+  \OptimalScene_{\mbox{\tt MAP}} &=& 
     \argmax_{\Scene\in\SetOfScenes}\limits~
     \ScenePayoff_{\textsf{joint}}(\Scene) - \ScenePenalty(\Scene) ~.
 \end{eqnarray}
@@ -723,7 +728,7 @@ function $\ScenePenalty$ such that solving \eqnref{opt-scene} is
 equivalent to solving MAP (or ML) inference under our model. In
 practice we only need to evaluate $\ScenePayoff$ at integer pixel
 coordinates, so we represent it as a 2D array. The remainder of this
-chapter focusses on solving optimisation problems of the form
+chapter focuses on solving optimisation problems of the form
 \eqnref{opt-scene}.
 
 
@@ -767,66 +772,52 @@ column. We therefore cast the optimisation directly in terms of the
 vertex representation introduced in \chapref{geometry}.
 
 We present our solution by first describing a simple but inefficient
-version, followed by two refinements that give an $O(N)$ algorithm. At
-each stage we first describe our algorithm conceptually, then
-formally.
+version, followed by three refinements that lead to an $O(N)$
+algorithm (where $N$ is the number of pixels). At each stage we
+describe our algorithm conceptually before formalising it.
 
 \subsection{Basic Algorithm}
-\label{sect:basic-alg}
+\label{sec:basic-alg}
 
 We have already seen that every indoor Manhattan scene can be
 represented as a left--to--right sequence of wall segments. Our
-approach is founded on the construction of a graph over all possible
-indoor Manhattan scenes. This graph has nodes representing pixels and
-edges that represent vanishing lines. By constructing this graph and
-assigning certain weights to the edges, we reduce the optimization
-problem \eqnref{opt-scene} to a graph search problem, which is
-informally depicted in \figref{dp-graph-search}.
+approach is based on the construction of a graph over all possible
+indoor Manhattan scenes. This nodes in this graph represent pixels and
+the edges represent vanishing lines. Each path in this graph
+corresponds to a different indoor Manhattan scene, and by assigning
+certain weights to the edges we reduce the optimisation problem
+\eqnref{opt-scene} to a graph search problem, which we solve using
+dynamic programming. The graph is depicted informally in
+\figref{dp-search-graph}. In dynamic programming parlance, nodes are
+called states and the adjacency matrix is called the feasible set. We
+now describe the construction of this graph.
 
 \textbf{State space.} Our state space contains two states for each
 pixel. Each state corresponds to a sub--problem of the form,
 \textit{``What is the optimal indoor Manhattan scenes spanning the
-  part of the image to the left of pixel $\Pixel$?''}. We further
-divide scenes according to the orientation of the rightmost
-wall. There is therefore one such sub--problem for each
-$($pixel$,$orientation$)$ pair, giving the $2N$ state space. We write
-states as pairs, as in
-$\State=(\Pixel,\WallOrient)$. \figref{state-space} shows our state
-space graphically, and some examples of the corresponding
-sub--problems are depicted in XXX.
-
-\begin{figure}[tb]
-  \centering
-  %\includegraphics[width=0.6\textwidth]{dp-earch-graph}
-  \caption{The search graph corresponding to the first version of our
-    dynamic programming algorithm. We show all the outgoing edges for
-    a particular pixel $\vect{p}$.}
-  \label{fig:dp-seach-graph}
-\end{figure}
+  part of the image to the left of pixel $\Pixel$?''}. There is
+one state for each pixel and each for of the two vertical
+orientations, giving the $2N$ state space. We write states as pairs,
+as in $\State=(\Pixel,\WallOrient)$.
 
 \textbf{Feasible set.} The feasible set describes the connections
-between states. In graph parlance, the feasible set is equivalent to
-the adjacency matrix: a state $\OtherState$ is in the feasible set for
-$\State$ if and only if there is an edge from $\State$ to
-$\OtherState$. In our algorithm the feasible set for a state
-$(\Pixel,\WallOrient)$ consists of all pixels that are to the left of
-$\Pixel$ that fall on the vanishing line connecting $\Pixel$ and
-$\vpt_{\WallOrient}$. This is depicted in \figref{dp-graph}.
-
-\begin{figure}[tb]
-  \centering
-  %\includegraphics[width=0.6\textwidth]{state-space}
-  \caption{The state space for our algorithm. We show all the outgoing
-    edges from $\Pixel$.}
-  \label{fig:state-space}
-\end{figure}
+between states. There is a separate feasible set
+$\FeasibleSet(\State)$ for each state and
+$\OtherState\in\FeasibleSet(\State)$ if and only if there is an edge
+from $\State$ to $\OtherState$. In our first algorithm the feasible
+set for a state $\State=(\Pixel,\WallOrient)$ consists of all pixels
+to the left of $\Pixel$ that fall on the vanishing line connecting
+$\Pixel$ and $\vpt_{\WallOrient}$, as depicted in
+\figref{dp-search-graph}. This leads to a search graph in which each
+path corresponds to an indoor Manhattan scene, as shown in
+\figref{path-correspondence}.
 
 \textbf{Value function.} The value function describes the quantity
-being optimized at each state. Our value function maps \textit{paths
-  through the image} to real numbers. More specifically, the domain of
-our value function is the set of paths from any pixel $\Pixel$ to the
-left edge of the image. We define its value to be the sum of the
-entries in the payoff matrix along this path minus the penalty for the
+being optimised at each state. Our value function maps \textit{paths
+  through the graph} to real numbers. That is, the domain of our value
+function is the set of paths from any pixel $\Pixel$ to the left edge
+of the image. We define the value of such a path to be the sum of the
+entries in the payoff matrix along the path minus the penalty for the
 corners along the path, \ie
 \begin{equation}
   \Objective(\PartialScene) = \sum
@@ -838,11 +829,26 @@ corners along the path, \ie
 payoff matrix that are summed to compute its value. The motivation for
 choosing this particular value function is that for pixels on the
 right edge of the image it is equal to the full objective function
-\eqnref{opt-scene}. Note that for pixels \textit{not} on the right
-edge of the image it is probably most helpful to think of
-\eqnref{scene-value} as an aribtrary function disconnected from any
-probabilistic interpretation and useful only insofar as it helps to
-solve the full optimization \eqnref{opt-scene}.
+\eqnref{opt-scene}.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.35\textwidth]{path-correspondence}
+  \caption{A path through the search graph and the indoor Manhattan
+    scene that it corresponds to. The black dots are states, the red
+    arrows are edges, and the rest is for illustration only.}
+  \label{fig:path-correspondence}
+\end{figure}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{dp-search-graph}
+  \caption{The search graph corresponding to the first version of our
+    dynamic programming algorithm. This figure identifies one node
+    (red circle) and shows all neighbours to which it is connected via
+    outgoing edges (grey circle).}
+  \label{fig:dp-search-graph}
+\end{figure}
 
 \begin{figure}[tb]
   \centering
@@ -853,170 +859,211 @@ solve the full optimization \eqnref{opt-scene}.
   \label{fig:partial-seam}
 \end{figure}
 
-\textbf{Optimization step.} We now describe how to maximize the value
+\textbf{Optimisation step.} We now show how to maximise the value
 function at each state. This is best explained by considering a single
 state $\State$ and assuming that we already know the solutions for all
-sub--problems preceeding it. That is, for each state $\OtherState$ to
-the left of $\State$, let us assume that we already know the optimal
+preceding states --- that is, for each state $\OtherState$ to
+the left of $\State$, let us assume that we already know the
+optimal\footnote{Optimality here means the path that maximises the
+  value function described above.}
 path from $\OtherState$ to the left edge of the image, and also the
-value of that path. Let this quantity be
+value of that path. We denote this quantity
 \begin{equation}
+  \label{eq:bestvalue-def}
   \bestvalue(\OtherState) = \argmax \Objective(\Scene)
 \end{equation}
-where the maximization is over paths terminating at $\OtherState$. Our
-task is to use the known values for the preceeding states to discover
-the optimal value for the state $\State$ under consideration. We
-accomplish this as follows
+where the maximisation is over paths terminating at $\OtherState$. Our
+task is to use the known solutions to the preceding states to
+discover the optimal path for the state $\State$ under
+consideration. We accomplish this as follows.
 \begin{enumerate}
   \item{Enumerate all states $\OtherState$ that are connected to
-    $\State$ (\ie all states in the feasible set for $\State$).}
+    $\State$; \ie all $\OtherState\in\FeasibleSet(\State)$.
+  }
   \item{For each, compute
     \begin{equation}
-      \label{eq:optimization-step}
-      \bestvalue(\OtherState)+\edgevalue(\OtherState,\State)-\lambda ~,
+      \label{eq:optimisation-step}
+      \bestvalue(\OtherState)+\edgevalue(\OtherState,\State) ~,
     \end{equation}
-    where $\edgevalue$ is the sum over the payoff function along the
-    line from $\OtherState$ to $\State$ and $\lambda$ is the penalty
-    associated wtih the new corner at $\OtherState$ (see
-    \figref{recurrence-value}).}
-  \item{Set $\bestvalue(\State)$ to the maximum over the values
-    computed in step 2.}
+    where
+    \begin{equation}
+      \label{eq:edge-value-basic}
+      \edgevalue(\OtherState,\State) =
+        \sum \PixelPayoff(x_i,y_i,\WallOrient_i) - \CornerPenalty
+    \end{equation}
+    is the sum of payoffs along the line segment between
+    $\OtherState$ and $\State$, and $\Penalty$ is the penalty
+    associated with the new corner at $\OtherState$ (see
+    \figref{recurrence-value}). $\edgevalue$ can be thought of as the
+    marginal value for the wall segment added between $\OtherState$
+    and $\State$.
+  }
+  \item{Set $\bestvalue(\State)$ to the maximum over the terms
+    computed in step 2. We summarise this in the following recurrence
+    relation.
+    \begin{equation}
+      \bestvalue(\State) = 
+      \max_{\OtherState \in \FeasibleSet(\State)}\limits
+      \bestvalue(\OtherState) + \edgevalue(\OtherState,\State)
+    \end{equation}
+  }
 \end{enumerate}
 
 \begin{figure}[tb]
   \centering
-  %\includegraphics[width=0.35\textwidth]{recurrence-value}
+  \includegraphics[width=0.35\textwidth]{recurrence-value}
   \caption{The computation of the value function at $\State$. This
-    figure shows just one term in the maximization
-    $\eqnref{optimization-step}$; computing $\bestvalue(\State)$
-    involves maximization over all states $\OtherState$.}
+    figure shows just one term in the maximisation
+    $\eqnref{optimisation-step}$; computing $\bestvalue(\State)$
+    involves maximisation over all possible states $\OtherState$.}
   \label{fig:recurrence-value}
 \end{figure}
 
-\textbf{Full algorithm.} Our first solution to the optimization
-problem \eqnref{opt-scene} recursively applies the procedure described
-above to compute the value $\bestvalue(\State)$ for all states. We
-start at the pixels on the right edge of the image and whenever we
-need to evaluate $\bestvalue$ for a state not yet considered, we
-simply recursively apply the same procedure. This are no circular
-dependencies because our state space is a directed acyclic
-graph. After evaluating $\bestvalue$ at each state we cache the result
-in a lookup table for re--use next time the same state is
-encountered \footnote{Far from being a minor optimization, the caching
+\textbf{Full algorithm.} We are now ready to describe our first
+algorithm that solves the optimisation problem \eqnref{opt-scene}. The
+basic idea is to recursively apply the procedure above to compute the
+value $\bestvalue(\State)$ for all states. We start at the pixels on
+the right edge of the image and begin executing the procedure
+above. During step 2 we will encounter some states $\OtherState$ for
+which we do not know the value of $\bestvalue(\OtherState)$. At this
+point we recursively apply the procedure to that state, and so on each
+time we need to evaluate $\bestvalue(\OtherState)$ for any state not
+yet encountered. The recursion terminates when we encounter a pixel on
+the left edge of the image since for these states $\bestvalue(\State)$
+is always zero. There are no circular dependencies because our search
+graph is acyclic by construction. Each time we complete the
+computation of some $\bestvalue(\OtherState)$, we cache the result in
+a lookup table for re--use next time the same state is
+encountered \footnote{Far from being a minor optimisation, the caching
   of intermediate results makes the difference between an exponential
-  and polynomial--time algorithm!}. The recursion terminates whenever
-we encounter a pixel on the left edge of the image --- for these
-states $\bestvalue$ returns zero. After applying this procedure
-recursively we will have computed the the value of the optimal model
-for every state. The final solution to our optimization problem is
-obtained by identifying the largest value among all states on the
-right edge of the image.
+  and polynomial--time algorithm.}. After applying this procedure
+recursively we will have computed the the value of the optimal path
+for every state. The final solution to our optimisation problem \changedsinceviva{is
+obtained} by identifying the largest value among all states on the
+right edge of the image. Back--tracking allows us to recover the
+optimal path through the graph, which is precisely the vertex
+representation for the indoor Manhattan scene maximising
+\eqnref{opt-scene}. We formalise and prove the correctness of this
+algorithm in a section below.
 
-\textbf{Complexity.} Analyzing the complexity of dynamic programming
-algorithms is easy because computation is bounded by the product of
-(1) the number of states and (2) the stfewamount of computation per
-state ignoring the cost of recursive evaluations. For an image of size
-$L \times L$ the algorithm described above consists of $2L^2$ states
-and each state involves a maximization over $O(L)$ preceeding
-states. Each term in the maximization costs $O(L)$ to compute, giving
+\textbf{Complexity.} Analysing the complexity of dynamic programming
+algorithms is trivial because computation is bounded by the product of
+(1) the number of states and (2) the amount of computation per
+state\footnote{excluding computation associated with recursive
+  evaluations of $\bestvalue$ to avoid double--counting}. For an image
+of size $L \times L$ the algorithm described above consists of $2L^2$
+states and each state involves a maximisation over $O(L)$ preceding
+states. Each term in the maximisation costs $O(L)$ to compute, giving
 an overall complexity of $O(L^4)$.
 
-\textbf{Short--commings.} The algorithm described thus far does not
-permit occluding corners, so if the true indoor Manhattan scene
+\textbf{Limitations.} The algorithm described thus far does not
+consider occluding corners, so if the true indoor Manhattan scene
 contains occluding corners, this algorithm will not find it. We
 rectify this in the following section.
 
 \subsection{First Refinement: Occluding Corners}
 \label{sec:amended-alg}
 
-In order to account for occluding corners we need to ammend two
-parts of the algorithm from \sectref{basic-alg}: the
-feasible set and the optimization step.
+In order to account for occluding corners we need to amend both the
+feasible set and the optimisation step from \sectref{basic-alg}.
 
-\textbf{Feasible set.} The feasible set described in the previous
-section consisted of the set of states along the vanishing line
-associated with $\State$. Here we revise the feasible set to include
-\textit{all} states to the left of $\State$, where for states
-$\OtherState$ not on the vanishing line, stepping from $\State$ to
-$\OtherState$ corresponds to moving first along the vanishing and then
-vertically up or down to $\OtherState$.
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\textwidth]{occluding-path-correspondence}
+  \caption{Three paths through the search graph after making the
+    changes described in \sectref{amended-alg} to permit occluding
+    corners. The two right--most scenes cannot be represented in the
+    previous search graph. Note that there is a state at the
+    bottom--right of each wall segment.}
+  \label{fig:occluding-path-correspondence}
+\end{figure}
 
-\textbf{Optimization step.} Our optimization step remains very similar
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.5\textwidth]{occluding-feasible-set}
+  \caption{The search graph corresponding to the second version of our
+    dynamic programming algorithm (\sectref{amended-alg}). Here we
+    have highlighted a single node (red circle), which has outgoing
+    edges to every pixel to its left (grey circles). One neighbouring
+    state (black dot) is singled out to show that the edges between
+    states represents displacement along a vanishing direction
+    followed by displacement in the vertical direction.}
+  \label{fig:occluding-feasible-set}
+\end{figure}
+
+\textbf{Feasible set.} The feasible $\FeasibleSet(\State)$ set
+described in the previous section consisted of the set of states along
+the vanishing line associated with $\State$. Here we revise the
+feasible set to include \textit{all} states to the left of $\State$,
+where for states $\OtherState$ not on the vanishing line, stepping
+from $\State$ to $\OtherState$ corresponds to moving first along the
+vanishing and then vertically up or down to $\OtherState$, as shown in
+\figref{occluding-feasible-set} and
+\figref{occluding-path-correspondence}.
+
+\textbf{Optimisation step.} Our optimisation step remains very similar
 to that described in \sectref{basic-alg}. For each state $\State$ we
-consider all preceeding states $\OtherState$. We add the value of
-$\OtherState$ to the value associated with the edge between the
+consider all preceding states $\OtherState$. We add the value for
+$\OtherState$ to the value associated with the edge between
 $\OtherState$ and $\State$, which is now computed by summing entries
 from the payoff matrix along the vanishing line from $\State$ to the
-column containing $\OtherState$ (as shown in
-\figref{recurrence-value-occluding}).
+column containing $\OtherState$.
 
 The introduction of occluding corners means that our algorithm can now
-generate configurations that are physically impossible, such as those
-shown in \figref{impossible-configurations}. We can easily detect and
+generate configurations that are physically impossible. We detect and
 exclude such configurations by checking each state in the feasible set
 against the rules described by Lee \etal \cite{Lee09}, and, if
 violated, excluding that state from the feasible set. The revised
-optimization routine is therefore:
+optimisation routine is therefore:
 \begin{enumerate}
   \item{Enumerate all states $\OtherState$ in the feasible set for
     $\State$.}
   \item{For each $\OtherState$, check whether connecting $\State$ to $\OtherState$
-    would yeild a physically unrealisable configuration.}
+    would yield a physically unrealisable configuration.}
   \item{If not, compute
     \begin{equation}
-      \label{eq:optimization-step-occluding}
-      \bestvalue(\OtherState)+\edgevalue(\OtherState,\State)-\lambda ~,
+      \label{eq:optimisation-step-occluding}
+      \bestvalue(\OtherState)+\edgevalue(\OtherState,\State) ~,
     \end{equation}
     where $\edgevalue$ is the sum over the payoff function along the
     vanishing line from $\State$ to the column containing
-    $\OtherState$ and $\lambda$ is the penalty associated wtih the new
-    corner at $\OtherState$ (see \figref{recurrence-value-occluding}).}
+    $\OtherState$ minus the penalty associated with the new corner at
+    $\OtherState$ (see \figref{occluding-feasible-set}).}
   \item{Set $\bestvalue(\State)$ to the maximum value computed in
     step 3.}
 \end{enumerate}
 
-\begin{figure}[tb]
-  \centering
-  %\includegraphics[width=0.35\textwidth]{recurrence-value-occluding}
-  \caption{The computation of the value function at $\State$. This
-    figure shows just one term in the maximization
-    $\eqnref{optimization-step-occluding}$; computing $\bestvalue(\State)$
-    involves maximization over all states $\OtherState$.}
-  \label{fig:recurrence-value-occluding}
-\end{figure}
-
-\textbf{Complexity.} The only change introduced in this section that
-is relevant to computational complexity is the expansion of the
-feasible set by a factor of $O(L)$, meaning that the maximization
-\eqnref{optimization-step-occluding} is now over $O(L^2)$ terms. The
-physical realisability conditions can be evaluated in constant time so
-do not affect computational complexity. This brings the computation
+\textbf{Algorithmic complexity.} The only change introduced in this
+section that is relevant to computational complexity is the expansion
+of the feasible set by a factor of $O(L)$, meaning that the
+maximisation in step 4 is now over $O(L^2)$ terms. The physical
+realisability conditions can be evaluated in constant time so do not
+affect computational complexity. This brings the computation
 complexity of the revised algorithm to $O(L^5)$.
 
 \subsection{Correctness of \sectref{amended-alg}}
 
 We now pause to prove the correctness of the algorithm presented thus
 far. All dynamic programming algorithms are associated with an optimal
-subustructure property of the underlying optimization problem. Here we
-prove the optimal subustructure property correseponding to indoor
-Manhattan scene inference.
+substructure property of the underlying optimisation problem. Here we
+prove the optimal substructure property corresponding to the
+inference of indoor Manhattan scenes.
 
 \subsubsection{Preliminaries}
 
-We begin by formalizing several concepts introduced in the preceeding
+We begin by formalising several concepts introduced in the preceding
 sections. What we have heretofore called a ``path from the left edge
 of the image to $\State$'' will henceforth be called a \textit{partial
   scene}. In vertex representation, a partial scene is identical to an
 ordinary scene except that the last $x$--coordinate might be smaller
 than the image width. Partial scenes have a seam representation
-mirroring that for full scenes, as depicted in \figref{partial-seam}.
+mirroring that for full scenes.
 
 The \textit{truncation} of the partial scene $\PartialScene$ is
-obtained by removing the last right--most from $\PartialScene$. We
-will write $\PartialScene_{-1}$. The \textit{concatenation} of 
-$\PartialScene$ with the wall $(x_a,y,\WallOrient,x_b)$ is
-defined if and only if $\PartialScene$ terminates at column $x_a$ and
-equals
+obtained by removing the right--most wall from $\PartialScene$, for
+which we will write $\PartialScene_{-1}$. The \textit{concatenation}
+of $\PartialScene$ with the wall $(x_a,y,\WallOrient,x_b)$ is defined
+if and only if $\PartialScene$ terminates at column $x_a$ and equals
 \begin{equation}
   \PartialScene \concat \Wall = 
   ( x_1,y_1,\WallOrient_1,
@@ -1025,26 +1072,19 @@ equals
   ~x_a, y, \WallOrient, ~ x_b )
 \end{equation}
 
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=0.35\textwidth]{partial-seam}
-  \caption{A partial scene and the corresponding partial seam. The
-    black dot shows the terminating state.}
-  \label{fig:partial-seam}
-\end{figure}
-
 We will also refer to the \textit{terminating state} of a scene, which
-is the state for the lower--right corner of the rightmost wall (see
-\figref{partial-seam}).
+is the state for the lower--right corner of the rightmost wall (the
+black dot in \figref{partial-seam}, for example).
 
 The correctness of our algorithm depends in part on the structure of
 the physical realisability constraints described by Lee \etal
 \cite{Lee09}. We do not wish to repeat their work here, but for
-completeness we re--state the relevant properties
+completeness we re--state some properties of the conditions they
+derived.
 
 \begin{lemma}
   \label{def:feasible-corners}
-  The phsical realisability of the $i$\th corner of the scene $\Scene$
+  The realisability of the $i$\th corner of the scene $\Scene$
   is a function of the four values:
   \begin{equation}
     y,~\WallOrient_i,~x_{i+1},~y_{i+1},~\WallOrient_{i+1}
@@ -1058,7 +1098,8 @@ completeness we re--state the relevant properties
 
 \begin{lemma}
   \label{def:feasible-scenes}
-  $\Scene$ is feasible if and only if all corners in $\Scene$ are feasible.
+  $\Scene$ is realisable if and only if all corners in
+  $\Scene$ are realisable.
 \end{lemma}
 \begin{proof}
   See \cite{Lee09}
@@ -1066,33 +1107,33 @@ completeness we re--state the relevant properties
 
 \begin{lemma}
   \label{lemma:trunc-feasibility}
-  Let $\Scene$ be a feasible scene. Then its truncation $\Scene_{-1}$ is
-  feasible.
+  Let $\Scene$ be a realisable scene. Then its truncation $\Scene_{-1}$ is
+  realisable.
 \end{lemma}
 \begin{proof}
   The truncation $\Scene_{-1}$ consists of a subset of the corners in
-  $\Scene$, all of which are feasible by assumption.
+  $\Scene$, all of which are realisable by assumption.
 \end{proof}
 
 \begin{lemma}
   \label{lemma:concat-feasibility}
   Let $\Wall=(x_b,y_b,\WallOrient_b,x_c)$ be a wall and let $\Scene$ and
   $\OtherScene$ be feasible scenes terminating at
-  $(x_b,y_a,\WallOrient_a)$. Then $\Scene\concat\Wall$ is feasible if
-  and only if $\OtherScene\concat\Wall$ is feasible.
+  $(x_b,y_a,\WallOrient_a)$. Then $\Scene\concat\Wall$ is realisable if
+  and only if $\OtherScene\concat\Wall$ is realisable.
 \end{lemma}
 \begin{proof}
-  Suppose $\Scene\concat\Wall$ is feasible. Then we need to show that
-  each corner in $\OtherScene\concat\Wall$ is feasible. By assumption
-  the first $\Length{\OtherScene}$ corners are feasible. According to
+  Suppose $\Scene\concat\Wall$ is realisable. Then we need to show that
+  each corner in $\OtherScene\concat\Wall$ is realisable. By assumption
+  the first $\Length{\OtherScene}$ corners are realisable. According to
   Definition \ref{def:feasible-corners}, the feasibility of the last corner
   is a function of the values
   \begin{equation}
     y_a,~\WallOrient_a,~x_b,~y_b,~\WallOrient_b,
   \end{equation}
   But these values are identical to the last corner in
-  $\Scene\concat\Wall$, which is feasible by assumption, so
-  $\OtherScene\concat\Wall$ is feasible. The other
+  $\Scene\concat\Wall$, which is realisable by assumption, so
+  $\OtherScene\concat\Wall$ is realisable. The other
   direction of implication is obtained by a symmetric argument.
 \end{proof}
 
@@ -1102,7 +1143,7 @@ completeness we re--state the relevant properties
 Proving that our algorithm solves the optimisation problem
 \eqnref{opt-scene} hinges on an optimal substructure property of
 indoor Manhattan scenes. Roughly, this property states that if a
-particular scene is optimal for a particular sub--problem, then its
+particular hypothesis is optimal for a particular sub--problem, then its
 ``predecessors'' (truncations) are each optimal for their
 corresponding sub--problems. We formalise this below.
 
@@ -1111,37 +1152,23 @@ corresponding sub--problems. We formalise this below.
   Let the sub--problem $\SubProb$ be defined as follows.
 
   A scene $\Scene$ \textit{satisfies} $\SubProb(x,y,\WallOrient)$ if
-  $\Scene$ is feasible and $\Scene$ terminates at $(x,y,\WallOrient)$.
+  $\Scene$ is realisable and $\Scene$ terminates at $(x,y,\WallOrient)$.
   A scene $\Scene$ \textit{solves} the sub--problem
   $\SubProb(x,y,\WallOrient)$ if it satisfies
   $\SubProb(x,y,\WallOrient)$ and there is no other scene satisfying
   $\SubProb(x,y,\WallOrient)$ that obtains a greater value.
 \end{definition}
 
-\Figref{fin-examples} shows three scenes satisfying one
+\Figref{subproblem-examples} shows three scenes satisfying one
 sub--problem.
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\textwidth]{fin-hypotheses}
+  \includegraphics[width=\textwidth]{subproblem-examples}
   \caption{Three models satisfying the sub--problem
     $\SubProb(x,y,\WallOrient)$.}
-  \label{fig:fin-examples}
+  \label{fig:subproblem-examples}
 \end{figure}
-
-\begin{lemma}
-  \label{lemma:solutions-exist}
-  There is a solution to $\SubProb(x,y,\WallOrient)$ for all $1 \leq x \leq W$,
-  $1 \leq y \leq H$, $\WallOrient\in\{1,2\}$.
-\end{lemma}
-\begin{proof}
-  Construct a scene $\Scene$ with a sequence of alternating
-  concave/convex corners in the interval $[1,x]$. Non--occluding
-  corners are always feasible \cite{Lee09}, so $\Scene$ satisfies
-  $\SubProb(x,y,\WallOrient)$. There are finitely many scenes and at
-  least one satisfies $\SubProb(x,y,\WallOrient)$; therefore
-  $\SubProb(x,y,\WallOrient)$ has a solution.
-\end{proof}
 
 We now turn to the optimal substructure theorem, which is the central
 theorem of this chapter. \figref{proof-sketch} gives a graphical
@@ -1158,7 +1185,7 @@ sketch of the proof.
 \begin{proof}
   First note that $\TruncScene$ satisfies
   $\SubProb(x',y',\WallOrient')$ since it terminates at
-  $(x',y',\WallOrient')$ and is feasible by Lemma
+  $(x',y',\WallOrient')$ and is realisable by Lemma
   \ref{lemma:trunc-feasibility}.
 
   We show that $\TruncScene$ solves $\SubProb(x',y',\WallOrient')$
@@ -1177,20 +1204,18 @@ sketch of the proof.
     \item{$\CfScene$ terminates at $(x,y,\WallOrient)$ since its
       right--most wall is $\Wall$, which terminates at
       $(x,y,\WallOrient)$ by assumption.}
-    \item{$\CfScene$ is feasible by Lemma
+    \item{$\CfScene$ is realisable by Lemma
       \ref{lemma:concat-feasibility}.}
   \end{enumerate}
-  Next we use Lemma \ref{lemma:additive-values} to expand the values
+  Next we use  expand the values
   obtained by $\Scene$ and $\CfScene$,
   \begin{equation}
   \begin{split}
     \label{eq:concat-values}
     \Objective(\Scene) &=
-      \Objective(\TruncScene) + \WallPayoff(\Wall) - 
-      \CornerPenalty(\TruncScene,\Wall) \\
+      \Objective(\TruncScene) + \edgevalue(\TruncScene,\Scene)\\
     \Objective(\CfScene) &=
-      \Objective(\CfTruncScene) + \WallPayoff(\Wall) - 
-      \CornerPenalty(\CfTruncScene;\Wall)
+      \Objective(\CfTruncScene) + \edgevalue(\CfTruncScene,\CfScene)
   \end{split}
   \end{equation}
   But by an analogous argument to the proof of Lemma
@@ -1200,8 +1225,8 @@ sketch of the proof.
   terminate at the same state. Therefore
   \begin{equation}
     \label{eq:equal-penalties}
-    \CornerPenalty(\TruncScene,\Wall) =
-    \CornerPenalty(\CfTruncScene,\Wall) ~.
+    \edgevalue(\TruncScene,\Scene) =
+    \edgevalue(\CfTruncScene,\CfScene) ~.
   \end{equation}
   Combining \eqnref{cf-value}, \eqnref{concat-values}, and
   \eqnref{equal-penalties}, we have
@@ -1227,119 +1252,105 @@ sketch of the proof.
 \end{figure}
 
 
+%% Theorem \ref{thm:substructure} is the main result in the construction
+%% of the dynamic programming solution to \eqnref{opt-scene}. Our first
+%% recurrence relation is provided by corollary
+%% \ref{cor:first-recurrence} below, but first we need to formalise the
+%% feasible set,
+%% \begin{definition}
+%%   A state $\State$ is a tuple $(x,y,\WallOrient)$. The state space
+%%   $\StateSpace$ is the set of all states,
+%%   \begin{equation}
+%%     \StateSpace = [1,\Width] \cross [1,\Height] \cross \{1,2\} ~.
+%%   \end{equation}
+%%   The realisable set $\FeasibleSet(\State) \subset \StateSpace$ for
+%%   $\State$ is the set of states $\State'$ such that the scene
+%%   \begin{equation}
+%%     \Scene = \Scene' \concat \Wall
+%%   \end{equation}
+%%   is physically realisable, where $\Scene'$ is any realisable model
+%%   terminating at $\State'$ and $\Wall=(x',y',\WallOrient,x)$.
+%% \end{definition}
 
+%% Our first recurrence relation is a corollary to theorem
+%% \ref{thm:substructure} as follows.
+%% \begin{corollary}
+%%   \label{cor:first-recurrence}
+%%   Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state with
+%%   $x>1$. Then
+%%   \begin{equation}
+%%     \label{eq:first-recurrence}
+%%     \SubProbIN(\State) = 
+%%     \max_{\State'\in\FeasibleSet(\State)}\limits
+%%     \Bigl( 
+%%       \SubProbIN(\State') + \WallPayoff(\Wall) - \CornerPenalty(\State',\Wall)
+%%     \Bigr) ~,
+%%   \end{equation}
+%%   where
+%%   \begin{equation}
+%%     \label{eq:wall-def2}
+%%     \Wall=(x',y',\WallOrient,x) ~.
+%%   \end{equation}
+%%   Further,
+%%   \begin{equation}
+%%     \label{eq:first-boundary}
+%%     \SubProbIN(1,y,\WallOrient) = 0 \quad\quad \forall y,\WallOrient ~.
+%%   \end{equation}
+%% \end{corollary}
+%% \begin{proof}
+%%   Let $\Scene$ be a solution to $\SubProbIN(\State)$. We first show
+%%   that the left side of \eqnref{first-recurrence} is greater than or
+%%   equal to the right side. We then show that the inequality is an
+%%   equality.
 
+%%   The inequality is established as follows. Let $\Scene'$ be a
+%%   solution to $\SubProbIN(\State')$ for
+%%   $\State'\in\FeasibleSet(\State)$. Let $\Wall$ be as defined in
+%%   \eqnref{wall-def2}. We have that
+%%   \begin{enumerate}
+%%     \item{$\Scene'\concat\Wall$ is realisable by the definition of the
+%%       realisable set; and}
+%%     \item{$\Scene'\concat\Wall$ terminates at $\State$ by the definition
+%%       of $\Wall$.}
+%%   \end{enumerate}
+%%   So $\Scene'\concat\Wall$ satisfies $\SubProbIN(\State)$. By the
+%%   assumption of $\Scene$ as the solution to $\SubProbIN(\State)$ we
+%%   therefore have
+%%   \begin{eqnarray}
+%%     \Objective(\Scene)
+%%       &\geq&
+%%     \Objective(\Scene'\concat\Wall)\\
+%%       &\geq&
+%%     \Objective(\Scene') + \WallPayoff(\Wall) -
+%%     \CornerPenalty(\State',\Wall)\\
+%%     \SubProbIN(\State)
+%%       &\geq&
+%%     \SubProbIN(\State') + \WallPayoff(\Wall) -
+%%     \CornerPenalty(\State',\Wall) ~,
+%%   \end{eqnarray}
+%%   thus giving the desired inequality.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{First Algorithm}
-Theorem \ref{thm:substructure} is the main result in the construction
-of the dynamic programming solution to \eqnref{opt-scene}. Our first
-recurrence relation is provided by corollary
-\ref{cor:first-recurrence} below, but first we need to define the
-feasible set,
-\begin{definition}
-  A state $\State$ is a tuple $(x,y,\WallOrient)$. The state space
-  $\StateSpace$ is the set of all states,
-  \begin{equation}
-    \StateSpace = [1,\Width] \cross [1,\Height] \cross \{1,2\} ~.
-  \end{equation}
-  The feasible set $\FeasibleSet(\State) \subset \StateSpace$ for
-  $\State$ is the set of states $\State'$ such that the scene
-  \begin{equation}
-    \Scene = \Scene' \concat \Wall
-  \end{equation}
-  is feasible, where $\Scene'$ is any feasible model terminating at
-  $\State'$ and $\Wall=(x',y',\WallOrient,x)$.
-\end{definition}
+%%   The equality is obtained by noting that theorem
+%%   \ref{thm:substructure} guarantees that there is at least one state
+%%   $\State^*\in\FeasibleSet(\State)$ such that a solution to
+%%   $\SubProbIN(\State^*)$ concatenated with $\Wall$ is a solution to
+%%   $\SubProbIN(\State)$. The boundary condition
+%%   \eqnref{first-boundary} follows from the fact that a scene that
+%%   terminates at column $1$ does not span any part of the image.
+%% \end{proof}
 
-Intuitively one can think of the feasible set as the set of states
-``reachable in one step'' from $\State$.
+%% Finally, the value of the solution to \eqnref{opt-scene} is
+%% \begin{equation}
+%%   \label{eq:opt-entry-point}
+%%   \Objective(\OptimalScene) = 
+%%   \max_{y,\WallOrient} \SubProb(\Width,y,\WallOrient) ~,
+%% \end{equation}
+%% which is precisely the optimisation step
+%% \eqnref{optimisation-step-occluding} described informally
+%% above.
 
-Our first recurrence relation is a corollary to theorem
-\ref{thm:substructure} as follows.
-\begin{corollary}
-  \label{cor:first-recurrence}
-  Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state with
-  $x>1$. Then
-  \begin{equation}
-    \label{eq:first-recurrence}
-    \SubProbIN(\State) = 
-    \max_{\State'\in\FeasibleSet(\State)}\limits
-    \Bigl( 
-      \SubProbIN(\State') + \WallPayoff(\Wall) - \CornerPenalty(\State',\Wall)
-    \Bigr) ~,
-  \end{equation}
-  where
-  \begin{equation}
-    \label{eq:wall-def2}
-    \Wall=(x',y',\WallOrient,x) ~.
-  \end{equation}
-  Further,
-  \begin{equation}
-    \label{eq:first-boundary}
-    \SubProbIN(1,y,\WallOrient) = 0 \quad\quad \forall y,\WallOrient ~.
-  \end{equation}
-\end{corollary}
-\begin{proof}
-  Let $\Scene$ be a solution to $\SubProbIN(\State)$. We first show
-  that the left side of \eqnref{first-recurrence} is greater than or
-  equal to the right side. We then show that the inequality is an
-  equality.
-
-  The inequality is established as follows. Let $\Scene'$ be a
-  solution to $\SubProbIN(\State')$ for
-  $\State'\in\FeasibleSet(\State)$. Let $\Wall$ be as defined in
-  \eqnref{wall-def2}. We have that
-  \begin{enumerate}
-    \item{$\Scene'\concat\Wall$ is feasible by the definition of the
-      feasible set; and}
-    \item{$\Scene'\concat\Wall$ terminates at $\State$ by the definition
-      of $\Wall$.}
-  \end{enumerate}
-  So $\Scene'\concat\Wall$ satisfies $\SubProbIN(\State)$. By the
-  assumption of $\Scene$ as the solution to $\SubProbIN(\State)$ we
-  therefore have
-  \begin{eqnarray}
-    \Objective(\Scene)
-      &\geq&
-    \Objective(\Scene'\concat\Wall)\\
-      &\geq&
-    \Objective(\Scene') + \WallPayoff(\Wall) -
-    \CornerPenalty(\State',\Wall)\\
-    \SubProbIN(\State)
-      &\geq&
-    \SubProbIN(\State') + \WallPayoff(\Wall) -
-    \CornerPenalty(\State',\Wall) ~,
-  \end{eqnarray}
-  thus giving the desired inequality.
-
-  The equality is obtained by noting that theorem
-  \ref{thm:substructure} guarantees that there is at least one state
-  $\State^*\in\FeasibleSet(\State)$ such that a solution to
-  $\SubProbIN(\State^*)$ concatenated with $\Wall$ is a solution to
-  $\SubProbIN(\State)$. The boundary condition
-  \eqnref{first-boundary} follows from the fact that a scene that
-  terminates at column $1$ does not span any part of the image.
-\end{proof}
-
-Finally, the value of the solution to \eqnref{opt-scene} is
-\begin{equation}
-  \label{eq:opt-entry-point}
-  \Objective(\OptimalScene) = 
-  \max_{y,\WallOrient} \SubProbIN(\Width,y,\WallOrient) ~.
-\end{equation}
-
-We are now ready to describe our first solution to optimisation
-problems in payoff form. We compute $\Objective(\Scene^*)$ by
-recursively evaluating $\SubProbIN$ according to
-\eqnref{first-recurrence} until we reach the boundary condition
-\eqnref{first-boundary}. To avoid redundant computation we cache the
-result of each evaluation together with the state $\State'$
-corresponding to the maximising term in
-\eqnref{first-recurrence}. Finally, the desired model $\OptimalScene$
-is reconstructed by back--tracking through the evaluation graph once
-all evaluations are complete. This is formalised in
-\algref{first-solution}.
+\algref{first-solution} formalises the procedure that we described
+informally in \sectref{amended-alg}.
 
 \begin{algorithm}
   \newcommand\ProcSolve{Solve}
@@ -1401,288 +1412,440 @@ all evaluations are complete. This is formalised in
   \label{alg:first-solution}
 \end{algorithm}
 
-\subsubsection{Algorithmic Complexity}
-Due to the caching scheme, \eqnref{first-recurrence} is evaluated at
-most once for each unique state. There are $2WH$ states and the
-complexity of each evaluation is $O(W^2H)$, since the minimisation in
-\eqnref{first-recurrence} is over $O(WH)$ terms and computing each
-marginal payoff $\ScenePayoff(\Wall)$ requires $O(W)$ additions. The
-overall complexity of the algorithm above is therefore $O(W^3H^2K) =
-O(L^5K)$ where $L=\max(W,H)$.
+\subsection{Second Refinement: Auxiliary Sub--problems}
+\label{sec:aux-alg}
 
-\subsection{First Refinement: Auxiliary Sub--problems}
+The basic algorithm described thus far iterates over all pixels to
+the left of $\State$ for each state $\State$. In this section \changedsinceviva{we show
+how to reduce} this $O(L^2)$ operation to $O(L)$. Our approach is to
+expand the state space in a way that allows us to reduce the number of
+connections between states. It will be shown that with only a constant
+factor increase in the number of states, we can decrease the size of
+the realisable set by a factor of $O(L)$, which leads to a corresponding
+speedup of the optimisation step. In the previous section we enforced
+physical realisability by explicitly testing each $\OtherState$ and
+omitting any that lead to an impossible scene. In this section we show
+that by introducing auxiliary states we can deal with realisability
+constraints while avoiding the expensive optimisation over $O(L^2)$
+terms.
 
-The basic algorithm described thus far involves minimising over all
-pixels to the left of $\State$ for each state $\State$. In the
-previous section we enforced feasibility by explicitly testing each
-$\State'$ and omitting any that lead to an infeasible model. In this
-section we show that by introducing auxiliary sub--problems we can
-deal with feasibility constraints while avoiding the minimisation over
-$O(WH)$ items at each evaluation. We introduce three new
-sub--problems as follows.
-\begin{definition}
-  \label{def:aux-sub-problems}
-  Let $\Scene$ be a scene terminating at $(x_b,y_b,\WallOrient_b)$ and
-  let $\State=(x,y,\WallOrient)$ be a state. Then
-  \begin{itemize}
-    \item{$\Scene$ satisfies $\SubProbUP(\State)$ iff $\Scene$
-      is feasible and $x_b=x$ and $\WallOrient_b=\WallOrient$ and $y_b \leq y$;}
-    \item{$\Scene$ satisfies $\SubProbDOWN(\State)$ iff
-      $\Scene$ is feasible and $x_b=x$ and $\WallOrient_b=\WallOrient$ and $y_b \geq y$;}
-    \item{$\Scene$ satisfies $\SubProbOUT(\State)$ iff
-      $\Scene$ is feasible and $x_b=x$ and $\Scene\concat(x,y,\WallOrient,x+1)$ is
-      feasible.}
-  \end{itemize}
-\end{definition}
+\textbf{State space.} The new state space contains four states for each
+state in the old state space (\sectref{basic-alg}), giving a total of 8
+states per pixel. We identify the new states with the labels
+$(\INlabel,\UPlabel,\DOWNlabel,\OUTlabel)$, which are depicted in
+\figref{aux-feasible-sets} and have the following meanings:
+\begin{itemize}
+  \item{States of the form $(\Pixel,\WallOrient,\INlabel)$ correspond
+    to the set of scenes that terminate at $\Pixel$ with orientation
+    $\WallOrient$, just as in \sectref{basic-alg}.}
+  \item{States of the form $(\Pixel,\WallOrient,\UPlabel)$ correspond
+    to the set of scenes that terminate at or above $\Pixel$ with
+    orientation $\WallOrient$.}
+  \item{States of the form $(\Pixel,\WallOrient,\DOWNlabel)$
+    correspond to the set of scenes that terminate at or below
+    $\Pixel$ with orientation $\WallOrient$.}
+  \item{States of the form $(\Pixel,\WallOrient,\OUTlabel)$ correspond
+    to the set of scenes such that appending a wall starting at
+    $\Pixel$ with orientation $\WallOrient$ would not contradict any
+    physical realisability constraints.}
+\end{itemize}
 
-Intuitively, the scenes satisfying $\SubProbUP$ and $\SubProbDOWN$ are
-those that terminate directly above $(x,y)$ and directly below
-$(x,y)$, respectively. The scenes that satisfy $\SubProbOUT$ are those
-to which a wall with lower--left corner $(x,y)$ and orientation
-$\WallOrient$ could feasibly be added. The purpose of introducing
-auxiliary sub--problems is to permit a series of more efficient
-recurrence relations, which we introduce below.
+\textbf{Feasible set.} The revised feasible sets are shown graphically
+in \figref{aux-feasible-sets}.
+\begin{itemize}
+  \item{States of the form $(\Pixel,\WallOrient,\INlabel)$ are
+    connected to states labelled $\OUTlabel$ that lie along the
+    vanishing direction $\WallOrient$ to the left of $\Pixel$. This
+    closely mirrors the situation in \sectref{basic-alg}.}
+  \item{States of the form $(\Pixel,\WallOrient,\UPlabel)$ are
+    connected to exactly two other states: the $\INlabel$ state for
+    pixel $\Pixel$ and the $\UPlabel$ state for the pixel immediately
+    above $\Pixel$. If $\Pixel$ is at the top of the image then the
+    latter connection is omitted.}
+  \item{States of the form $(\Pixel,\WallOrient,\DOWNlabel)$ are
+    connected to exactly two other states: the $\INlabel$ state for
+    pixel $\Pixel$ and the $\DOWNlabel$ state for the pixel
+    immediately below $\Pixel$. If $\Pixel$ is at the bottom of the
+    image then the latter connection is omitted.}
+  \item{States of the form $(\Pixel,\WallOrient,\OUTlabel)$ are
+    connected to exactly three other states: the $\INlabel$,
+    $\UPlabel$, and $\DOWNlabel$ states for $\Pixel$.}
+\end{itemize}
 
-\begin{corollary}
-  \label{cor:fupdown-recurrence}
-  Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state. Then
-  \begin{eqnarray}
-    \label{eq:fup-recurrence}
-    \SubProbUP(x,y,\WallOrient) &=& 
-    \begin{cases}
-      \max \Bigl(\SubProbIN(x,y,\WallOrient),
-      \SubProbUP(x,y-1,\WallOrient) \Bigr), &
-      \mbox{if } y > 1 \\
-      \SubProbIN(x,y,\WallOrient), & \mbox{if } y=1
-    \end{cases}\\
-    \label{eq:fdown-recurrence}
-    \SubProbDOWN(x,y,\WallOrient) &=& 
-    \begin{cases}
-      \max \Bigl(\SubProbIN(x,y,\WallOrient),
-      \SubProbDOWN(x,y+1,\WallOrient) \Bigr), &
-      \mbox{if } y < H \\
-      \SubProbIN(x,y,\WallOrient), & \mbox{if } y=H
-    \end{cases}
-  \end{eqnarray}
-\end{corollary}
-\begin{proof}
-  We prove \eqnref{fup-recurrence} only; the proof of
-  \eqnref{fdown-recurrence} is identical.
+The motivation for this arrangement of states and feasible sets is
+that it allows us to solve per--state optimisation problems in terms
+of the solutions to preceding states. Furthermore, three of the four
+states now have just a constant number of outgoing edges, while the
+fourth (states labelled $\INlabel$) have $O(L)$ outgoing edges. In
+comparison, the feasible sets described in \sectref{amended-alg}
+contained $O(L^2)$ states. The value function remains unchanged from
+the previous sections; all that remains to describe is the per--state
+optimisation step.
 
-  Let $\Scene$ be a solution to $\SubProbUP(x,y,\WallOrient)$ and let
-  its terminating state be $(x_b,y_b,\WallOrient_b)$. Consider first
-  the case that $y=1$. By the definition of $\SubProbUP$ it must be
-  that $\Scene$ terminates at $(x,y,\WallOrient)$, in which case the
-  conditions on $\Scene$ now exactly match those for $\SubProbIN$
-  given in definition \ref{def:sub-problem-in}.
+\textbf{Optimisation step.} Let us once again select a particular
+state $\State$ and assume that all preceding states $\OtherState$ are
+already solved --- that is, for each $\OtherState$ to the left of
+$\State$, we know which indoor Manhattan scene maximises the value
+function at $\OtherState$ and we have also have the output of the
+value function for that scene (this value will once again be written
+$\SubProb(\OtherState)$). The procedure for computing
+$\SubProb(\State)$ is as follows:
+\begin{itemize}
+  \item{If $\State$ is labelled $\UPlabel$ or $\DOWNlabel$ then the
+    optimisation step consists simply of taking the maximum of the
+    value at the two connected states, as depicted in
+    \figref{aux-feasible-sets}.}
+  \item{If $\State$ is labelled $\INlabel$ then the maximisation is
+    over states along one of the vanishing directions, with an edge
+    cost added. This is identical to the procedure of
+    \sectref{basic-alg} except that at each pixel we take the value
+    from the state labelled $\OUTlabel$.}
+  \item{For states $(\Pixel,\WallOrient,\OUTlabel)$, the maximisation
+    is over three predecessor states:
+    \begin{eqnarray*}
+      (\Pixel,\WallOrient,\INlabel) \\
+      (\Pixel,\WallOrient,\UPlabel) \\
+      (\Pixel,\WallOrient,\DOWNlabel)
+    \end{eqnarray*}
+    One or more of these may be omitted if the physical
+    realisability rules indicate that such a connection would generate
+    a physically impossible wall segment.}
+\end{itemize}
 
-  Now suppose $y>1$. Then either $y_b=y$ or $y_b \leq y-1$, with the
-  former corresponding again to the sub--problem $\SubProbIN(x,y,\WallOrient)$
-  and the latter to the sub--problem $\SubProbUP(x,y-1,\WallOrient)$. Therefore,
-  we may simply maximise over those two cases.
-\end{proof}  
+\textbf{Full algorithm.} Now that the states, feasible sets, and
+optimisation steps have been specified, the complete procedure for
+finding the indoor Manhattan scene maximising \eqnref{opt-scene} is
+as follows. As in \secref{amended-alg} we begin at the right edge of the
+image (specifically with states labelled \INlabel). At each state we
+compute $\SubProb(\State)$ using the procedure described above. Each
+time we need the value for a state that has not yet been evaluated we
+recursively apply the procedure to that state, terminating this
+recursive process when we reach the left edge of the image. The only
+difference between this procedure and that of \secref{amended-alg} is
+that the structure of the state space has changed.
 
-\begin{corollary}
-  \label{cor:fout-recurrence}
-  Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state. Then
-  \begin{equation}
-    \begin{split}
-      \label{eq:fout-recurrence}
-      \SubProbOUT(x,y,\WallOrient) = 
-      \max_{\WallOrient'\in\{l,r\}} \max \Bigl(
-      &\SubProbUP(x,y-1,\WallOrient')
-      - \CornerPenalty(x,\WallOrient',\WallOrient,-1),\\
-      &\SubProbIN(x,y,\WallOrient')
-      - \CornerPenalty(x,\WallOrient',\WallOrient,0),\\
-      &\SubProbDOWN(x,y+1,\WallOrient')
-      - \CornerPenalty(x,\WallOrient',\WallOrient,+1),
-      \Bigr)
-    \end{split}
-  \end{equation}
-\end{corollary}
-\begin{proof}
-  Omitted. The main result is Theorem \ref{thm:substructure}; this proof
-  closely mirrors that of Corollary \ref{cor:fupdown-recurrence} above.
-\end{proof}
-
-Finally we re--write \eqnref{first-recurrence} in terms of the new
-sub--problems as follows.
-
-\begin{corollary}
-  \label{cor:fin-recurrence-second}
-  Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state with
-  $x>1$. Let $Y_{\State}(x')$ be the intersection of column $x'$ with
-  the line through $\vpt_{\WallOrient}$ and $(x,y)$ (see
-  \figref{line-jump}). Then
-  \begin{equation}
-    \label{eq:fin-recurrence-second}
-    \SubProbIN(x,y,\WallOrient) =
-    \max_{x'<x}\limits
-    \Bigl(
-    \SubProbOUT(x',Y_{\State}(x'),\WallOrient) + \WallPayoff(\Wall)
-    \Bigr) ~,
-  \end{equation}
-  where $\State'=(x,Y_{\State}(x'),\WallOrient)$ and
-  $\Wall=(x',Y_{\State}(x'),\WallOrient,x)$ is a wall.
-\end{corollary}
-\begin{proof}
-  Omitted. The main result is Theorem \ref{thm:substructure}; this proof
-  closely mirrors that of Corollary \ref{cor:fupdown-recurrence} above.
-\end{proof}
-
-The dependencies between the sub--problems are illustrated as an
-evaluation graph in \figref{evaluation-graphs}.
-
-\subsubsection{Algorithmic Complexity}
-
-By introducing auxiliary sub--problems we have increased the total
-number of sub--problems by a factor of 4. However, the sub--problems
-$\SubProbUP, \SubProbDOWN,$ and $\SubProbOUT$ have $O(1)$ complexity
-and the maximisation \eqnref{fin-recurrence-second} is now over $O(W)$
-terms (whereas \eqnref{first-recurrence} consists of $O(WH)$
-terms). The complexity of the algorithm in this section is therefore
+\textbf{Algorithmic complexity.} By introducing auxiliary
+sub--problems we have increased the total number of sub--problems by a
+factor of 4. However, the sub--problems $\UPlabel$, $\DOWNlabel$, and
+$\OUTlabel$ have $O(1)$ complexity and the maximisation for $\INlabel$
+states is now over $O(L)$ terms. Furthermore, the edge costs can now
+be computed incrementally in constant time. The number of states
+remains $O(L^2)$ so the complexity of the algorithm presented here is
 $O(L^3)$.
-
-\begin{figure}[tb]%
-  \centering
-  \subfloat[First algorithm.]{
-    \includegraphics[width=0.25\textwidth]{simple-graph}
-  }
-  \qquad
-  \subfloat[Second algorithm.]{
-    \includegraphics[width=0.5\textwidth]{auxiliary-node-graph}
-  }
-  \caption{The evaluation graph for a $3 \times 3$ image before (left)
-    and after (right) introducing auxiliary sub--problems.}
-  \label{fig:evaluation-graphs}
-\end{figure}
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.35\textwidth]{eval-graph}
-  \label{fig:eval-graph}
-  \caption{A graph in which each node represents a
-    sub--problem and each edge is a dependence relation. Two columns
-    are expanded; other column are omitted for brevity. The green quad
-    is a wall corresponding to a particular pair of nodes in the
-    graph.}
+  \subfloat[Feasible set for $\UPlabel$ nodes]{
+    \includegraphics[width=0.45\textwidth]{aux-feasible-set-up}
+  }
+  \quad
+  \subfloat[Feasible set for $\DOWNlabel$ nodes]{
+    \includegraphics[width=0.45\textwidth]{aux-feasible-set-down}
+  }
+  \\
+  \subfloat[Feasible set for $\OUTlabel$ nodes]{
+    \includegraphics[width=0.45\textwidth]{aux-feasible-set-out}
+  }
+  \quad
+  \subfloat[Feasible set for $\INlabel$ nodes]{
+    \includegraphics[width=0.45\textwidth]{aux-feasible-set-in}
+  }
+  \caption{The feasible sets for each of the four new node labels
+    introduced in \secref{aux-alg}. Each panel highlights one
+    node and shows the outgoing edges for just that node. These are
+    repeated for every pixel and orientation.}
+  \label{fig:aux-feasible-sets}
 \end{figure}
 
-\subsection{Second Refinement: From $O(L^3)$ to $O(L^2)$}
+
+%% \subsection{Correctness of \secref{aux-alg}}
+%% TODO
+
+%%  We introduce three new sub--problems as follows.
+%% \begin{definition}
+%%   \label{def:aux-sub-problems}
+%%   Let $\Scene$ be a scene terminating at $(x_b,y_b,\WallOrient_b)$ and
+%%   let $\State=(x,y,\WallOrient)$ be a state. Then
+%%   \begin{itemize}
+%%     \item{$\Scene$ satisfies $\SubProbUP(\State)$ iff $\Scene$
+%%       is realisable and $x_b=x$ and $\WallOrient_b=\WallOrient$ and $y_b \leq y$;}
+%%     \item{$\Scene$ satisfies $\SubProbDOWN(\State)$ iff
+%%       $\Scene$ is realisable and $x_b=x$ and $\WallOrient_b=\WallOrient$ and $y_b \geq y$;}
+%%     \item{$\Scene$ satisfies $\SubProbOUT(\State)$ iff
+%%       $\Scene$ is realisable and $x_b=x$ and $\Scene\concat(x,y,\WallOrient,x+1)$ is
+%%       realisable.}
+%%   \end{itemize}
+%% \end{definition}
+
+%% Intuitively, the scenes satisfying $\SubProbUP$ and $\SubProbDOWN$ are
+%% those that terminate directly above $(x,y)$ and directly below
+%% $(x,y)$, respectively. The scenes that satisfy $\SubProbOUT$ are those
+%% to which a wall with lower--left corner $(x,y)$ and orientation
+%% $\WallOrient$ could feasibly be added. The purpose of introducing
+%% auxiliary sub--problems is to permit a series of more efficient
+%% recurrence relations, which we introduce below.
+
+%% \begin{corollary}
+%%   \label{cor:fupdown-recurrence}
+%%   Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state. Then
+%%   \begin{eqnarray}
+%%     \label{eq:fup-recurrence}
+%%     \SubProbUP(x,y,\WallOrient) &=& 
+%%     \begin{cases}
+%%       \max \Bigl(\SubProbIN(x,y,\WallOrient),
+%%       \SubProbUP(x,y-1,\WallOrient) \Bigr), &
+%%       \mbox{if } y > 1 \\
+%%       \SubProbIN(x,y,\WallOrient), & \mbox{if } y=1
+%%     \end{cases}\\
+%%     \label{eq:fdown-recurrence}
+%%     \SubProbDOWN(x,y,\WallOrient) &=& 
+%%     \begin{cases}
+%%       \max \Bigl(\SubProbIN(x,y,\WallOrient),
+%%       \SubProbDOWN(x,y+1,\WallOrient) \Bigr), &
+%%       \mbox{if } y < H \\
+%%       \SubProbIN(x,y,\WallOrient), & \mbox{if } y=H
+%%     \end{cases}
+%%   \end{eqnarray}
+%% \end{corollary}
+%% \begin{proof}
+%%   We prove \eqnref{fup-recurrence} only; the proof of
+%%   \eqnref{fdown-recurrence} is identical.
+
+%%   Let $\Scene$ be a solution to $\SubProbUP(x,y,\WallOrient)$ and let
+%%   its terminating state be $(x_b,y_b,\WallOrient_b)$. Consider first
+%%   the case that $y=1$. By the definition of $\SubProbUP$ it must be
+%%   that $\Scene$ terminates at $(x,y,\WallOrient)$, in which case the
+%%   conditions on $\Scene$ now exactly match those for $\SubProbIN$
+%%   given in definition \ref{def:sub-problem-in}.
+
+%%   Now suppose $y>1$. Then either $y_b=y$ or $y_b \leq y-1$, with the
+%%   former corresponding again to the sub--problem $\SubProbIN(x,y,\WallOrient)$
+%%   and the latter to the sub--problem $\SubProbUP(x,y-1,\WallOrient)$. Therefore,
+%%   we may simply maximise over those two cases.
+%% \end{proof}  
+
+%% \begin{corollary}
+%%   \label{cor:fout-recurrence}
+%%   Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state. Then
+%%   \begin{equation}
+%%     \begin{split}
+%%       \label{eq:fout-recurrence}
+%%       \SubProbOUT(x,y,\WallOrient) = 
+%%       \max_{\WallOrient'\in\{l,r\}} \max \Bigl(
+%%       &\SubProbUP(x,y-1,\WallOrient')
+%%       - \CornerPenalty(x,\WallOrient',\WallOrient,-1),\\
+%%       &\SubProbIN(x,y,\WallOrient')
+%%       - \CornerPenalty(x,\WallOrient',\WallOrient,0),\\
+%%       &\SubProbDOWN(x,y+1,\WallOrient')
+%%       - \CornerPenalty(x,\WallOrient',\WallOrient,+1),
+%%       \Bigr)
+%%     \end{split}
+%%   \end{equation}
+%% \end{corollary}
+%% \begin{proof}
+%%   Omitted. The main result is Theorem \ref{thm:substructure}; this proof
+%%   closely mirrors that of Corollary \ref{cor:fupdown-recurrence} above.
+%% \end{proof}
+
+%% Finally we re--write \eqnref{first-recurrence} in terms of the new
+%% sub--problems as follows.
+
+%% \begin{corollary}
+%%   \label{cor:fin-recurrence-second}
+%%   Let $\State=(x,y,\WallOrient)\in\StateSpace$ be a state with
+%%   $x>1$. Let $Y_{\State}(x')$ be the intersection of column $x'$ with
+%%   the line through $\vpt_{\WallOrient}$ and $(x,y)$ (see
+%%   \figref{line-jump}). Then
+%%   \begin{equation}
+%%     \label{eq:fin-recurrence-second}
+%%     \SubProbIN(x,y,\WallOrient) =
+%%     \max_{x'<x}\limits
+%%     \Bigl(
+%%     \SubProbOUT(x',Y_{\State}(x'),\WallOrient) + \WallPayoff(\Wall)
+%%     \Bigr) ~,
+%%   \end{equation}
+%%   where $\State'=(x,Y_{\State}(x'),\WallOrient)$ and
+%%   $\Wall=(x',Y_{\State}(x'),\WallOrient,x)$ is a wall.
+%% \end{corollary}
+%% \begin{proof}
+%%   Omitted. The main result is Theorem \ref{thm:substructure}; this proof
+%%   closely mirrors that of Corollary \ref{cor:fupdown-recurrence} above.
+%% \end{proof}
+
+%% The dependencies between the sub--problems are illustrated as an
+%% evaluation graph in \figref{aux-feasible-sets}.
+
+
+\subsection{Third Refinement: From $O(L^3)$ to $O(L^2)$}
 \label{sec:line-jump}
-Evaluating \eqnref{fin-recurrence-second} remains an $O(W)$ operation
-due to the minimisation over $x'$. In this section we reduce this
-to $O(1)$.
 
-Consider recurrence relation \eqnref{fin-recurrence-second}. The
-maximisation is over columns $x-1,x-2,\ldots,1$. Suppose we pick
-some $z$ and divide the columns into two sets,
-$Z_+=\{x-1,x-2,\ldots,z\}$ and $Z_-=\{z-1,z-2,\ldots,1\}$. Then
-expanding the maximisation of \eqnref{fin-recurrence-second} we have
-\begin{equation}
-  \label{eq:fin-split}
-  \begin{split}
-    \SubProbIN(x,y,\WallOrient) =
-    \max\Bigl\{
-      &\max_{\State'\in Z_+}\limits \bigl(~
-        \SubProbOUT(\State',\WallOrient)
-        + \WallPayoff(\Wall) - \CornerPenalty(\State',\Wall)~
-      \bigr),\\
-      &\max_{\State'\in Z_-}\limits \bigl(~
-        \SubProbOUT(\State',\WallOrient)
-        + \WallPayoff(\Wall) - \CornerPenalty(\State',\Wall)~
-      \bigr)
-    \Bigr\} ~.
-  \end{split}
-\end{equation}
-Now compare the maximisation over $Z_-$ in \eqnref{fin-split} with the
-sub--problem $\SubProbIN(z,\tilde{y},o)$, where $\tilde{y}$ equals
-$Y_{\State}(z)$ rounded to the nearest integer ($Y_{\State}(z)$ was
-defined in Corollary \ref{cor:fin-recurrence-second}). Both
-maximizations are over columns $z-1 \ldots 1$; the only difference is
-that in \eqnref{fin-split} the $y$--coordinates at each column are
-$Y_{\State}(x)$ whereas in $\SubProbIN(z,\tilde{y},o)$ they are
-$Y_{\OtherState}(x)$ where $\OtherState=(z,\tilde{y},o)$. If we accept
-the latter as an approximation to the former then we could set $z=x-1$
-and replace the $O(W)$ maximisation over $Z_-$ with a single call to
-$\SubProbIN(z,\tilde{y},\WallOrient)$, giving an $O(1)$ expression for
-$\SubProbIN$. Unfortunately this is a very poor approximation because
-the quantities $Y_{\State}(x)$ and $Y_{\OtherState}(x)$ may differ
-substantially, since a small vertical offset at one point may
-correspond to a large offset at another image column. Furthermore,
-repeatedly making this approximation in recursive evaluations of
-$\SubProbIN$ compounds the errors. Instead, we proceed as follows.
+Evaluating states labelled $\INlabel$ remains an $O(L)$ operation
+because the associated feasible set contains $O(L)$ states. In this
+section we reduce this to $O(1)$. We will make an approximation in
+which, as we walk along vanishing lines, we will permit non--integer
+pixel locations to be replaced by nearby integer pixel locations
+if the round--off error is smaller than a parameter $\RoundoffEps$. We
+will show that for any $\RoundoffEps>0$, we only ever have to consider at
+most $R$ pixels along the vanishing line before encountering one with
+a sufficiently small round--off error (where $R$ is a function of
+$\RoundoffEps$). When we do encounter such a pixel we may terminate the
+line search, delegating instead to a related sub--problem. Figure
+\figref{line-jump-schematic} depicts this modification
+schematically. After this modification the feasible set for each
+$\INlabel$ state contains a bounded number of states, giving the
+desired $O(1)$ complexity.
 
-\begin{figure}[tb]%
-  \centering
-  \subfloat[The bend introduced by rounding $y'$ to $\hat{y}=\lfloor
-    y'+0.5 \rfloor$.]{
-    \includegraphics[width=0.3\textwidth]{kinked-wall}
-  }
-  \qquad
-  \subfloat[A line from $\vect{x}$ to
-    $\vect{v_a}$ showing the distances $d$ to nearby pixel centres (green
-    dots). The starred pixel is the first that satisfies
-    $d<\epsilon$.]{
-    \includegraphics[width=0.45\textwidth]{pixel-residuals}
-  }
-  \caption{Two quantities related to the ``line--jump'' approximation
-    described in \secref{line-jump}.}
-  \label{fig:line-jump}
-\end{figure}
+To explain this modification, we will first describe how it is that we
+terminate the line search and which sub--problem we delegate to. We
+then show that there is an upper bound on the number of steps we must
+take before finding a state satisfying the termination criteria.
 
-Consider the sub--problem $\SubProbIN(x,y,\WallOrient)$ as formulated
-in \eqnref{fin-recurrence-second}. Evaluating $\SubProbIN$ is like
-walking along each column $x-1,x-2,...,1$ and considering two
-possibilities at each step: insert a corner or continue walking. The
-former corresponds to evaluating $\SubProbOUT(x',y',\WallOrient)$; the
-latter to $\SubProbIN(x',y',\WallOrient)$. But $y'$ is computed by
-intersecting two lines, so in general is not an integer. While it
-is sufficient to round $y'$ to the nearest integer $\tilde{y}=\lfloor
-y'+0.5 \rfloor$ when evaluating $\SubProbOUT$, doing the same for
-$\SubProbIN$ would produce a bend in the wall as shown in
-\figref{line-jump}. In \eqnref{fin-recurrence-second} we avoided this
-by evaluating $\SubProbOUT$ for all $x'<x$, but this is unnecessarily
-wasteful.
+\subsubsection{The line search can be terminated}
 
-We now introduce a parameter $\RoundoffEps>0$ and allow
-$\OtherState=(z,\tilde{y},\WallOrient)$ to replace
-$\State=(x,y,\WallOrient)$ whenever
-\begin{equation}
-  |y-\tilde{y}| < \RoundoffEps ~.
-  \label{eq:eps}
-\end{equation}
-To evaluate $\SubProbIN(x,y,\WallOrient)$ we find the largest integer
-$z<x$ satisfying the above. We do this by enumerating  each $z$
-from $x-1$ to $0$. We cannot do better with a more efficient search
-strategy since we must evaluate $\SubProbOUT$ for each column between
-the $z$ that we do eventually identify and $x-1$. Finally, the
-recurrence relation for $\SubProbIN$ is
-\begin{equation}
-  \label{eq:fin-recurrence-final}
-  \begin{split}
-    \SubProbIN(x,y,\WallOrient) = 
-    \max \Biggl\{&
-      \max_{x'\in[z,x-1]}\limits \Bigl(
-        \SubProbOUT(x',Y_{\State}(x'),\WallOrient) 
-        + \ScenePayoff(\Wall) 
-        - \CornerPenalty(\State', \Wall)
-      \Bigr),\\
-      & \SubProbIN(z, Y_{\State}(z), \WallOrient)
-      + \ScenePayoff(\Wall) 
-      - \CornerPenalty(\State', \Wall)
-    \Biggr\} ~.
-  \end{split}
-\end{equation}
-where
-\begin{equation}
-  z = \max \Bigl\{x'\in\Ints : x'<x \wedge
-    \bigl|Y_{\State}(x') - \bigl\lfloor Y_{\State}(x') + 0.5 \bigr\rfloor\bigr|
-    \leq \RoundoffEps \Bigr\}
-\end{equation}
+\begin{figure}
+   \centering
+   \includegraphics[width=0.5\textwidth]{pixel-residuals}
+   \caption{Each time we evaluate an $\INlabel$ node we walk along a
+     vanishing line from some state $\vect{x}$ to a vanishing point
+     $\vpt$ (green line), examining each state we encounter (green
+     dots). The approximation described in \secref{line-jump} permits
+     us to terminate this search when we first encounter a node within
+     a threshold distance of the line (blue asterisk).}
+   \label{fig:line-jump-schematic}
+ \end{figure}
 
-A bound on number of terms in \eqnref{fin-recurrence-final} is
-provided by the following lemma.
+Let us first review the algorithm as presented in
+\secref{aux-alg}. There is one $\INlabel$ node for each pixel in the
+image. Each time such a node is evaluated, we walk from that node to the
+left edge of the image along a vanishing line, identifying at each
+column the closest $\OUTlabel$ node as depicted in
+\figref{line-jump-schematic} and \figref{aux-feasible-sets}. In the worst
+case, the number of steps equals the width of the image so this is an
+$O(L)$ operation.
+
+Suppose we are evaluating $\SubProb(\vect{x},\WallOrient,\INlabel)$
+where $\vect{x}$ is the node at the top right of
+\figref{line-jump-schematic}. This evaluation involves walking along
+the vanishing line shown in green. Consider the node marked with a
+blue asterisk. If this node lay precisely on the vanishing line then
+we could make the following substitution. When we reach this node,
+rather than continuing to walk along the line evaluating
+$\SubProb(\Pixel,\WallOrient,\OUTlabel)$ at each column, we could
+instead make a single call to
+$\SubProb(\Pixel^*,\WallOrient,\INlabel)$ where $\Pixel^*$ is the node
+marked with the asterisk. This substitution is valid for the following
+reason. The sub--problem $\SubProb(\Pixel^*,\WallOrient,\INlabel)$
+consists of a maximisation over all nodes along the vanishing line to
+its left, but these nodes are precisely the nodes that we would have
+enumerated had we continued the original line search. Hence the
+substitution replaces a maximisation over $O(L)$ nodes with a single
+evaluation --- an $O(1)$ operation.
+
+Now in actuality the node marked with an asterisk in
+\figref{line-jump-schematic} does not lie precisely on the vanishing
+line and in general we cannot expect to find integer--valued pixels
+that do. Hence we introduce the following approximation. Whenever a
+pixel falls within a distance $\RoundoffEps$ of a vanishing line we
+treat it as though it fell precisely on the vanishing line and apply
+the substitution described above. How many steps might we have to take
+before encountering a sufficiently close pixel? We show below that
+there is a global upper bound on the number of steps that we ever have
+to take. In our experiments we found that even a threshold as small as
+$\RoundoffEps=0.01$ produced a significant speedup.
+
+%% Consider recurrence relation \eqnref{fin-recurrence-second}. The
+%% maximisation is over columns $x-1,x-2,\ldots,1$. Suppose we pick
+%% some $z$ and divide the columns into two sets,
+%% $Z_+=\{x-1,x-2,\ldots,z\}$ and $Z_-=\{z-1,z-2,\ldots,1\}$. Then
+%% expanding the maximisation of \eqnref{fin-recurrence-second} we have
+%% \begin{equation}
+%%   \label{eq:fin-split}
+%%   \begin{split}
+%%     \SubProbIN(x,y,\WallOrient) =
+%%     \max\Bigl\{
+%%       &\max_{\State'\in Z_+}\limits \bigl(~
+%%         \SubProbOUT(\State',\WallOrient)
+%%         + \WallPayoff(\Wall) - \CornerPenalty(\State',\Wall)~
+%%       \bigr),\\
+%%       &\max_{\State'\in Z_-}\limits \bigl(~
+%%         \SubProbOUT(\State',\WallOrient)
+%%         + \WallPayoff(\Wall) - \CornerPenalty(\State',\Wall)~
+%%       \bigr)
+%%     \Bigr\} ~.
+%%   \end{split}
+%% \end{equation}
+%% Now compare the maximisation over $Z_-$ in \eqnref{fin-split} with the
+%% sub--problem $\SubProbIN(z,\tilde{y},o)$, where $\tilde{y}$ equals
+%% $Y_{\State}(z)$ rounded to the nearest integer ($Y_{\State}(z)$ was
+%% defined in Corollary \ref{cor:fin-recurrence-second}). Both
+%% maximizations are over columns $z-1 \ldots 1$; the only difference is
+%% that in \eqnref{fin-split} the $y$--coordinates at each column are
+%% $Y_{\State}(x)$ whereas in $\SubProbIN(z,\tilde{y},o)$ they are
+%% $Y_{\OtherState}(x)$ where $\OtherState=(z,\tilde{y},o)$. If we accept
+%% the latter as an approximation to the former then we could set $z=x-1$
+%% and replace the $O(W)$ maximisation over $Z_-$ with a single call to
+%% $\SubProbIN(z,\tilde{y},\WallOrient)$, giving an $O(1)$ expression for
+%% $\SubProbIN$. Unfortunately this is a very poor approximation because
+%% the quantities $Y_{\State}(x)$ and $Y_{\OtherState}(x)$ may differ
+%% substantially, since a small vertical offset at one point may
+%% correspond to a large offset at another image column. Furthermore,
+%% repeatedly making this approximation in recursive evaluations of
+%% $\SubProbIN$ compounds the errors. Instead, we proceed as follows.
+
+%% Consider the sub--problem $\SubProbIN(x,y,\WallOrient)$ as formulated
+%% in \eqnref{fin-recurrence-second}. Evaluating $\SubProbIN$ is like
+%% walking along each column $x-1,x-2,...,1$ and considering two
+%% possibilities at each step: insert a corner or continue walking. The
+%% former corresponds to evaluating $\SubProbOUT(x',y',\WallOrient)$; the
+%% latter to $\SubProbIN(x',y',\WallOrient)$. But $y'$ is computed by
+%% intersecting two lines, so in general is not an integer. While it
+%% is sufficient to round $y'$ to the nearest integer $\tilde{y}=\lfloor
+%% y'+0.5 \rfloor$ when evaluating $\SubProbOUT$, doing the same for
+%% $\SubProbIN$ would produce a bend in the wall as shown in
+%% \figref{line-jump}. In \eqnref{fin-recurrence-second} we avoided this
+%% by evaluating $\SubProbOUT$ for all $x'<x$, but this is unnecessarily
+%% wasteful.
+
+%% We now introduce a parameter $\RoundoffEps>0$ and allow
+%% $\OtherState=(z,\tilde{y},\WallOrient)$ to replace
+%% $\State=(x,y,\WallOrient)$ whenever
+%% \begin{equation}
+%%   |y-\tilde{y}| < \RoundoffEps ~.
+%%   \label{eq:eps}
+%% \end{equation}
+%% To evaluate $\SubProbIN(x,y,\WallOrient)$ we find the largest integer
+%% $z<x$ satisfying the above. We do this by enumerating  each $z$
+%% from $x-1$ to $0$. We cannot do better with a more efficient search
+%% strategy since we must evaluate $\SubProbOUT$ for each column between
+%% the $z$ that we do eventually identify and $x-1$. Finally, the
+%% recurrence relation for $\SubProbIN$ is
+%% \begin{equation}
+%%   \label{eq:fin-recurrence-final}
+%%   \begin{split}
+%%     \SubProbIN(x,y,\WallOrient) = 
+%%     \max \Biggl\{&
+%%       \max_{x'\in[z,x-1]}\limits \Bigl(
+%%         \SubProbOUT(x',Y_{\State}(x'),\WallOrient) 
+%%         + \ScenePayoff(\Wall) 
+%%         - \CornerPenalty(\State', \Wall)
+%%       \Bigr),\\
+%%       & \SubProbIN(z, Y_{\State}(z), \WallOrient)
+%%       + \ScenePayoff(\Wall) 
+%%       - \CornerPenalty(\State', \Wall)
+%%     \Biggr\} ~.
+%%   \end{split}
+%% \end{equation}
+%% where
+%% \begin{equation}
+%%   z = \max \Bigl\{x'\in\Ints : x'<x \wedge
+%%     \bigl|Y_{\State}(x') - \bigl\lfloor Y_{\State}(x') + 0.5 \bigr\rfloor\bigr|
+%%     \leq \RoundoffEps \Bigr\}
+%% \end{equation}
+
+\subsubsection{The feasible set contains a bounded number of states.}
+
+A bound on number of steps that we might have to take when evaluating
+an $\INlabel$ node is provided by the following lemma.
 \newcommand\xa{p}
 \newcommand\ya{q}
 \begin{lemma}
@@ -1730,11 +1893,12 @@ provided by the following lemma.
 
 \subsubsection{Algorithmic Complexity}
 
-For fixed $\RoundoffEps$, the number of terms in the maximisation in
-\eqnref{fin-recurrence-final} is bounded by a constant independent of
-the problem size. All sub--problems are thus $O(1)$ operations and the
-overall complexity of the algorithm is given by the total number of
-unique sub--problems, which is $O(L^2)$.
+For fixed $\RoundoffEps$, the number of terms required to evaluate a
+$\INlabel$ node is bounded by a constant independent of the problem
+size. Since the other three sub--problems are unchanged, all
+sub--problems are now $O(1)$ operations and the overall complexity of
+the algorithm is given by the total number of unique sub--problems,
+which is $O(L^2)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
@@ -1756,7 +1920,7 @@ room, we consider that a \textit{success}.
 The monocular features $\Feature_i$ consist of 3 RGB channels, 3 HSV
 channels, 24 Gabor filters (4 scales, 6 orientations), and 3 binary
 line sweep features \cite{Lee09}. For stereo we use patches of size
-$5 \times 5$ and when computing photoconsistency terms we normalize
+$5 \times 5$ and when computing photoconsistency terms we normalise
 all images to zero mean and unit variance.
 
 For these experiments, we fixed the various hyper--parameters using a
@@ -1771,7 +1935,7 @@ constraints, the global inference algorithm, and the Bayesian sensor
 models.
 
 We compute two error metrics: the labelling accuracy, which is the
-proportion of all pixels that were labeled with the correct surface
+proportion of all pixels that were labelled with the correct surface
 orientation, and the mean relative depth error, computed per--pixel
 with respect to ground truth. While the latter better captures
 similarity to the ground truth, one of the systems we compared with
@@ -1780,7 +1944,7 @@ accuracy.
 
 To the best of our knowledge, there is no previously published work
 other than our own on precisely this problem (indoor--Manhattan
-reasoning from multiple views), so we compare with two alternative
+reasoning from multiple views), so we compare with three different
 systems, though neither comparison is ideal. Our first comparison is
 with the approach of Brostow \etal \cite{Brostow08}, who performed
 semantic segmentation by training a per--pixel classifier on
@@ -1798,36 +1962,85 @@ Manhattan assumption we feel this comparison is important to
 demonstrate the benefit of a Bayesian framework and integration of
 stereo and 3D cues.
 
-The performance of each system is shown in \figref{inf-performance}. Our
-system significantly out--performs both others. Even when restricted
-to monocular features, our system outperforms \cite{Brostow08}, which
-has access to 3D cues. This reflects the utility of global consistency
-and the indoor Manhattan representation in our approach. The
-initialisation procedure of \cite{Lee09} fails for 31\% of our
-training images, so at the bottom of \figref{inf-performance} we show
-results for their system after excluding these images. Labelling
-accuracy increases to within 3\% of our monocular--only results,
-though on the depth error metric a margin of 10\% remains. This
-illustrates the effect of our training procedure, which optimises for
-the depth error. \Figref{inf-performance} also shows that joint estimation
-is superior to using any one sensor modality alone. Anecdotally we
-find that using 3D cues alone often fails within large textureless
-regions in which the structure--from--motion system failed to track
-any points, whereas stereo or monocular cues alone often perform
-better in such regions but can lack precision at corners and
-boundaries.
+\changedsinceviva{Our third comparison is with the stereo approach of Zeisl \etal
+\cite{Zeisl2011}, which leverages a ``vertical structure'' prior that
+is similar to our own indoor Manhattan assumption. Their payoff
+function is identical to our stereo payoff function, but they employ a
+different prior, and hence a different optimisation algorithm. Like
+the indoor Manhattan assumption, their prior insists on a floor and
+ceiling plane with vertical surfaces extending continuously between
+them. Unlike the indoor Manhattan assumption, they allow surfaces at
+any vertical orientation and they allow these surfaces to bend and
+curve arbitrarily (although they do penalise changes in orientation
+and depth with pair--wise potentials). The assumption of a floor and
+ceiling plane allows the authors to adopt a column--wise labelling
+scheme similar to the seam representation we described in
+\chapref{geometry}. The relationship between their dynamic programming
+formulation and our own is that we reason in terms of discrete wall
+segments in the vertex representation (and hence our regularisation is
+in terms of discrete wall segments), while they reason directly in the
+seam representation and restrict themselves to regularisation
+potentials defined over neighbouring image columns. We implemented the
+first extension described in their paper (``slope based smoothness terms'') but
+not the second (``model selection'') since the latter permits
+non--Manhattan structure yet all ground truth data in our dataset
+contains only Manhattan structure.
+}
 
+The performance of each system is shown in
+\figref{inf-performance}. Even when restricted to monocular features,
+our system outperforms \cite{Brostow08}, which has access to 3D
+cues. This reflects the utility of global consistency and the indoor
+Manhattan representation in our approach. The initialisation procedure
+of \cite{Lee09} fails for 31\% of our training images, so at the
+bottom of \figref{inf-performance} we show results for their system
+after excluding these images. Labelling accuracy increases to within
+3\% of our monocular--only results, though on the depth error metric a
+margin of 10\% remains. \Figref{inf-performance} also shows that joint
+estimation is superior to using any one sensor modality
+alone. Anecdotally we find that using 3D cues alone often fails within
+large textureless regions in which the structure--from--motion system
+failed to track any points, whereas stereo or monocular cues alone
+often perform better in such regions but can lack precision at corners
+and boundaries.
+
+\changedsinceviva{
+We found that the the system of Zeisl \etal was most likely to produce
+incorrect reconstructions at image columns where multiple vertical
+surface were observed, such as when looking through a window or
+doorway, or when cabinets or other box--structured furniture was
+visible. The vertical surfaces on these objects are strong attractors
+for the stereo likelihood and often caused this system to mistake, for
+example, the front of a cabinet for a wall. A similar observation was
+made by Zeisl \etal of their own system \cite{Zeisl2011}. Our own
+stereo--only experiments showed similar errors, though the addition of
+3D and monocular features often resolved these ambiguities. We note
+that even when restricted to stereo clues alone, in which case the
+systems are differentiated only by their priors, our system
+out--performed that of Zeisl \etal. One thing to note here is that our
+ground truth data always considers room boundaries to be the correct
+reconstruction, even when a wall is completely occluded by a piece of
+furniture. This reflects our goal of extracting simple and meaningful
+geometric summaries from images, and means that our system (which
+explicitly models floorplans) has an advantage on this dataset. In
+contrast, for robot navigation, which is one of the goals stated by
+Zeisl \etal, it may instead be more important to identify all vertical
+surfaces in the scene, whether walls or objects. 
+}
+
+\changedsinceviva{
 We have noticed that one source of errors is vanishing points that are
 slightly mis--estimated, which is often due to errors in the
 underlying reconstruction provided by structure--from--motion. When
 vanishing points deviate slightly from their true position, our
 reconstruction system inserts very narrow wall segments to ``correct''
-for the mis--localization, forming small zig--zags in order to track
+for the mis--localisation, forming small zig--zags in order to track
 the observed image gradients. Examples of this phenomenon are shown in
 rows 6 and 7 of \tableref{showcase}. Although this does not pose a
 major concern for our system, one way to correct for it would be to
 jointly refine structure, motion, and vanishing points, as in
-\cite{Sinha2008}.
+\cite{Sinha2008}. 
+}
 
 \Figref{timing} shows timing results for our system. For each triplet
 of frames, our system requires on average less than one second to
@@ -1845,14 +2058,18 @@ optimisation.
     \hspace{1mm} 3D only & 15.2 & 71.1 \\
     \hspace{1mm} Monocular only & 24.8 & 69.2 \\
     Brostow \etal \cite{Brostow08} && 40.6  \\  % Tue_Brostow_NoNormals_mcSVM
+    Zeisl \etal \cite{Zeisl2011} & 18.0 &  \\
     Lee \etal \cite{Lee09} & 79.8 & 45.5 \\
     \hspace{1mm}excluding failures\footnotemark & 34.1 & 66.2 \\
     \bottomrule
   \end{tabular}
   \vspace{0.2cm}
   \caption{Performance on our data--set. Labelling accuracy is the
-    percentage of correctly labeled pixels over the data--set, and
-    depth error is the mean relative depth error.}
+    percentage of correctly labelled pixels over the data--set, and
+    depth error is the mean relative depth error. There is no depth
+    error in row 5 because that system does not generate 3D models,
+    and there is no labelling error in row 6 because that system
+    does constrain surfaces to the three Manhattan orientations.}
   \label{fig:inf-performance}
 \end{table}
 \footnotetext{This row excludes cases for which \cite{Lee09}
@@ -2145,11 +2362,8 @@ hypotheses, our approach is \textit{independent} of scene complexity;
 yet our hypothesis class is a strict superset of theirs.
 
 Their approach also differs from ours in that they only allow wall
-boundaries to occur where lines are observed in the image. Our system
-can easily be extended to enforce such a constraint by including the
-$\SubProbIN$ term in \eqnref{fup-recurrence} and
-\eqnref{fdown-recurrence} only where lines are detected. However, we
-have found this to be unnecessary because the objective
+boundaries to occur where lines are observed in the image. We have
+found this to be unnecessary because the objective
 \eqnref{scene-objective} already incorporates this
 information. Furthermore, our system avoids dependence on edge
 detection, whereas Lee \etal are unable to find the correct model if
@@ -2208,7 +2422,7 @@ hyper--parameters, which we used to write the prior as a sum over
 independent penalties for each corner category in
 \eqnref{corner-penalty}. On this basis we defined sub--problems
 independently of the number of corners and were able to incorporate
-penalties as additive terms in \eqnref{fout-recurrence}. With a
+penalties as additive terms in our algorithm. With a
 non--memoryless prior this is impossible because the marginal
 probability of an additional corner is no longer independent of the
 number of corners already added.
@@ -2258,28 +2472,28 @@ so we write
 \end{equation}
 
 The only recurrence relation we need to update is
-\eqnref{fout-recurrence}. The relation for $\SubProbOUT$ becomes
+that for nodes labelled $\OUTlabel$, which becomes
 \begin{equation}
   \begin{split}
     \label{eq:fout-recurrence-aug}
-    \SubProbOUT(x,y,\WallOrient,\Counts) = 
+    \SubProb(x,y,\WallOrient,\Counts,\OUTlabel) = 
     \max_{\WallOrient'\in\{l,r\}} \max \Bigl(
-      &\SubProbUP(x,y-1,\WallOrient', 
-        \Counts-\CategoryFunc(x,\WallOrient',\WallOrient,-1)~),\\
-      &\SubProbIN(x,y,\WallOrient',
-        \Counts-\CategoryFunc(x,\WallOrient',\WallOrient,0)~),\\
-      &\SubProbDOWN(x,y+1,\WallOrient',
-        \Counts-\CategoryFunc(x,\WallOrient',\WallOrient,+1)~)~
+      &\SubProb(x,y-1,\WallOrient', 
+        \Counts-\CategoryFunc(x,\WallOrient',\WallOrient,-1), \UPlabel),\\
+      &\SubProb(x,y,\WallOrient',
+        \Counts-\CategoryFunc(x,\WallOrient',\WallOrient,0), \INlabel),\\
+      &\SubProb(x,y+1,\WallOrient',
+        \Counts-\CategoryFunc(x,\WallOrient',\WallOrient,+1), \DOWNlabel)~
     \Bigr)
   \end{split}
 \end{equation}
-Comparison with \eqnref{fout-recurrence} shows that we have replaced
+Comparison with the previous algorithm shows that we have replaced
 the penalty term with a transition from $\Counts$ to
 $\Counts'=\Counts-\CategoryFunc(\cdot)$. This means our sub--problems
 no longer incorporate penalties at all, instead we have expanded our
 state space to incorporate that information in a different form. In
 order to solve for the optimal scene we will need to enumerate many
-terminating states, replacing \eqnref{opt-entry-point} by
+terminating states:
 \begin{equation}
   \label{eq:opt-entry-point2}
   \Objective(\OptimalScene) = 
@@ -2290,7 +2504,7 @@ terminating states, replacing \eqnref{opt-entry-point} by
 \end{equation}
 
 At the cost of a substantial expansion of the state space we are
-now able to optimise with respect to a much larger class of priors.
+now able to optimise with respect to a larger class of priors.
 
 %\subsection{Upper--bounds}
 

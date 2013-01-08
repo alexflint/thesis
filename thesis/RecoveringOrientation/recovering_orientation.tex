@@ -1,12 +1,12 @@
 \begin{quote}
   In order to make use of the Manhattan world assumption we must first
   discover the orientation of the Manhattan world with respect to the
-  camera. This chapter focusses on estimating a 3D rotation that
+  camera. This chapter focuses on estimating a 3D rotation that
   transforms the three cardinal Manhattan orientations onto the $x$,
   $y$, and $z$ axes. In contrast to much previous work, we seek to
   recover this rotation given a sequence of calibrated images, such as
   may be provided by a structure--from--motion or SLAM system. Where
-  previous multiple--view approaches have focussed on surface normal
+  previous multiple--view approaches have focused on surface normal
   estimates derived from a reconstructed point cloud, we build upon
   ideas from single--view vanishing point detection and cast
   estimation in terms of photometric information. We develop a
@@ -123,7 +123,7 @@ uncalibrated camera. Their approach used a prior on camera intrinsics
 to condition the estimation process, though the estimation of three
 vanishing points was not explicitly coupled after this stage.
 
-Denis \etal \cite{denis2008efficient} took this a step further by
+Denis \etal \cite{Denis2008} took this a step further by
 exploiting a prior on the rotation $\SceneR$ learned from training
 data. Whereas Coughlan and Yuille used a discretisation of the space
 of rotations to identify $\SceneR$, they showed how to exploit the
@@ -133,16 +133,18 @@ Expectation--Maximisation approach of Schindler and Dellaert
 optimisation over rotations, leveraging the maximum likelihood
 reprojection error of Hartley and Zisserman\cite{Hartley04}.
 
+\changedsinceviva{
 Sinha \etal \cite{Sinha2008} show how vanishing points in different
-views can be optimized jointly with structure and motion inside a
+views can be optimised jointly with structure and motion inside a
 single bundle adjustment. Their approach fixes the
 line/vanishing--point associations using multi--hypothesis RANSAC in
 individual views. Structure, motion, and vanishing directions are then
-optimized jointly while holding the data associations fixed. Our approach
-differs from theirs in that (1) we optimize the data association
+optimised jointly while holding the data associations fixed. Our approach
+differs from theirs in that (1) we optimise the data association
 variables linking lines to vanishing points jointly with the vanishing
 point locations; and (2) we do not refine structure and motion using
-the vanishing points\changedsinceviva.
+the vanishing points.
+}
 
 Mirzaei and Roumeliotis \cite{Mirzaei2011} showed that
 minimising the algebraic error for three mutually orthogonal vanishing
@@ -151,15 +153,17 @@ approach assumes the algebraic error; it is not clear whether the
 reprojection error leads to a likelihood that is amenable to a
 polynomial solution.
 
+\changedsinceviva{
 Bazin \etal \cite{Bazin2012} recently proposed a novel
 globally--optimal vanishing point algorithm based on
 branch--and--bound. They search over partitions of the observed
 line segments, constrained by the requirement that each partition must
 be consistent with some vanishing point to a tolerance $\tau$. This
 approach is attractive because it is guaranteed to find the global
-optimum. The authors optimize an objective function based on the
+optimum. The authors optimise an objective function based on the
 number of consistent line segments, whereas most previous approaches
-optimize a log--likelihood.\changedsinceviva
+optimise a log--likelihood.
+}
 
 \subsection{Multiple View Approaches}
 
@@ -198,6 +202,7 @@ therefore incorporate all available evidence into a joint
 estimation. We show that this is both computationally efficient and
 avoids the fragile single--view estimation scenario.
 
+\changedsinceviva{
 The structure--from--motion system we have chosen to work with is the
 parallel tracking and mapping (PTAM) approach of Klein and Murray
 \cite{Klein07}. This approach is suitable for online experiments,
@@ -207,8 +212,9 @@ orientation drift, so the maps it builds may not be perfectly
 metric. While our results with this system are promising, we do notice
 small vanishing point inconsistencies between frames, which can lead
 to errors in our reconstructions. When operating offline, this could
-be alieviated by running global bundle adjustment prior to executing
-our system.\changedsinceviva
+be alleviated by running global bundle adjustment prior to executing
+our system.
+}
 
 \section{Generative Model}
 
@@ -229,8 +235,8 @@ our system.\changedsinceviva
   \subfloat[The reprojection error, $d$.]{
     \includegraphics[width=0.4\textwidth]{reproj-dist}
   }  
-  \caption{Illustration of our error model and various geometric
-    quantities involved in the derivations in the main text.}
+  \caption{\changedsinceviva{Illustration of our error model and various geometric
+    quantities involved in the derivations in the main text.}}
   \label{fig:line-model}
 \end{figure}
 
@@ -704,9 +710,10 @@ function. Convergence is detected when $\gamma<\epsilon_1$ and the
 value of the error function decreases by less than $\epsilon_2$ in any
 one update.
 
-\subsection{Initialization}
+\subsection{Initialisation}
 
-We initialize our EM algorithm using the clustering approach described
+\changedsinceviva{
+We initialise our EM algorithm using the clustering approach described
 by Koseck\`{a} and Zhang \cite{Zhang02}. This process begins by
 clustering observed line segments according to their orientation in
 the image plane, the basis for this being that Manhattan environments
@@ -717,9 +724,10 @@ each image separately (with $K=5$) then we estimate a least--squares
 vanishing point for each cluster that has at least 5 associated line
 segments. Finally we project vanishing points from all frames onto the
 plane at infinity and pick three that are close to mutually orthogonal
-(by enumerating all combinations). We initialize the EM algorithm with
+(by enumerating all combinations). We initialise the EM algorithm with
 an (orthonormalized) rotation matrix containing the chosen vanishing
-points as columns.\changedsinceviva
+points as columns.
+}
 
 \subsection{Summary}
 To obtain $\SceneR$ we iterate between updating $\PosteriorEst$ (the
@@ -733,7 +741,7 @@ descent.
 
 We evaluated our approach using a dataset of 18 video sequences of 8
 unique places, which we collected in indoor environments such as homes
-and office spaces. We ran an\changedsinceviva off--the--shelf bundle
+and office spaces. We ran \changedsinceviva{an} off--the--shelf bundle
 adjuster on each sequence to yield calibrated views, then transformed
 each sequence by a random 3D rotation to eliminate any bias in the
 initial conditions for our optimisation that might have been
@@ -775,7 +783,7 @@ algorithm. Unsurprisingly, the surface normal approach fails under the
 sparse structure--from--motion point clouds --- it was proposed in the
 context of dense reconstructions. Strikingly, the multiple--view
 algebraic minimiser performs consistently worse than single--image
-estimation. Our investigations suggest that this is because the
+estimation. \changedsinceviva{Our investigations suggest that this is because the
 algebraic error is an even poorer approximation to the reprojection
 error in the multiple view context than in the single--view context,
 since among many frames there is a high likelihood of observing a
@@ -783,8 +791,9 @@ vanishing point close to infinity. As a vanishing point moves towards
 infinity, the algebraic error diverges from the reprojection error,
 and the error terms for vanishing points near infinity to dominate the
 objective function. This leads to poorly reconstructed vanishing
-points since the optimization focusses almost exclusively on these
-very large error terms, ignoring the majority of the image evidence.\changedsinceviva
+points since the optimisation focuses almost exclusively on these
+very large error terms, ignoring the majority of the image evidence.
+}
 
 We ran a separate experiment to explore the relationship between the
 number of frames used for estimation and the quality of the estimated
@@ -867,13 +876,13 @@ and \ref{fig:vpt-example3}.
   \subfloat[A magnification of the third series above.]{
     \includegraphics[width=0.65\textwidth]{plots/error_vs_nframes_oursonly_with_errorbars}
   }
-  \caption{Plots showing the performance of three algorithms as the
+  \caption{\changedsinceviva{Plots showing the performance of three algorithms as the
     number of input frames is increased. We compute each data point by
     executing the relevant algorithm on sets of $n$ consecutive frames
     drawn from our dataset, where $n$ is the value shown on the
     $x$--axis. The $y$--axis shows the average distance between the
     estimated and ground truth rotation, with error bars showing 90\%
-    confidence intervals for the observed error distributions.}
+    confidence intervals for the observed error distributions.}}
   \label{fig:error-vs-nframes}
 \end{figure}
 
@@ -988,8 +997,8 @@ correctly in all of our evaluation sequences.
   \subfloat[]{
     \includegraphics[width=0.4\textwidth]{manhattan-homology-realworld}
   }
-  \caption{The mapping $\Hcf$ transfers points between the ceiling and
-    floor in the image domain. $\Hcf$ is a planar homology.}
+  \caption{\changedsinceviva{The mapping $\Hcf$ transfers points between the ceiling and
+    floor in the image domain. $\Hcf$ is a planar homology.}}
   \label{fig:fcmap}
 \end{figure}
 

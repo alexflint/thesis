@@ -187,18 +187,19 @@ unsupervised.
 \begin{figure}[htp]
   \centering
   \includegraphics[width=\textwidth]{texton_exemplars}
-  \caption{Textons identified for our dataset during the offline
-    training stage. Each panel shows a representative image patch for
-    one of the cluster identified by K--means. The patches were
-    selected by identifying the feature closest to each cluster
-    center, and then extracting a small patch about the image position
-    from which it arose. The textons are sorted by
-    decreasing frequency from top to bottom, left to right. Image
-    patches are converted to grayscale before filtering, but here we
-    show them in colour to assist visualization. The patches vary in
-    size due to clipping near image boundaries (this does not affect
-    clustering).
-    % \changedsinceviva
+  \caption{\changedsinceviva{
+      Textons identified for our dataset during the offline
+      training stage. Each panel shows a representative image patch for
+      one of the cluster identified by K--means. The patches were
+      selected by identifying the feature closest to each cluster
+      centre, and then extracting a small patch about the image position
+      from which it arose. The textons are sorted by
+      decreasing frequency from top to bottom, left to right. Image
+      patches are converted to grayscale before filtering, but here we
+      show them in colour to assist visualisation. The patches vary in
+      size due to clipping near image boundaries (this does not affect
+      clustering).
+    }
   }
   \label{fig:textons-generated}
 \end{figure}
@@ -304,6 +305,7 @@ have used Parzen windowing \cite{Parzen62} for the continuous variable
 $s_{i,j}$ but due to the very large number of samples we obtain for
 each image, we found this to be unnecessary.
 
+\changedsinceviva{
 For images of reasonable size the cost of enumerating all $N^2$ texton
 pairs is prohibitively expensive. We overcome this by overlaying an $M
 \times M$ grid on the image and counting the occurrences of each
@@ -320,7 +322,8 @@ note that quantizing displacements in this way implicitly shares
 information between similar displacements. One could think of this
 operation as an efficient approximation to building the full joint
 distribution and then smoothing along the displacement
-axis.\changedsinceviva
+axis.
+}
 
 During training we evaluate these aggregated observations by
 multiplying the entry we make in the histogram by $n^a_i n^b_j$, and
@@ -565,7 +568,7 @@ significantly faster than performing the original convolution.
 
 \subsection{Parallelization over filters}
 Generating the pixel features requires convolving an input image with
-12 different filters. To leverage the parallelization capabilities of
+12 different filters. To leverage the parallelism of
 modern multi--core CPUs we execute the convolutions in parallel where
 possible. This approach allows parallelization within a single scale,
 but requires synchronisation upon completion of each scale due to the
@@ -592,14 +595,16 @@ others. It improves over the baseline strategy by a factor of $5$ for
 the $320 \times 240$ image and by a factor of $6$ for the $640 \times
 480$ image.
 
-It is interesting to note that when the image is enlarged to
-include four times as many pixels, the three CPU--based strategies
-degrade by a factor very close to four, whereas the GPU implementation
-degrades by a factor closer to three. This indicates that this task
-saturates CPU performance but that a significant overhead remains in
-the GPU implementation. This matches our observation in the previous
-section that transmitting data between the CPU and GPU consumes much
-time, and that further performance improvements are possible.
+
+It is interesting to note \changedsinceviva{that when} the image is
+enlarged to include four times as many pixels, the three CPU--based
+strategies degrade by a factor very close to four, whereas the GPU
+implementation degrades by a factor closer to three. This indicates
+that this task saturates CPU performance but that a significant
+overhead remains in the GPU implementation. This matches our
+observation in the previous section that transmitting data between the
+CPU and GPU consumes much time, and that further performance
+improvements are possible.
 
 
 

@@ -117,9 +117,6 @@
 \newcommand\DepthPayoff{\PixelPayoff_{\textsf{3D}}}
 \newcommand\JointPayoff{\PixelPayoff_{\textsf{joint}}}
 
-\newcommand\bestvalue{\text{\textsf{BestValueUpTo}}}
-\newcommand\edgevalue{\text{\textsf{EdgeValue}}}
-
 % Input parameters
 \newcommand\Width{W}
 \newcommand\Height{H}
@@ -197,7 +194,17 @@
 \newcommand\tOUT{\tau_{\OUT}}
 \newcommand\tON{\tau_{\ON}}
 
-\newcommand\SubProb{\text{\textsf{BestValueUpTo}}}
+% Dynamic programming
+\newcommand\bestvalue{V}
+\newcommand\edgevalue{\Delta}
+\newcommand\SubProb{\text{\textsf{Best}}}
+
+\newcommand\INlabel{\texttt{IN}}
+\newcommand\OUTlabel{\texttt{OUT}}
+\newcommand\UPlabel{\texttt{UP}}
+\newcommand\DOWNlabel{\texttt{DOWN}}
+
+% TODO: remove these, write them instead as V(x,y,o,IN/OUT/UP/DOWN)
 \newcommand\SubProbIN{\Objective_{in}}
 \newcommand\SubProbOUT{\Objective_{out}}
 \newcommand\SubProbUP{\Objective_{up}}
@@ -205,7 +212,7 @@
 
 % Optimal sub--structure proof
 \newcommand\OptimalScene{\Scene^*}
-\newcommand\EstimatedScene{\hat{\Scene}}
+%\newcommand\EstimatedScene{\hat{\Scene}}
 \newcommand\PartialScene{\Scene}
 \newcommand\PartialSeam{\Seam}
 \newcommand\OtherScene{Q}
@@ -219,7 +226,7 @@
 \newcommand\StateSpace{\mathcal{S}}
 \newcommand\FeasibleSet{\mathcal{F}}
 
-\newcommand\Length[1]{|\!#1\!|}
+\newcommand\Length[1]{|#1|}
 \newcommand\SceneLen{\Length{\PartialScene}}
 
 \newcommand\DepthAtPGivenModel{\ComputedDepth(\Pixel;\Scene)}
@@ -352,4 +359,6 @@
 % SINCE VIVA' footnote on it. Then I will change this to a null macro,
 % re-build the PDF and send them the clean version along with my list
 % of changes.
-\newcommand\changedsinceviva{\footnote{CHANGED SINCE VIVA}}
+%\newcommand\changedsinceviva{\textcolor{red}{$\Diamond$}}
+%\newcommand\changedsinceviva[1]{\textcolor{red}{#1}}
+\newcommand\changedsinceviva[1]{#1}
