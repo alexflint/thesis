@@ -33,7 +33,7 @@ We adopt the standard approach in machine learning of distinguishing a
 learning phase --- a one--off computation performed ahead of time ---
 from the inference phase --- in which the results of the learning
 phase are used to label incoming training examples. This chapter
-focusses on the learning phase; we will show that under the learning
+focuses on the learning phase; we will show that under the learning
 scheme we propose, inference reduces to exactly the algorithm
 presented in the previous chapter. As a result, the approach described
 in this chapter is strictly complimentary to the inference algorithm
@@ -65,11 +65,11 @@ For learning we employ the tools of structured prediction --- in
 particular, the structured support vector machine
 \cite{Tsochantaridis04}. The use of these tools is part of a long
 trend within computer vision towards statistically rigorous,
-well--understood convex optimisation techniques. Recent successfully
-applications of the structured SVM include detection
-\cite{blaschko2008learning}, segmentation
-\cite{Szummer2008,taskar2004max}, and scene classification
-\cite{Yang2010}\changedsinceviva. In the domain of reconstruction,
+well--understood convex optimisation
+techniques. \changedsinceviva{Recent successfully applications of the
+  structured SVM include detection \cite{blaschko2008learning},
+  segmentation \cite{Szummer2008,taskar2004max}, and scene
+  classification \cite{Yang2010}}. In the domain of reconstruction,
 structured prediction ideas have been applied to several simple model
 classes such as stereo disparities \cite{li2008learning} and cuboids
 \cite{Hedau09}.
@@ -114,15 +114,15 @@ minimising the expected loss
   \int \Loss\bigl(\Predictor(\inp),\outp\bigr) ~ \intd P(\inp,\outp)
 \end{equation}
 with respect to the predictor $\Predictor$, where $\Loss$ is a loss
-function. Given training samples
+function. \changedsinceviva{Given training samples
 $(\inp_i,\outp_i)\in\mathcal{X}\cross\mathcal{Y}$, the integral above
-is approximated by\changedsinceviva
+is approximated by}
 \begin{equation}
   \label{eq:erm}
   \sum_i \Loss\bigl(\Predictor(\inp_i),\outp_i\bigr)~.
 \end{equation}
-Structural risk minimisation techniques add a regulariser
-$\mathcal{R}$:\changedsinceviva
+\changedsinceviva{Structural risk minimisation techniques add a regulariser
+$\mathcal{R}$:}
 \begin{equation}
   \label{eq:srm}
   \mathcal{R}(\Predictor) + \sum_i \Loss\bigl(\Predictor(\inp_i),\outp_i\bigr)
@@ -139,7 +139,7 @@ function. In this case equation \eqnref{srm} becomes
   \|\Model\|^2 + \sum h(\outp_i, \Model \cdot \inp_i))
 \end{equation}
 where $h$ is the hinge loss, and learning consists of minimisation
-with respect to $\Model$. Rewriting the hinge loss as a penalized
+with respect to $\Model$. Rewriting the hinge loss as a penalised
 linear constraint leads to the well--known quadratic programming
 formulation for the SVM \cite{Cortes1995}.
 
@@ -169,7 +169,7 @@ used to define the objective function,
 \end{equation}
 In order to optimise with respect to $\Model$, Toschantaridis \etal
 showed how to write \eqnref{first-ssvm} as a constrained optimisation
-problem paralleling the classic SVM:
+problem parallelling the classic SVM:
 \begin{equation}
   \begin{split}
     \min_{\Model,\Slacks} &
@@ -374,8 +374,8 @@ first order Taylor expansion about $\IndModelo$ as follows.
       {P(\Depth_i~|~\Seam,\Ind) P(\Ind~|~\IndModel)}
       {\sum_{\Ind} P(\Depth_i~|~\Seam,\Ind_i) P(\Ind~|~\IndModelo)} + O(1) ~.
 \end{eqnarray}
-In our experiments we linearize about
-$\IndModelo=(\frac{1}{3},\frac{1}{3},\frac{1}{3})$. It follows that by
+\changedsinceviva{In our experiments we linearize about
+$\IndModelo=(\frac{1}{3},\frac{1}{3},\frac{1}{3})$}. By
 defining
 \begin{equation}
   \JointFtr_{\textsf{3D}}(\Depths,\Seam) =
@@ -725,6 +725,7 @@ seconds in duration. We sampled key--frames at regular intervals. Each
 ``instance'' in our training and hold--out sets consists of one base
 frame together with four auxiliary frames.
 
+\changedsinceviva{
 Ground truth for this dataset was acquired by reconstructing the
 camera trajectory using a SLAM system (we worked with PTAM
 \cite{Klein07}). This system is designed for real--time operation and
@@ -735,9 +736,9 @@ indoor Manhattan scenes, and so there is some ambiguity in how we
 should construct the ground--truth floorplans. For example, there is a
 stairwell at the end of one sequence, which is shown near the bottom
 of \tableref{learned-showcase}. It is hard to define any sensible
-indoor Manhattan model from this environment, but rather than
+indoor Manhattan model for this environment, but rather than
 eliminating it from the dataset, we leave it in to understand the
-performance of our system in adverse conditions.\changedsinceviva
+performance of our system in adverse conditions.}
 
 We compared with the bootstrapping approach described in
 \cite{Flint11} and outlined in the preceding chapter. Our metrics
@@ -965,10 +966,10 @@ alone}
   \subfloat[Weight vector learned for multiple view features]{
     \includegraphics[width=0.8\textwidth]{weights-multiview}
   }
-  \caption{Final weight vector that was learned for the single-- and
-    multiple--view feature spaces. The two figures each show the
-    weights learned when minimizing the labelling loss and when
-    minimizing the depth loss.}
+  \caption{\changedsinceviva{Final weight vector that was learned for
+      the single-- and multiple--view feature spaces. The two figures
+      each show the weights learned when minimizing the labelling loss
+      and when minimising the depth loss.}}
   \label{fig:learned-weights}
 \end{figure}
 
@@ -1092,7 +1093,7 @@ higher volatility during the exploration phase.
       described in \chapref{inference} and in \cite{Flint11}. The
       first two columns correspond to the predictors trained on
       $\DepthLoss$ and $\LblLoss$ respectively, the third column is
-      from \chapref{inference} using photometric featues alone, and
+      from \chapref{inference} using photometric features alone, and
       the fourth column is ground truth. This figure shows samples
       from the hold--out set, and were selected uniformly at random
       for inclusion here.}\\
